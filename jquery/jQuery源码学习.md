@@ -503,11 +503,11 @@ $('parent > child') // YES
 ```javascript
 // NO
 for (i = 0 ; i < 10000; i ++ ) {   
-    var a= $( ' .aaron' );   
+    var a= $( ' .class' );   
     a.append(i);   
 }
 // YES
-var a= $( ' .aaron' );
+var a= $( ' .class' );
 for (i = 0 ; i < 10000; i ++ ) {   
     a.append(i);   
 }

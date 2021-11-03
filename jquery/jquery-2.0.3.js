@@ -1046,6 +1046,7 @@ try {
 }
 
 function Sizzle( selector, context, results, seed ) {
+	debugger
 	var match, elem, m, nodeType,
 		// QSA vars
 		i, groups, old, nid, newContext, newSelector;
@@ -1065,7 +1066,7 @@ function Sizzle( selector, context, results, seed ) {
 		return [];
 	}
 
-	if ( documentIsHTML && !seed ) {
+	if ( !documentIsHTML && !seed ) {
 
 		// Shortcuts
 		if ( (match = rquickExpr.exec( selector )) ) {
@@ -2571,6 +2572,7 @@ function matcherFromTokens( tokens ) {
 }
 
 function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
+	debugger
 	// A counter to specify which element is currently being matched
 	var matcherCachedRuns = 0,
 		bySet = setMatchers.length > 0,
@@ -2672,6 +2674,7 @@ function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
 }
 
 compile = Sizzle.compile = function( selector, group /* Internal Use Only */ ) {
+	debugger
 	var i,
 		setMatchers = [],
 		elementMatchers = [],
@@ -2691,6 +2694,8 @@ compile = Sizzle.compile = function( selector, group /* Internal Use Only */ ) {
 				elementMatchers.push( cached );
 			}
 		}
+		console.log(setMatchers);
+		console.log(elementMatchers);
 
 		// Cache the compiled function
 		cached = compilerCache( selector, matcherFromGroupMatchers( elementMatchers, setMatchers ) );
@@ -2708,9 +2713,10 @@ function multipleContexts( selector, contexts, results ) {
 }
 
 function select( selector, context, results, seed ) {
+	debugger
 	var i, tokens, token, type, find,
 		match = tokenize( selector );
-
+    console.log(match);
 	if ( !seed ) {
 		// Try to minimize operations if there is only one group
 		if ( match.length === 1 ) {
