@@ -1,2 +1,2 @@
 # LearningDocument
-日常的学习文档
+目前主要包括读源码的文档。
