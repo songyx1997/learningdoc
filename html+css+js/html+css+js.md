@@ -136,7 +136,7 @@ em（1em=1fontSize）是相对于字体大小来计算，rem相对于根元素�
 }
 ```
 
-##### ☆浮动☆
+##### 浮动
 
 脱离文档流的特点：不独占一行、宽高可设置、默认宽高取决于内容（无论块元素与行内元素）。
 
@@ -214,7 +214,7 @@ BFC：块级格式化环境。
 除启动BFC外，最完美的方式为（伪类+清除浮动）。
 
 ```css
-/* 既可以解决高度塌陷（after+全部三行），又可以解决外边距重叠（before+前两行）。 */
+/* 既可以解决高度塌陷（after+全部三行），又可以解决外边距重叠（before+前两行） */
 .father::before,
 .father::after {
     content: '';
@@ -249,9 +249,9 @@ BFC：块级格式化环境。
         height: 100px;
         background-color: red;
         position: absolute;
-        /*水平居中*/
+        /* 水平居中 */
         margin: auto;
-        /*垂直居中*/
+        /* 垂直居中 */
         top: 0;
         left: 0;
         right: 0;
@@ -259,3 +259,122 @@ BFC：块级格式化环境。
     }
 </style>
 ```
+
+##### 字体
+
+字体类别：`serif`（衬线字体）、`sans-serif`（非衬线字体）、`monospace`（等宽字体）。一般放于`font-family`最后，用于兜底。
+
+单行文字垂直居中：`line-height=height`。
+
+字体的垂直对齐：`vertical-align`（top、bottom、middle），也可用于元素垂直居中（不常用）。
+
+```html
+<html>
+<body>
+    <div class="father">
+        <div class="son"></div>
+    </div>
+</body>
+</html>
+<style>
+    .father {
+        width: 400px;
+        height: 400px;
+        background-color: orange;
+        /* 垂直居中 */
+        display: table-cell;
+        vertical-align: middle;
+    }
+    .son {
+        width: 100px;
+        height: 100px;
+        background-color: red;
+        /* 水平居中 */
+        margin: 0auto;
+    }
+</style>
+```
+
+文字溢出时显示为省略号，四种属性缺一不可。
+
+```css
+.father {
+    width: 100px;
+    /* 空白处理：不换行 */
+    white-space: nowrap;
+    overflow: hidden;
+    /* 文字溢出显示方式：省略号 */
+    text-overflow: ellipsis;
+}
+```
+
+`text-decoration`用于设置或删除文本装饰。`text-transform`用于指定文本中的大写和小写字母。`text-shadow`为文本添加阴影，依次为水平阴影、垂直阴影、模糊效果、阴影颜色。`font-style`主要用于指定斜体文本。
+
+```css
+p {
+    text-decoration: underline;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 5px red;
+    font-style: italic;
+}
+```
+
+##### 背景
+
+```css
+body {
+    background-image: url("tree.png");
+    /* 不重复（no-repeat）、水平重复（repeat-x）、垂直重复（repeat-y） */
+    background-repeat: no-repeat;
+    /* 不随页面滚动（fixed）、随页面滚动（scroll） */
+    background-attachment: fixed;
+    /* 铺满元素（cover）、在元素中完整显示图片（contain） */
+    background-size: contain;
+    /* 指定位置（水平偏移、垂直偏移），常用于雪碧图。也可以指定方位：左上（left top） */
+    background-position: 50px 100px;
+}
+```
+
+##### 宽度
+
+`max-width`窗口缩小至指定宽度内时，元素宽度随着窗口大小变化。`min-width`窗口缩小至指定宽度内时，元素宽度保持不变，出现水平滚动条。
+
+##### 过渡
+
+鼠标悬停时元素的显示效果。
+
+```css
+.div {
+    /*属性名、持续时间、速度曲线、延迟时间*/
+    transition: property duration timing-function delay;
+}
+```
+
+借助过渡实现按钮放大。
+
+```html
+<html>
+<body>
+    <div class="box">OH!</div>
+</body>
+</html>
+<style>
+    .box {
+        width: 60px;
+        font-size: 20px;
+        background-color: #d2e395;
+        border-radius: 10px;
+        text-align: center;
+        vertical-align: middle;
+        transition: width 2s, font-size 2s, background-color 1s;
+        cursor: pointer;
+    }
+    .box:hover {
+        width: 120px;
+        font-size: 40px;
+        background-color: #22c9e2;
+    }
+</style>
+```
+
+##### 动画
