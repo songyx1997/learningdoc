@@ -328,7 +328,7 @@ body {
     background-repeat: no-repeat;
     /* 不随页面滚动（fixed）、随页面滚动（scroll） */
     background-attachment: fixed;
-    /* 铺满元素（cover）、在元素中完整显示图片（contain） */
+    /* 铺满元素（cover）、在元素中完整显示图片（contain），类似于img中的object-fit */
     background-size: contain;
     /* 指定位置（水平偏移、垂直偏移），常用于雪碧图。也可以指定方位：左上（left top） */
     background-position: 50px 100px;
@@ -339,42 +339,236 @@ body {
 
 `max-width`窗口缩小至指定宽度内时，元素宽度随着窗口大小变化。`min-width`窗口缩小至指定宽度内时，元素宽度保持不变，出现水平滚动条。
 
-##### 过渡
+##### transition
 
 鼠标悬停时元素的显示效果。
 
 ```css
 .div {
-    /*属性名、持续时间、速度曲线、延迟时间*/
+    /* 属性名、持续时间、速度曲线、延迟时间 */
     transition: property duration timing-function delay;
 }
 ```
 
-借助过渡实现按钮放大。
+##### animation
+
+```css
+div {
+    /* 关键帧、持续时间、速度曲线、延迟时间、播放次数（数值n、无限infinite）、是否反向播放（默认否normal、是alternate） */
+    animation: name duration timing-function delay iteration-count direction;
+}
+```
+
+动画实现：雪碧图宽度为456px，包括四个动作。因此宽度为114px、速度曲线为steps(4)。
 
 ```html
 <html>
 <body>
-    <div class="box">OH!</div>
+    <div class="box"></div>
 </body>
 </html>
 <style>
     .box {
+        width: 114px;
+        height: 138px;
+        background-image: url('./sprite.jpg');
+        animation: example 1s steps(4) infinite;
+    }
+    @keyframes example {
+        from {
+            background-position: 0 0;
+        }
+        to {
+            background-position: -456px 0;
+        }
+    }
+</style>
+```
+
+##### transform
+
+`transform: translate(50px,100px)`从其当前位置向右移动50个`px`，并向下移动100个`px`。
+
+绝对定位使元素水平垂直居中存在的问题：子元素若未定义宽高，宽高通过内部元素填充获得，则该方法失效。但可以通过转换进行优化。
+
+```html
+<html>
+<body>
+    <div class="father">
+        <div class="son">通过内部元素填充宽高</div>
+    </div>
+</body>
+</html>
+<style>
+    .father {
+        width: 400px;
+        height: 400px;
+        background-color: orange;
+        position: relative;
+    }
+    .son {
+        background-color: red;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+```
+
+`rotateX()`绕`x`轴旋转。`rotateY()`绕`y`轴旋转。`rotateZ()`括号内为正则顺时针旋转，括号内为负则逆时针旋转。
+
+实现时钟动画效果。
+
+```html
+<html>
+<body>
+    <div class="panel">
+        <div class="second-box">
+            <div class="second"></div>
+        </div>
+    </div>
+</body>
+</html>
+<style>
+    .panel {
+        width: 300px;
+        height: 300px;
+        margin: 100px auto;
+        border: 5px solid black;
+        border-radius: 50%;
+        position: relative;
+    }
+    .panel > div {
+        margin: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+    .second-box {
+        width: 100%;
+        height: 100%;
+        animation: run 60s steps(60)infinite;
+    }
+    .second {
+        width: 2px;
+        height: 50%;
+        margin: 0 auto;
+        background-color: red;
+    }
+    @keyframes run {
+        from {
+            transform: rotateZ(0);
+        }
+        to {
+            transform: rotateZ(360deg);
+        }
+    }
+</style>
+```
+
+`scale(2,3)`元素增大为其原始宽度的两倍和其原始高度的三倍，可用于实现按钮、图片放大。
+
+```html
+<html>
+<body>
+    <div class="box">BUY!</div>
+</body>
+</html>
+<style>
+    .box {
+        margin: 100px;
         width: 60px;
         font-size: 20px;
         background-color: #d2e395;
         border-radius: 10px;
         text-align: center;
         vertical-align: middle;
-        transition: width 2s, font-size 2s, background-color 1s;
+        transition: transform 2s, background-color 1s;
         cursor: pointer;
+        /* 指定变形的原点，默认为center */
+        transform-origin: 0 0;
     }
     .box:hover {
-        width: 120px;
-        font-size: 40px;
+        transform: scale(2, 2);
         background-color: #22c9e2;
     }
 </style>
 ```
 
-##### 动画
+##### flex
+
+容器相关：
+
+`flex-direction`定义父元素要在哪个方向上堆叠 flex 项目，依次为：从左到右、从右到左、从上到下、从下到上。
+
+`flex-wrap`规定是否应该对 flex 项目换行，依次为：默认不换行、必要时进行换行、相反顺序换行。
+
+```css
+.box {
+    display: flex;
+    flex-direction: row | row-reverse | column | column-reverse;
+    flex-wrap: nowrap | wrap | wrap-reverse;
+}
+```
+
+`justify-content`定义了项目在主轴（水平方向）上的对齐方式，依次为：默认左对齐、右对齐、居中、项目之间的间隔都相等、每个项目两侧的间隔相等。
+
+```css
+.box {
+    display: flex;
+    justify-content: flex-start | flex-end | center | space-between | space-around;
+}
+```
+
+`align-items`定义项目在交叉轴（竖直方向）上的对齐方式，依次为：默认占满整个容器的高度、交叉轴的起点对齐、交叉轴的终点对齐、交叉轴的中点对齐、项目的第一行文字的基线对齐。
+
+```css
+.box {
+    display: flex;
+    align-items: stretch | flex-start | flex-end | center | baseline;
+}
+```
+
+由于换行产生了多条水平轴线，`align-content`定义了多根轴线的对齐方式，依次为：与交叉轴的起点对齐、与交叉轴的终点对齐、与交叉轴的中点对齐、轴线之间的间隔平均分布、每根轴线两侧的间隔都相等、默认轴线占满整个交叉轴。
+
+```CSS
+.box {
+    display: flex;
+    flex-wrap: wrap align-content: flex-start | flex-end | center | space-between | space-around | stretch;
+}
+```
+
+项目相关：
+
+`order` 定义项目的排列顺序。数值越小，排列越靠前，默认为0。
+
+`flex-grow` 规定某个项目相对于其余项目将增长多少，默认为0。
+
+`flex-shrink` 规定某个项目相对于其余项目将收缩多少，默认为1。如果一个项目的 flex-shrink 属性为0，其他项目都为1，则空间不足时，前者不缩小。
+
+`flex-basis`规定项目的初始长度，默认值为`auto`，即项目的本来大小。
+
+`flex: 1`或者`flex: auto`相当于`flex-grow: 1; flex-shrink: 1; flex-basis: auto`。
+
+```css
+.item {
+    width: 200px;
+    height: 200px;
+    order: 2;
+    flex: 1 1 auto;
+}
+```
+
+`align-self`允许单个项目有与其他项目不一样的对齐方式，可覆盖`align-items`。默认值为`auto`，表示继承父元素的`align-items`属性，如果没有父元素，则等同于`stretch`。
+
+```css
+.item {
+    align-self: auto | flex-start | flex-end | center | baseline | stretch;
+}
+```
+
+#### 3. JS
+
