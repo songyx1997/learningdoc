@@ -570,5 +570,124 @@ div {
 }
 ```
 
-#### 3. JS
+##### viewport
 
+默认情况下，移动端的网页都会将视口`viewport`设置为980像素。如果网页设置宽度超过了980像素，移动端则会对网页进行缩放以完整显示网页。
+
+```html
+<!-- 将网页视口设置为完美视口，无该设置则为默认情况，移动端适配必须设置完美视口 -->
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+```
+
+移动端设计图纸宽度为750px，通过`vw`适配，(100vw/750px)*100=13.333，为了方便编写，可借助`less`。
+
+```html
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body>
+    <div class="box"></div>
+</body>
+<style>
+    html {
+        font-size: 13.333vw;
+    }
+    .box {
+        width: 7.5rem;
+        height: 100px;
+        background-color: orange;
+    }
+</style>
+```
+
+#### 3. LESS
+
+##### 变量
+
+变量的使用遵循就近原则。
+
+```less
+@basewidth: 100px;
+@basewidth: 200px;
+@mkdir: myImgs;
+
+div {
+    width: @basewidth;
+    height: 200px;
+    line-height: $height;
+    background-image:url('/@{mkdir}/img1.jpg');
+}
+```
+
+##### 嵌套
+
+`&`表示当前选择器的父级。
+
+```less
+.box {
+    color: black;
+    >a {
+        color: red;
+        &:hover {
+            color: orange;
+        }
+    }
+    &-subBox {
+        color: pink;
+    }
+}
+```
+
+##### extend
+
+```less
+.father {
+    width: 100px;
+    height: 100px;
+}
+.mother {
+    color: red;
+    font-size: 16px;
+}
+.son:extend(.father, .mother) {
+    margin: 0 auto;
+}
+```
+
+##### mixins
+
+```less
+.father {
+    color: red;
+}
+.son {
+    .father;
+    margin: 0 auto;
+}
+```
+
+混合函数可以定义参数，并可设置参数默认值。
+
+```less
+.standard-box(@width, @height, @backgroundColor: red) {
+    width: @width;
+    height: @height;
+    background-color: @backgroundColor;
+}
+.box {
+    margin: 0 auto;
+    .standard-box(100px, 200px);
+}
+```
+
+##### 运算
+
+算术运算符`+`、`-`、`*`、`/`可以对任何数字、颜色或变量进行运算。计算的结果以最左侧操作数的单位类型为准。
+
+##### 导入
+
+使用其他文件中的变量与函数，如果导入的文件是`.less`扩展名，则可以将扩展名省略掉。
+
+#### 4. JS
