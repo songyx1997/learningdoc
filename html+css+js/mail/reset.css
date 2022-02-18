@@ -54,8 +54,16 @@ a{
   border-radius: 5px;
   background-color: rgba(0, 0, 0, 0.1);
 }
-html, body{
-  font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", "微软雅黑", sans-serif;
+html,
+body {
+  font: 14px/1.5 Helvetica Neue,
+    Helvetica,
+    Arial,
+    Microsoft Yahei,
+    Hiragino Sans GB,
+    Heiti SC,
+    WenQuanYi Micro Hei,
+    sans-serif;
 }
 .clearfix:before,
 .clearfix:after{

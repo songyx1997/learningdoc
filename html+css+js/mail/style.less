@@ -1,0 +1,60 @@
+@min-width: 1226px;
+@balck: #333333;
+@grey: #b0b0b0;
+@white: white;
+
+body {
+    min-width: @min-width;
+}
+
+// 导航条列之间的分隔线
+.divider(@content, @color) {
+    content: @content;
+    color: @color;
+    margin: 0 .6em;
+}
+
+.topBar {
+    font-size: 12px;
+    background-color: @balck;
+    width: 100%;
+
+    &-contain {
+        line-height: 40px;
+        width: @min-width;
+        margin: 0 auto;
+
+        li {
+            float: left;
+
+            &:not(:nth-last-of-type(1))::after {
+                .divider('I', #424242);
+            }
+        }
+
+        a {
+            color: @grey;
+
+            &:hover {
+                color: @white;
+            }
+        }
+    }
+
+    &-left {
+        float: left;
+    }
+
+    &-right {
+        float: right;
+
+        ul {
+            float: left;
+        }
+
+        .shop-cart {
+            float: right;
+            width: 120px;
+        }
+    }
+}

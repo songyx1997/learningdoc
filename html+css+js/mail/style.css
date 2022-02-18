@@ -1,0 +1,40 @@
+body {
+  min-width: 1226px;
+}
+.topBar {
+  font-size: 12px;
+  background-color: #333333;
+  width: 100%;
+}
+.topBar-contain {
+  line-height: 40px;
+  width: 1226px;
+  margin: 0 auto;
+}
+.topBar-contain li {
+  float: left;
+}
+.topBar-contain li:not(:nth-last-of-type(1))::after {
+  content: 'I';
+  color: #424242;
+  margin: 0 0.6em;
+}
+.topBar-contain a {
+  color: #b0b0b0;
+}
+.topBar-contain a:hover {
+  color: white;
+}
+.topBar-left {
+  float: left;
+}
+.topBar-right {
+  float: right;
+}
+.topBar-right ul {
+  float: left;
+}
+.topBar-right .shop-cart {
+  float: right;
+  width: 120px;
+}
