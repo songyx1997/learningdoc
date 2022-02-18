@@ -1,22 +1,16 @@
 @min-width: 1226px;
-@balck: #333333;
+@black: #333333;
 @grey: #b0b0b0;
 @white: white;
+@orange: #ff6700;
 
 body {
     min-width: @min-width;
 }
 
-// 导航条列之间的分隔线
-.divider(@content, @color) {
-    content: @content;
-    color: @color;
-    margin: 0 .6em;
-}
-
 .topBar {
     font-size: 12px;
-    background-color: @balck;
+    background-color: @black;
     width: 100%;
 
     &-contain {
@@ -27,8 +21,11 @@ body {
         li {
             float: left;
 
+            // 导航条列之间的分隔线
             &:not(:nth-last-of-type(1))::after {
-                .divider('I', #424242);
+                content: 'I';
+                color: darken(@black, -10%);
+                margin: 0 .6em;
             }
         }
 
@@ -45,16 +42,59 @@ body {
         float: left;
     }
 
-    &-right {
+    &-user {
         float: right;
+    }
 
-        ul {
-            float: left;
+    &-cart {
+        color: @grey;
+        float: right;
+        margin-left: 2em;
+        position: relative;
+        background-color: darken(@black, -10%);
+
+        .cart-icon {
+            width: 10em;
+            cursor: pointer;
+            text-align: center;
         }
 
-        .shop-cart {
-            float: right;
-            width: 120px;
+        .cart-panel {
+            color: @black;
+            width: 27em;
+            height: 0px;
+            /* 设置绝对定位使其脱离文档流 */
+            position: absolute;
+            right: 0;
+            z-index: 1;
+            box-shadow: 0px 2px 10px fade(@black, 15%);
+            transition: height .3s;
+
+            span {
+                display: none;
+            }
+        }
+
+        &:hover {
+            color: @orange;
+
+            .cart-icon {
+                /* 遮挡面板的阴影 */
+                position: relative;
+                z-index: 2;
+                background-color: @white;
+            }
+
+            .cart-panel {
+                height: 100px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                span {
+                    display: inline;
+                }
+            }
         }
     }
 }
