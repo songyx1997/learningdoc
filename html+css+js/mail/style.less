@@ -8,37 +8,40 @@ body {
     min-width: @min-width;
 }
 
+.container {
+    width: @min-width;
+    margin: 0 auto;
+}
+
+/* 配置导航条 */
+@topBar-height: 40px;
+
 .topBar {
     font-size: 12px;
     background-color: @black;
     width: 100%;
 
-    &-contain {
-        line-height: 40px;
-        width: @min-width;
-        margin: 0 auto;
+    li {
+        float: left;
 
-        li {
-            float: left;
-
-            // 导航条列之间的分隔线
-            &:not(:nth-last-of-type(1))::after {
-                content: 'I';
-                color: darken(@black, -10%);
-                margin: 0 .6em;
-            }
-        }
-
-        a {
-            color: @grey;
-
-            &:hover {
-                color: @white;
-            }
+        // 导航条列之间的分隔线
+        &:not(:nth-last-of-type(1))::after {
+            content: 'I';
+            color: darken(@black, -10%);
+            margin: 0 .6em;
         }
     }
 
-    &-left {
+    a {
+        color: @grey;
+        line-height: @topBar-height;
+
+        &:hover {
+            color: @white;
+        }
+    }
+
+    &-item {
         float: left;
     }
 
@@ -55,6 +58,7 @@ body {
 
         .cart-icon {
             width: 10em;
+            line-height: @topBar-height;
             cursor: pointer;
             text-align: center;
         }
@@ -96,5 +100,47 @@ body {
                 }
             }
         }
+    }
+}
+
+/* 头部 */
+.header {
+    font-size: 16px;
+    width: 100%;
+
+    &-logo {
+        float: left;
+
+        img {
+            padding-top: 22px;
+            width: 3.5em;
+            height: 3.5em;
+        }
+    }
+
+    &-nav {
+        float: left;
+        width: 54.625em;
+        height: 100px;
+        padding-left: 11.75em;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+
+        li {
+            padding-right: 1.25em;
+        }
+    }
+
+    &-search {
+        float: right;
+        width: 18.5em;
+        padding-top: 25px;
+
+        // input {
+        //     font-size: 1rem;
+        //     width: 100%;
+        //     height: 50px;
+        // }
     }
 }

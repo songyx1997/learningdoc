@@ -1,31 +1,32 @@
 body {
   min-width: 1226px;
 }
+.container {
+  width: 1226px;
+  margin: 0 auto;
+}
+/* 配置导航条 */
 .topBar {
   font-size: 12px;
   background-color: #333333;
   width: 100%;
 }
-.topBar-contain {
-  line-height: 40px;
-  width: 1226px;
-  margin: 0 auto;
-}
-.topBar-contain li {
+.topBar li {
   float: left;
 }
-.topBar-contain li:not(:nth-last-of-type(1))::after {
+.topBar li:not(:nth-last-of-type(1))::after {
   content: 'I';
   color: #4d4d4d;
   margin: 0 0.6em;
 }
-.topBar-contain a {
+.topBar a {
   color: #b0b0b0;
+  line-height: 40px;
 }
-.topBar-contain a:hover {
+.topBar a:hover {
   color: white;
 }
-.topBar-left {
+.topBar-item {
   float: left;
 }
 .topBar-user {
@@ -40,6 +41,7 @@ body {
 }
 .topBar-cart .cart-icon {
   width: 10em;
+  line-height: 40px;
   cursor: pointer;
   text-align: center;
 }
@@ -74,4 +76,34 @@ body {
 }
 .topBar-cart:hover .cart-panel span {
   display: inline;
+}
+/* 头部 */
+.header {
+  font-size: 16px;
+  width: 100%;
+}
+.header-logo {
+  float: left;
+}
+.header-logo img {
+  padding-top: 22px;
+  width: 3.5em;
+  height: 3.5em;
+}
+.header-nav {
+  float: left;
+  width: 54.625em;
+  height: 100px;
+  padding-left: 11.75em;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+.header-nav li {
+  padding-right: 1.25em;
+}
+.header-search {
+  float: right;
+  width: 18.5em;
+  padding-top: 25px;
 }

@@ -43,6 +43,7 @@ table {
 
 /* 自定义 */
 a{
+  color: #333333;
   text-decoration: none;
 }
 ::-webkit-scrollbar {
