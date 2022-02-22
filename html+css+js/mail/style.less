@@ -1,5 +1,6 @@
 @min-width: 1226px;
 @black: #333333;
+@lightgrey: #e0e0e0;
 @grey: #b0b0b0;
 @white: white;
 @orange: #ff6700;
@@ -129,18 +130,95 @@ body {
 
         li {
             padding-right: 1.25em;
+
+            &:hover {
+                a {
+                    color: @orange;
+                }
+            }
         }
     }
 
     &-search {
         float: right;
         width: 18.5em;
-        padding-top: 25px;
+        height: 50px;
+        margin-top: 25px;
 
-        // input {
-        //     font-size: 1rem;
-        //     width: 100%;
-        //     height: 50px;
-        // }
+        .search-base {
+            float: left;
+            height: inherit;
+            border: 1px solid @lightgrey;
+
+        }
+
+        .search-inp {
+            .search-base;
+            width: 83%;
+            border-right: none;
+            outline: none;
+
+            &:focus {
+                border-color: @orange;
+            }
+
+            &:focus+.search-btn {
+                border-color: @orange;
+            }
+        }
+
+        .search-btn {
+            .search-base;
+            width: 17%;
+            cursor: pointer;
+
+            &:hover {
+                background-color: @orange;
+            }
+        }
+    }
+
+    &-menu {
+        opacity: 0;
+        width: 100%;
+        border-top: 1px solid darken(@black, -60%);
+        box-shadow: 0px 3px 4px fade(@black, 20%);
+        transition: opacity .3s;
+
+        ul {
+            display: flex;
+            justify-content: space-around;
+
+            li:nth-of-type(odd) {
+                width: 11.25em;
+                height: 195px;
+                padding-top: 35px;
+                text-align: center;
+
+                img {
+                    width: 10em;
+                    margin-bottom: 10px;
+                }
+
+                .menu-title {
+                    width: 10em;
+                    line-height: 20px;
+                    font-size: 0.75em;
+                    margin: 0 auto;
+                }
+
+                .menu-price {
+                    .menu-title;
+                    color: @orange;
+                }
+            }
+
+            .menu-divider {
+                width: 1px;
+                height: 100px;
+                margin-top: 40px;
+                background-color: @lightgrey;
+            }
+        }
     }
 }

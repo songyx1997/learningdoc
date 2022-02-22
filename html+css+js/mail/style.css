@@ -102,8 +102,81 @@ body {
 .header-nav li {
   padding-right: 1.25em;
 }
+.header-nav li:hover a {
+  color: #ff6700;
+}
 .header-search {
   float: right;
   width: 18.5em;
-  padding-top: 25px;
+  height: 50px;
+  margin-top: 25px;
+}
+.header-search .search-base {
+  float: left;
+  height: inherit;
+  border: 1px solid #e0e0e0;
+}
+.header-search .search-inp {
+  float: left;
+  height: inherit;
+  border: 1px solid #e0e0e0;
+  width: 83%;
+  border-right: none;
+  outline: none;
+}
+.header-search .search-inp:focus {
+  border-color: #ff6700;
+}
+.header-search .search-inp:focus + .search-btn {
+  border-color: #ff6700;
+}
+.header-search .search-btn {
+  float: left;
+  height: inherit;
+  border: 1px solid #e0e0e0;
+  width: 17%;
+  cursor: pointer;
+}
+.header-search .search-btn:hover {
+  background-color: #ff6700;
+}
+.header-menu {
+  opacity: 0;
+  width: 100%;
+  border-top: 1px solid #cccccc;
+  box-shadow: 0px 3px 4px rgba(51, 51, 51, 0.2);
+  transition: opacity 0.3s;
+}
+.header-menu ul {
+  display: flex;
+  justify-content: space-around;
+}
+.header-menu ul li:nth-of-type(odd) {
+  width: 11.25em;
+  height: 195px;
+  padding-top: 35px;
+  text-align: center;
+}
+.header-menu ul li:nth-of-type(odd) img {
+  width: 10em;
+  margin-bottom: 10px;
+}
+.header-menu ul li:nth-of-type(odd) .menu-title {
+  width: 10em;
+  line-height: 20px;
+  font-size: 0.75em;
+  margin: 0 auto;
+}
+.header-menu ul li:nth-of-type(odd) .menu-price {
+  width: 10em;
+  line-height: 20px;
+  font-size: 0.75em;
+  margin: 0 auto;
+  color: #ff6700;
+}
+.header-menu ul .menu-divider {
+  width: 1px;
+  height: 100px;
+  margin-top: 40px;
+  background-color: #e0e0e0;
 }

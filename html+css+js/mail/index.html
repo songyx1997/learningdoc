@@ -1,3 +1,12 @@
+<script>
+    function openMenu() {
+        $('.header-menu').css('opacity', '1');
+    }
+
+    function closeMenu() {
+        $('.header-menu').css('opacity', '0');
+    }
+</script>
 <!DOCTYPE html>
 <html lang="zh-CN">
 
@@ -7,6 +16,7 @@
     <link href="./style.css" rel="stylesheet">
     <link href="./icons/css/all.css" rel="stylesheet">
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <script language="JavaScript" src="./jquery-3.0.0.js"></script>
     <title>
         小米商城 - Xiaomi 11 Ultra、Redmi K40 Pro、MIX FOLD，小米电视官方网站
     </title>
@@ -46,7 +56,7 @@
                 <a href="#"><img src="./icons/logo.png"></a>
             </div>
             <ul class="header-nav">
-                <li><a href="#">Xiaomi手机</a></li>
+                <li onmousemove="openMenu()" onmouseout="closeMenu()"><a href="#">Xiaomi手机</a></li>
                 <li><a href="#">Redmi 红米</a></li>
                 <li><a href="#">电视</a></li>
                 <li><a href="#">笔记本</a></li>
@@ -57,8 +67,62 @@
                 <li><a href="#">社区</a></li>
             </ul>
             <div class="header-search">
-                <!-- <input value="" placeholder="小米手机"> -->
+                <input class="search-inp" value="">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
+        </div>
+        <div class="header-menu">
+            <ul class="container">
+                <li>
+                    <a href="#">
+                        <img src="./icons/phone_1.webp">
+                        <div class="menu-title">Xiaomi 12 Pro</div>
+                        <div class="menu-price">4699元起</div>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
+                <li>
+                    <a href="#">
+                        <img src="./icons/phone_2.webp">
+                        <div class="menu-title">Xiaomi 12</div>
+                        <div class="menu-price">3699元起</div>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
+                <li>
+                    <a href="#">
+                        <img src="./icons/phone_3.webp">
+                        <div class="menu-title">Xiaomi 12X</div>
+                        <div class="menu-price">3199元起</div>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
+                <li>
+                    <a href="#">
+                        <img src="./icons/phone_4.webp">
+                        <div class="menu-title">Xiaomi 11 青春活力版</div>
+                        <div class="menu-price">1999元起</div>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
+                <li>
+                    <a href="#">
+                        <img src="./icons/phone_5.webp">
+                        <div class="menu-title">Xiaomi Civi</div>
+                        <div class="menu-price">2299元起</div>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
+                <li>
+                    <a href="#">
+                        <img src="./icons/phone_6.webp">
+                        <div class="menu-title">Xiaomi MIX 4</div>
+                        <div class="menu-price">4199元起</div>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </body>
