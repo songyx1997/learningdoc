@@ -118,7 +118,7 @@ body {
     &-logo {
         float: left;
 
-        img {
+        &>a img {
             padding-top: 22px;
             width: 56px;
             height: 56px;
@@ -134,7 +134,7 @@ body {
         display: flex;
         align-items: center;
 
-        li {
+        &>li {
             padding-right: 20px;
 
             &:hover {
@@ -163,6 +163,7 @@ body {
             width: 83%;
             border-right: none;
             outline: none;
+            box-sizing: border-box;
 
             &:focus {
                 border-color: @orange;
@@ -193,11 +194,11 @@ body {
         box-shadow: 0px 3px 4px fade(@black, 20%);
         transition: opacity .5s;
 
-        ul {
+        &>ul {
             display: flex;
             justify-content: space-around;
 
-            li:nth-of-type(odd) {
+            &>li:nth-of-type(odd) {
                 width: 180px;
                 height: 195px;
                 padding-top: 35px;
@@ -244,7 +245,7 @@ body {
         background-color: rgba(0, 0, 0, .35);
         padding: 20px 0;
 
-        li {
+        &>li {
             position: relative;
             width: 204px;
             height: 42px;
@@ -254,14 +255,14 @@ body {
 
             &>a {
                 color: @white;
-            }
 
-            i {
-                position: absolute;
-                top: 13px;
-                right: 20px;
-                font-size: 16px;
-                color: @lightgrey;
+                i {
+                    position: absolute;
+                    top: 13px;
+                    right: 20px;
+                    font-size: 16px;
+                    color: @lightgrey;
+                }
             }
 
             &:hover {
@@ -280,6 +281,7 @@ body {
                 width: 992px;
                 height: 460px;
                 background-color: @white;
+                border: 1px solid darken(@black, -60%);
                 box-shadow: 3px 4px 10px fade(@black, 20%);
                 align-content: flex-start;
                 flex-wrap: wrap;
@@ -290,7 +292,7 @@ body {
                     box-sizing: border-box;
                     position: relative;
 
-                    a {
+                    &>a {
                         cursor: pointer;
 
                         img {
@@ -300,7 +302,7 @@ body {
                         .sideBar-title {
                             position: absolute;
                             left: 72px;
-                            bottom: 28px;
+                            bottom: 34px;
                         }
 
                         &:hover {

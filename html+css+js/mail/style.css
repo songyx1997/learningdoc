@@ -91,7 +91,7 @@ body {
 .header-logo {
   float: left;
 }
-.header-logo img {
+.header-logo > a img {
   padding-top: 22px;
   width: 56px;
   height: 56px;
@@ -105,10 +105,10 @@ body {
   display: flex;
   align-items: center;
 }
-.header-nav li {
+.header-nav > li {
   padding-right: 20px;
 }
-.header-nav li:hover a {
+.header-nav > li:hover a {
   color: #ff6700;
 }
 .header-search {
@@ -129,6 +129,7 @@ body {
   width: 83%;
   border-right: none;
   outline: none;
+  box-sizing: border-box;
 }
 .header-search .search-inp:focus {
   border-color: #ff6700;
@@ -155,34 +156,34 @@ body {
   box-shadow: 0px 3px 4px rgba(51, 51, 51, 0.2);
   transition: opacity 0.5s;
 }
-.header-menu ul {
+.header-menu > ul {
   display: flex;
   justify-content: space-around;
 }
-.header-menu ul li:nth-of-type(odd) {
+.header-menu > ul > li:nth-of-type(odd) {
   width: 180px;
   height: 195px;
   padding-top: 35px;
   text-align: center;
 }
-.header-menu ul li:nth-of-type(odd) img {
+.header-menu > ul > li:nth-of-type(odd) img {
   width: 160px;
   margin-bottom: 10px;
 }
-.header-menu ul li:nth-of-type(odd) .menu-title {
+.header-menu > ul > li:nth-of-type(odd) .menu-title {
   width: 160px;
   line-height: 20px;
   font-size: 12px;
   margin: 0 auto;
 }
-.header-menu ul li:nth-of-type(odd) .menu-price {
+.header-menu > ul > li:nth-of-type(odd) .menu-price {
   width: 160px;
   line-height: 20px;
   font-size: 12px;
   margin: 0 auto;
   color: #ff6700;
 }
-.header-menu ul .menu-divider {
+.header-menu > ul .menu-divider {
   width: 1px;
   height: 100px;
   margin-top: 40px;
@@ -201,7 +202,7 @@ body {
   background-color: rgba(0, 0, 0, 0.35);
   padding: 20px 0;
 }
-.sideBar-menu li {
+.sideBar-menu > li {
   position: relative;
   width: 204px;
   height: 42px;
@@ -209,23 +210,23 @@ body {
   padding-left: 30px;
   cursor: pointer;
 }
-.sideBar-menu li > a {
+.sideBar-menu > li > a {
   color: white;
 }
-.sideBar-menu li i {
+.sideBar-menu > li > a i {
   position: absolute;
   top: 13px;
   right: 20px;
   font-size: 16px;
   color: #e0e0e0;
 }
-.sideBar-menu li:hover {
+.sideBar-menu > li:hover {
   background-color: #ff6700;
 }
-.sideBar-menu li:hover .sideBar-list {
+.sideBar-menu > li:hover .sideBar-list {
   display: flex;
 }
-.sideBar-menu li .sideBar-list {
+.sideBar-menu > li .sideBar-list {
   display: none;
   position: absolute;
   top: -20px;
@@ -233,27 +234,28 @@ body {
   width: 992px;
   height: 460px;
   background-color: white;
+  border: 1px solid #cccccc;
   box-shadow: 3px 4px 10px rgba(51, 51, 51, 0.2);
   align-content: flex-start;
   flex-wrap: wrap;
 }
-.sideBar-menu li .sideBar-list > div {
+.sideBar-menu > li .sideBar-list > div {
   width: 25%;
   padding: 18px 20px;
   box-sizing: border-box;
   position: relative;
 }
-.sideBar-menu li .sideBar-list > div a {
+.sideBar-menu > li .sideBar-list > div > a {
   cursor: pointer;
 }
-.sideBar-menu li .sideBar-list > div a img {
+.sideBar-menu > li .sideBar-list > div > a img {
   height: 40px;
 }
-.sideBar-menu li .sideBar-list > div a .sideBar-title {
+.sideBar-menu > li .sideBar-list > div > a .sideBar-title {
   position: absolute;
   left: 72px;
-  bottom: 28px;
+  bottom: 34px;
 }
-.sideBar-menu li .sideBar-list > div a:hover {
+.sideBar-menu > li .sideBar-list > div > a:hover {
   color: #ff6700;
 }
