@@ -236,9 +236,10 @@ body {
     position: relative;
     z-index: 20;
     background-image: url(./icons/background_1.jpg);
-    background-size: cover;
+    background-size: contain;
+    background-repeat: no-repeat;
 
-    .sideMenu {
+    &-menu {
         float: left;
         background-color: rgba(0, 0, 0, .35);
         padding: 20px 0;
@@ -251,7 +252,7 @@ body {
             padding-left: 30px;
             cursor: pointer;
 
-            a {
+            &>a {
                 color: @white;
             }
 
@@ -266,27 +267,46 @@ body {
             &:hover {
                 background-color: @orange;
             }
-        }
-    }
 
-    .li-panel {
-        float: right;
-        background-color: @white;
-        box-shadow: 3px 4px 10px fade(@black, 20%);
-        display: flex;
-        align-content: flex-start;
-        flex-wrap: wrap;
-        width: 992px;
-        height: 460px;
+            &:hover .sideBar-list {
+                display: flex;
+            }
 
-        div {
-            width: 25%;
-            padding: 18px 20px;
-            box-sizing: border-box;
+            .sideBar-list {
+                display: none;
+                position: absolute;
+                top: -20px;
+                left: 234px;
+                width: 992px;
+                height: 460px;
+                background-color: @white;
+                box-shadow: 3px 4px 10px fade(@black, 20%);
+                align-content: flex-start;
+                flex-wrap: wrap;
 
-            a {
-                img {
-                    height: 40px;
+                &>div {
+                    width: 25%;
+                    padding: 18px 20px;
+                    box-sizing: border-box;
+                    position: relative;
+
+                    a {
+                        cursor: pointer;
+
+                        img {
+                            height: 40px;
+                        }
+
+                        .sideBar-title {
+                            position: absolute;
+                            left: 72px;
+                            bottom: 28px;
+                        }
+
+                        &:hover {
+                            color: @orange;
+                        }
+                    }
                 }
             }
         }
