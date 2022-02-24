@@ -4,6 +4,7 @@
 @grey: #b0b0b0;
 @white: white;
 @orange: #ff6700;
+@brown: #5f5750;
 
 body {
     min-width: @min-width;
@@ -180,9 +181,10 @@ body {
 
                         /* 注意替换元素的写法，否则会出现空行 */
                         .menu-img {
-                            width: 160px;
-                            height: 110px;
-                            margin-bottom: 15px;
+                            width: 130px;
+                            height: 130px;
+                            padding-bottom: 15px;
+                            margin: -10px auto;
 
                             &>img {
                                 width: inherit;
@@ -200,13 +202,6 @@ body {
                             .menu-title;
                             color: @orange;
                         }
-
-                        // &::after {
-                        //     display: inline-block;
-                        //     content: '1';
-                        //     height: 100px;
-                        //     width: 1px;
-                        // }
                     }
                 }
             }
@@ -390,8 +385,52 @@ body {
         background-color: yellowgreen;
         float: left;
         width: @sideBarWidth;
-        height: 170px;
         margin-right: 14px;
+        background-color: @brown;
+
+        a {
+            float: left;
+            width: 72px;
+            height: 64px;
+            color: @white;
+            opacity: 0.5;
+            position: relative;
+            padding: 18px 3px 3px 3px;
+            text-align: center;
+            transition: opacity .3s;
+
+            i {
+                font-size: 20px;
+            }
+
+            div {
+                font-size: 12px;
+            }
+
+            &::before {
+                content: '';
+                width: 70px;
+                height: 1px;
+                position: absolute;
+                top: 0;
+                left: 4px;
+                background-color: darken(@black, -10%);
+            }
+
+            &::after {
+                content: '';
+                width: 1px;
+                height: 70px;
+                position: absolute;
+                top: 8px;
+                left: 0;
+                background-color: darken(@black, -10%);
+            }
+
+            &:hover {
+                opacity: 1;
+            }
+        }
     }
 
     .recommend-imgs {
@@ -399,12 +438,15 @@ body {
 
         li {
             float: left;
-            width: 316px;
-            height: 170px;
-            background-color: orange;
 
             &:not(:nth-of-type(1)) {
                 margin-left: 15px;
+            }
+
+            img {
+                width: 316px;
+                height: 170px;
+                vertical-align: top;
             }
         }
     }
@@ -421,9 +463,12 @@ body {
     background-color: darken(@lightgrey, -8%);
 
     .display-recommend {
-        height: 120px;
         .divider-top;
-        background-color: red;
+
+        img {
+            height: 120px;
+            vertical-align: top;
+        }
     }
 
     .display-phone {
@@ -453,5 +498,21 @@ body {
                 background-color: orange;
             }
         }
+    }
+}
+
+/* 网站底部 */
+.footer {
+    &-services {
+        height: 25px;
+        padding: 27px 0;
+        border-bottom: 1px solid @lightgrey;
+        background-color: red;
+    }
+
+    &-links {
+        height: 172.5px;
+        padding: 40px 0;
+        background-color: orange;
     }
 }

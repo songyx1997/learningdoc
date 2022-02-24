@@ -146,9 +146,10 @@ body {
   background-color: #e0e0e0;
 }
 .header-nav > li .header-menu > ul > li .menu-img {
-  width: 160px;
-  height: 110px;
-  margin-bottom: 15px;
+  width: 130px;
+  height: 130px;
+  padding-bottom: 15px;
+  margin: -10px auto;
 }
 .header-nav > li .header-menu > ul > li .menu-img > img {
   width: inherit;
@@ -315,20 +316,60 @@ body {
   background-color: yellowgreen;
   float: left;
   width: 234px;
-  height: 170px;
   margin-right: 14px;
+  background-color: #5f5750;
+}
+.recommend-panel .recommend-box a {
+  float: left;
+  width: 72px;
+  height: 64px;
+  color: white;
+  opacity: 0.5;
+  position: relative;
+  padding: 18px 3px 3px 3px;
+  text-align: center;
+  transition: opacity 0.3s;
+}
+.recommend-panel .recommend-box a i {
+  font-size: 20px;
+}
+.recommend-panel .recommend-box a div {
+  font-size: 12px;
+}
+.recommend-panel .recommend-box a::before {
+  content: '';
+  width: 70px;
+  height: 1px;
+  position: absolute;
+  top: 0;
+  left: 4px;
+  background-color: #4d4d4d;
+}
+.recommend-panel .recommend-box a::after {
+  content: '';
+  width: 1px;
+  height: 70px;
+  position: absolute;
+  top: 8px;
+  left: 0;
+  background-color: #4d4d4d;
+}
+.recommend-panel .recommend-box a:hover {
+  opacity: 1;
 }
 .recommend-panel .recommend-imgs {
   float: right;
 }
 .recommend-panel .recommend-imgs li {
   float: left;
-  width: 316px;
-  height: 170px;
-  background-color: orange;
 }
 .recommend-panel .recommend-imgs li:not(:nth-of-type(1)) {
   margin-left: 15px;
+}
+.recommend-panel .recommend-imgs li img {
+  width: 316px;
+  height: 170px;
+  vertical-align: top;
 }
 /* 商品展区 */
 .divider-top {
@@ -340,9 +381,11 @@ body {
   background-color: #f4f4f4;
 }
 .display-body .display-recommend {
-  height: 120px;
   margin-top: 22px;
-  background-color: red;
+}
+.display-body .display-recommend img {
+  height: 120px;
+  vertical-align: top;
 }
 .display-body .display-phone .phone-title {
   height: 58px;
@@ -365,5 +408,17 @@ body {
   width: 234px;
   height: 300px;
   margin: 0 0 14px 14px;
+  background-color: orange;
+}
+/* 网站底部 */
+.footer-services {
+  height: 25px;
+  padding: 27px 0;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: red;
+}
+.footer-links {
+  height: 172.5px;
+  padding: 40px 0;
   background-color: orange;
 }
