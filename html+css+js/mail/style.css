@@ -112,10 +112,12 @@ body {
   color: #ff6700;
 }
 .header-nav > li:hover > .header-menu {
-  display: block;
+  visibility: visible;
+  opacity: 1;
 }
 .header-nav > li .header-menu {
-  display: none;
+  visibility: hidden;
+  opacity: 0;
   position: absolute;
   left: 0;
   width: 100%;
@@ -123,19 +125,30 @@ body {
   background-color: white;
   border-top: 1px solid #cccccc;
   box-shadow: 0px 3px 4px rgba(51, 51, 51, 0.2);
+  transition: opacity 0.3s;
 }
 .header-nav > li .header-menu > ul {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
 }
 .header-nav > li .header-menu > ul > li {
-  padding-top: 35px;
+  padding: 35px 20px 0 20px;
   text-align: center;
+  position: relative;
   /* 注意替换元素的写法，否则会出现空行 */
+}
+.header-nav > li .header-menu > ul > li:not(:nth-of-type(1))::before {
+  position: absolute;
+  left: 0;
+  content: '';
+  width: 1px;
+  height: 100px;
+  background-color: #e0e0e0;
 }
 .header-nav > li .header-menu > ul > li .menu-img {
   width: 160px;
   height: 110px;
+  margin-bottom: 15px;
 }
 .header-nav > li .header-menu > ul > li .menu-img > img {
   width: inherit;
@@ -192,12 +205,46 @@ body {
 .sideBar {
   position: relative;
   z-index: 20;
-  background-image: url(icons/background_1.jpg);
-  background-size: contain;
-  background-repeat: no-repeat;
+  height: 460px;
+}
+.sideBar .banner-imgs {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.sideBar .banner-imgs li {
+  position: absolute;
+}
+.sideBar .banner-imgs img {
+  width: 100%;
+  /* 清除图片底侧空白缝隙 */
+  vertical-align: top;
+}
+.sideBar .banner-pointers {
+  position: absolute;
+  width: 100px;
+  right: 30px;
+  bottom: 25px;
+}
+.sideBar .banner-pointers .pointer-active {
+  background-color: white;
+}
+.sideBar .banner-pointers a {
+  float: right;
+  width: 6px;
+  height: 6px;
+  border: 2px solid #979797;
+  border-radius: 10px;
+  margin: 0 3px;
+  opacity: 1;
+  background-color: #646464;
+}
+.sideBar .banner-pointers a:hover {
+  background-color: white;
 }
 .sideBar-menu {
-  float: left;
+  position: absolute;
+  z-index: 21;
   background-color: rgba(0, 0, 0, 0.35);
   padding: 20px 0;
 }
@@ -231,7 +278,7 @@ body {
   top: -20px;
   left: 234px;
   width: 992px;
-  height: 460px;
+  height: 458px;
   background-color: white;
   border: 1px solid #cccccc;
   box-shadow: 3px 4px 10px rgba(51, 51, 51, 0.2);
