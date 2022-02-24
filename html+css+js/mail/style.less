@@ -461,7 +461,7 @@ body {
 
 .display-body {
     padding: 4px 0 12px 0;
-    margin: 22px 0;
+    margin-top: 22px;
     background-color: darken(@lightgrey, -8%);
 
     .display-recommend {
@@ -565,15 +565,31 @@ body {
 /* 网站底部 */
 .footer {
     &-services {
-        height: 25px;
-        padding: 27px 0;
-        border-bottom: 1px solid @lightgrey;
-        background-color: red;
-    }
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-    &-links {
-        height: 172.5px;
-        padding: 40px 0;
-        background-color: orange;
+        a {
+            color: @black;
+            font-size: 16px;
+            line-height: 75px;
+            cursor: pointer;
+            transition: color .3s;
+
+
+            i {
+                margin-right: 8px;
+            }
+
+            &:not(:nth-last-of-type(1))::after {
+                content: 'I';
+                color: @lightgrey;
+                margin: 60px;
+            }
+
+            &:hover {
+                color: @orange;
+            }
+        }
     }
 }
