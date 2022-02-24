@@ -254,6 +254,8 @@ body {
     }
 }
 
+@sideBarWidth: 234px;
+
 /* 侧边栏 */
 .sideBar {
     position: relative;
@@ -310,10 +312,11 @@ body {
 
         &>li {
             position: relative;
-            width: 204px;
+            width: @sideBarWidth;
             height: 42px;
             line-height: 42px;
             padding-left: 30px;
+            box-sizing: border-box;
             cursor: pointer;
 
             &>a {
@@ -340,7 +343,7 @@ body {
                 display: none;
                 position: absolute;
                 top: -20px;
-                left: 234px;
+                left: @sideBarWidth;
                 width: 992px;
                 height: 458px;
                 background-color: @white;
@@ -351,7 +354,8 @@ body {
 
                 &>div {
                     width: 25%;
-                    padding: 18px 20px;
+                    height: 76px;
+                    padding: 18px 20px 0 20px;
                     box-sizing: border-box;
                     position: relative;
 
@@ -365,7 +369,7 @@ body {
                         .sideBar-title {
                             position: absolute;
                             left: 72px;
-                            bottom: 34px;
+                            bottom: 16px;
                         }
 
                         &:hover {
@@ -373,6 +377,80 @@ body {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+/* 推荐栏 */
+.recommend-panel {
+    margin: 14px auto 26px auto;
+
+    .recommend-box {
+        background-color: yellowgreen;
+        float: left;
+        width: @sideBarWidth;
+        height: 170px;
+        margin-right: 14px;
+    }
+
+    .recommend-imgs {
+        float: right;
+
+        li {
+            float: left;
+            width: 316px;
+            height: 170px;
+            background-color: orange;
+
+            &:not(:nth-of-type(1)) {
+                margin-left: 15px;
+            }
+        }
+    }
+}
+
+/* 商品展区 */
+.divider-top {
+    margin-top: 22px;
+}
+
+.display-body {
+    padding: 4px 0 12px 0;
+    margin: 22px 0;
+    background-color: darken(@lightgrey, -8%);
+
+    .display-recommend {
+        height: 120px;
+        .divider-top;
+        background-color: red;
+    }
+
+    .display-phone {
+        .phone-title {
+            height: 58px;
+            .divider-top;
+            background-color: yellowgreen;
+        }
+
+        .phone-recommend {
+            float: left;
+            width: @sideBarWidth;
+            height: 614px;
+            background-color: red;
+        }
+
+        .phone-list {
+            float: right;
+            display: flex;
+            flex-wrap: wrap;
+            width: 992px;
+
+            div {
+                width: @sideBarWidth;
+                height: 300px;
+                margin: 0 0 14px 14px;
+                background-color: orange;
             }
         }
     }
