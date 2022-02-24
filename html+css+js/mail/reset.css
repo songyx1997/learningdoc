@@ -72,3 +72,7 @@ body {
   display: table;
   clear: both;
 }
+img {
+  /* 清除图片底侧空白缝隙 */
+  vertical-align: top;
+}
