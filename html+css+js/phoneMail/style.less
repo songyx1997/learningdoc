@@ -1,6 +1,10 @@
 @screen-width: 750;
-
-@main-width: (693/40)* 1rem;
+@main-width: 100vw;
+@black: #333333;
+@lightgrey: #e0e0e0;
+@grey: #b0b0b0;
+@white: white;
+@orange: #ff6700;
 
 html {
     font-size: (100vw/@screen-width) * 40;
@@ -15,19 +19,44 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: (175/40)* 1rem;
-    background-color: yellowgreen;
+    flex-wrap: wrap;
+    height: (88/40)* 1rem;
+    background-color: @lightgrey;
 
-    &-menu-btn {
-        background-color: red;
+    &-logo {
+        line-height: inherit;
+
+        img {
+            width: (50/40) *1rem;
+            padding: 0 (27/40) *1rem;
+        }
     }
 
-    &-title {
-        background-color: orange;
-        text-align: center;
+    &-search {
+        display: flex;
+        width: (540/40) *1rem;
+        height: (68/40)* 1rem;
+        border-radius: 3px;
+        font-size: .8rem;
+        background-color: @white;
+
+        i {
+            color: @grey;
+            line-height: (68/40)* 1rem;
+            margin: 0 (18/40)* 1rem;
+        }
+
+        input {
+            min-width: (140/40)* 1rem;
+            border: 0;
+            background-color: @white;
+        }
     }
 
-    &-search-btn {
-        background-color: yellow;
+    &-user {
+        i {
+            line-height: (68/40)* 1rem;
+            margin: 0 (35/40)* 1rem;
+        }
     }
 }

@@ -2,23 +2,43 @@ html {
   font-size: 5.33333333vw;
 }
 .container {
-  width: 17.325rem;
+  width: 100vw;
   margin: 0 auto;
 }
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 4.375rem;
-  background-color: yellowgreen;
+  flex-wrap: wrap;
+  height: 2.2rem;
+  background-color: #e0e0e0;
 }
-.header-menu-btn {
-  background-color: red;
+.header-logo {
+  line-height: inherit;
 }
-.header-title {
-  background-color: orange;
-  text-align: center;
+.header-logo img {
+  width: 1.25rem;
+  padding: 0 0.675rem;
 }
-.header-search-btn {
-  background-color: yellow;
+.header-search {
+  display: flex;
+  width: 13.5rem;
+  height: 1.7rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  background-color: white;
+}
+.header-search i {
+  color: #b0b0b0;
+  line-height: 1.7rem;
+  margin: 0 0.45rem;
+}
+.header-search input {
+  min-width: 3.5rem;
+  border: 0;
+  background-color: white;
+}
+.header-user i {
+  line-height: 1.7rem;
+  margin: 0 0.875rem;
 }
