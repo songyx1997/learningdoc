@@ -1,0 +1,33 @@
+@screen-width: 750;
+
+@main-width: (693/40)* 1rem;
+
+html {
+    font-size: (100vw/@screen-width) * 40;
+}
+
+.container {
+    width: @main-width;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: (175/40)* 1rem;
+    background-color: yellowgreen;
+
+    &-menu-btn {
+        background-color: red;
+    }
+
+    &-title {
+        background-color: orange;
+        text-align: center;
+    }
+
+    &-search-btn {
+        background-color: yellow;
+    }
+}

@@ -1,0 +1,24 @@
+html {
+  font-size: 5.33333333vw;
+}
+.container {
+  width: 17.325rem;
+  margin: 0 auto;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4.375rem;
+  background-color: yellowgreen;
+}
+.header-menu-btn {
+  background-color: red;
+}
+.header-title {
+  background-color: orange;
+  text-align: center;
+}
+.header-search-btn {
+  background-color: yellow;
+}
