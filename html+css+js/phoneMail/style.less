@@ -1,7 +1,6 @@
 @black: #333333;
-@lightgrey: #e0e0e0;
-@grey: #b0b0b0;
-@darkgrey: grey;
+@lightgrey: #f2f2f2;
+@grey: #747474;
 @white: white;
 @orange: #ff6700;
 
@@ -18,6 +17,7 @@ body {
     top: 0;
     left: 0;
     right: 0;
+    z-index: 40;
     background-color: @lightgrey;
 
     &-tools {
@@ -32,7 +32,7 @@ body {
 
             img {
                 width: .5rem;
-                margin: 0 .2rem;
+                margin: 0 .3rem;
             }
         }
 
@@ -41,7 +41,7 @@ body {
             display: flex;
             align-items: center;
             border-radius: .04rem;
-            color: @grey;
+            color: darken(@lightgrey, 20%);
             background-color: @white;
 
             i {
@@ -59,34 +59,89 @@ body {
 
             i {
                 font-size: .4rem;
-                padding: 0 .3rem;
+                padding: 0 .35rem;
             }
         }
     }
 
     &-menu {
-        display: flex;
         font-size: .26rem;
-        padding: .15rem 0;
+        padding-top: .06rem;
+        position: relative;
+        z-index: 41;
 
         .menu-left {
+            float: left;
             flex: 1;
             display: flex;
             justify-content: space-around;
-            padding: 0 .4rem;
+            padding-left: .28rem;
+            padding-right: .85rem;
 
-            a {
-                color: @darkgrey;
+            li {
+                margin-left: .5rem;
+                padding-bottom: .12rem;
 
-                &:hover {
+                a {
+                    color: @grey;
+                }
+            }
+
+            .menu-active {
+                border-bottom: 2px solid @orange;
+
+                a {
                     color: @orange;
                 }
             }
         }
 
         .menu-right {
-            color: @grey;
+            position: absolute;
+            right: .24rem;
+            z-index: 43;
+            color: darken(@lightgrey, 20%);
+        }
+
+        .menu-detail {
+            position: relative;
+            height: 2.5rem;
+            z-index: 42;
             padding: 0 .25rem;
+            background-color: orange;
+
+            .detail-title {
+                background-color: red;
+            }
+
+            .detail-btns {
+                display: flex;
+                flex-wrap: wrap;
+                margin-top: .34rem;
+                background-color: green;
+
+                li {
+                    margin-right: .2rem;
+
+                    button {
+                        width: 1.52rem;
+                        height: .56rem;
+                        text-align: center;
+                        line-height: .56rem;
+                        margin-bottom: .24rem;
+                        border-radius: 4px;
+                        font-size: .25rem;
+                        border: 1px solid @grey;
+                        background-color: @white;
+                    }
+
+                    .active-button {
+                        color: @orange;
+                        border: 1px solid @orange;
+                        background-color: darken(@orange, -40%);
+                    }
+                }
+            }
         }
     }
 }

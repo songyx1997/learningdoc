@@ -9,7 +9,8 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  background-color: #e0e0e0;
+  z-index: 40;
+  background-color: #f2f2f2;
 }
 .header-tools {
   display: flex;
@@ -22,14 +23,14 @@ body {
 }
 .header-tools .header-logo img {
   width: 0.5rem;
-  margin: 0 0.2rem;
+  margin: 0 0.3rem;
 }
 .header-tools .header-search {
   flex: 1;
   display: flex;
   align-items: center;
   border-radius: 0.04rem;
-  color: #b0b0b0;
+  color: #bfbfbf;
   background-color: white;
 }
 .header-tools .header-search i {
@@ -44,26 +45,73 @@ body {
 }
 .header-tools .header-user i {
   font-size: 0.4rem;
-  padding: 0 0.3rem;
+  padding: 0 0.35rem;
 }
 .header-menu {
-  display: flex;
   font-size: 0.26rem;
-  padding: 0.15rem 0;
+  padding-top: 0.06rem;
+  position: relative;
+  z-index: 41;
 }
 .header-menu .menu-left {
+  float: left;
   flex: 1;
   display: flex;
   justify-content: space-around;
-  padding: 0 0.4rem;
+  padding-left: 0.28rem;
+  padding-right: 0.85rem;
 }
-.header-menu .menu-left a {
-  color: grey;
+.header-menu .menu-left li {
+  margin-left: 0.5rem;
+  padding-bottom: 0.12rem;
 }
-.header-menu .menu-left a:hover {
+.header-menu .menu-left li a {
+  color: #747474;
+}
+.header-menu .menu-left .menu-active {
+  border-bottom: 2px solid #ff6700;
+}
+.header-menu .menu-left .menu-active a {
   color: #ff6700;
 }
 .header-menu .menu-right {
-  color: #b0b0b0;
+  position: absolute;
+  right: 0.24rem;
+  z-index: 43;
+  color: #bfbfbf;
+}
+.header-menu .menu-detail {
+  position: relative;
+  height: 2.5rem;
+  z-index: 42;
   padding: 0 0.25rem;
+  background-color: orange;
+}
+.header-menu .menu-detail .detail-title {
+  background-color: red;
+}
+.header-menu .menu-detail .detail-btns {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0.34rem;
+  background-color: green;
+}
+.header-menu .menu-detail .detail-btns li {
+  margin-right: 0.2rem;
+}
+.header-menu .menu-detail .detail-btns li button {
+  width: 1.52rem;
+  height: 0.56rem;
+  text-align: center;
+  line-height: 0.56rem;
+  margin-bottom: 0.24rem;
+  border-radius: 4px;
+  font-size: 0.25rem;
+  border: 1px solid #747474;
+  background-color: white;
+}
+.header-menu .menu-detail .detail-btns li .active-button {
+  color: #ff6700;
+  border: 1px solid #ff6700;
+  background-color: #ffe1cc;
 }
