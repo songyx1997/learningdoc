@@ -4,6 +4,10 @@ html {
 body {
   font-size: 0.22rem;
 }
+.container {
+  margin: 0 auto;
+  width: 7.2rem;
+}
 .header {
   position: fixed;
   top: 0;
@@ -51,19 +55,15 @@ body {
   font-size: 0.26rem;
   padding-top: 0.06rem;
   position: relative;
-  z-index: 41;
 }
 .header-menu .menu-left {
-  float: left;
-  flex: 1;
-  display: flex;
-  justify-content: space-around;
-  padding-left: 0.28rem;
-  padding-right: 0.85rem;
+  padding-left: 0.54rem;
+  box-sizing: border-box;
 }
 .header-menu .menu-left li {
-  margin-left: 0.5rem;
+  float: left;
   padding-bottom: 0.12rem;
+  margin: 0 0.25rem;
 }
 .header-menu .menu-left li a {
   color: #747474;
@@ -76,30 +76,41 @@ body {
 }
 .header-menu .menu-right {
   position: absolute;
-  right: 0.24rem;
-  z-index: 43;
+  top: 0.1rem;
+  right: 0;
+  left: 0;
+}
+.header-menu .menu-right:hover .menu-detail {
+  display: block;
+}
+.header-menu .menu-right .menu-right-icon {
+  position: absolute;
+  right: 0.22rem;
   color: #bfbfbf;
+  transition: transform 0.6s;
 }
-.header-menu .menu-detail {
-  position: relative;
-  height: 2.5rem;
-  z-index: 42;
-  padding: 0 0.25rem;
-  background-color: orange;
+.header-menu .menu-right .menu-right-icon:hover {
+  transform: rotateZ(180deg);
 }
-.header-menu .menu-detail .detail-title {
-  background-color: red;
+.header-menu .menu-right .menu-detail {
+  display: none;
+  padding-left: 0.25rem;
+  box-shadow: 0px 4px 4px -3px #747474;
+  background-color: #f2f2f2;
 }
-.header-menu .menu-detail .detail-btns {
+.header-menu .menu-right .menu-detail .detail-title {
+  font-size: 0.28rem;
+  padding-top: 0.1rem;
+}
+.header-menu .menu-right .menu-detail .detail-btns {
   display: flex;
   flex-wrap: wrap;
   margin-top: 0.34rem;
-  background-color: green;
 }
-.header-menu .menu-detail .detail-btns li {
+.header-menu .menu-right .menu-detail .detail-btns li {
   margin-right: 0.2rem;
 }
-.header-menu .menu-detail .detail-btns li button {
+.header-menu .menu-right .menu-detail .detail-btns li button {
   width: 1.52rem;
   height: 0.56rem;
   text-align: center;
@@ -107,11 +118,103 @@ body {
   margin-bottom: 0.24rem;
   border-radius: 4px;
   font-size: 0.25rem;
-  border: 1px solid #747474;
+  border: 1px solid #bfbfbf;
   background-color: white;
 }
-.header-menu .menu-detail .detail-btns li .active-button {
+.header-menu .menu-right .menu-detail .detail-btns li .active-button {
   color: #ff6700;
   border: 1px solid #ff6700;
   background-color: #ffe1cc;
+}
+.body {
+  position: absolute;
+  top: 1.4rem;
+  width: 100vw;
+}
+.body .body-recommend {
+  background-color: #4878a6;
+  padding-bottom: 0.266667rem;
+}
+.body .body-recommend .body-title {
+  color: white;
+  text-align: center;
+  padding: 0.19rem 0;
+  margin-top: 0.266667rem;
+  background-color: #4286bf;
+}
+.body .body-recommend .body-title span {
+  font-size: 0.3rem;
+  padding: 0.17rem;
+}
+.body .body-recommend .recommend-display {
+  padding: 0 0.12rem;
+  margin-top: 0.266667rem;
+}
+.body .body-recommend .recommend-display img {
+  width: 6.96rem;
+}
+.body .body-recommend .recommend-display .recommend-info {
+  width: 6.96rem;
+  box-sizing: border-box;
+  padding: 0.2rem 0.27rem;
+  background-color: white;
+}
+.body .body-recommend .recommend-display .recommend-info .info-top {
+  display: flex;
+}
+.body .body-recommend .recommend-display .recommend-info .info-top .info-top-title {
+  flex: 1;
+  font-size: 0.32rem;
+}
+.body .body-recommend .recommend-display .recommend-info .info-top .info-top-price {
+  font-size: 0.28rem;
+  color: #ea625b;
+  height: 1.5em;
+  line-height: 1.5em;
+  position: relative;
+  display: inline-block;
+}
+.body .body-recommend .recommend-display .recommend-info .info-bottom {
+  display: flex;
+}
+.body .body-recommend .recommend-display .recommend-info .info-bottom .info-bottom-description {
+  flex: 1;
+  margin-top: 0.18rem;
+  color: #747474;
+  font-size: 0.22rem;
+  line-height: 0.3rem;
+  /* 空白处理：不换行 */
+  white-space: nowrap;
+  overflow: hidden;
+  /* 文字溢出显示方式：省略号 */
+  text-overflow: ellipsis;
+}
+.body .body-recommend .recommend-display .recommend-info .info-bottom .info-bottom-btn {
+  width: 2rem;
+  background: #ea625b;
+  border-radius: 0.05rem;
+  text-align: center;
+  color: white;
+  font-size: 0.24rem;
+  padding: 0.16rem 0;
+  font-weight: 700;
+  border: none;
+}
+.body .computers-table .table-title {
+  text-align: center;
+  padding-top: 0.15rem;
+}
+.body .computers-table .table-title i {
+  font-size: 0.3rem;
+}
+.body .computers-table .table-title span {
+  font-size: 0.35rem;
+}
+.body .computers-table table {
+  margin: 0.1rem;
+}
+.body .computers-table table img {
+  padding: 0.05rem;
+  width: 3.4rem;
+  object-fit: contain;
 }

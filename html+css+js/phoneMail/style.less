@@ -3,6 +3,9 @@
 @grey: #747474;
 @white: white;
 @orange: #ff6700;
+@darkblue: #4878a6;
+@blue: #4286bf;
+@red: #ea625b;
 
 html {
     font-size: 52.1111px;
@@ -10,6 +13,11 @@ html {
 
 body {
     font-size: .22rem;
+}
+
+.container {
+    margin: 0 auto;
+    width: 7.2rem;
 }
 
 .header {
@@ -68,19 +76,15 @@ body {
         font-size: .26rem;
         padding-top: .06rem;
         position: relative;
-        z-index: 41;
 
         .menu-left {
-            float: left;
-            flex: 1;
-            display: flex;
-            justify-content: space-around;
-            padding-left: .28rem;
-            padding-right: .85rem;
+            padding-left: .54rem;
+            box-sizing: border-box;
 
             li {
-                margin-left: .5rem;
+                float: left;
                 padding-bottom: .12rem;
+                margin: 0 .25rem;
 
                 a {
                     color: @grey;
@@ -98,49 +102,177 @@ body {
 
         .menu-right {
             position: absolute;
-            right: .24rem;
-            z-index: 43;
-            color: darken(@lightgrey, 20%);
-        }
+            top: .1rem;
+            right: 0;
+            left: 0;
 
-        .menu-detail {
-            position: relative;
-            height: 2.5rem;
-            z-index: 42;
-            padding: 0 .25rem;
-            background-color: orange;
-
-            .detail-title {
-                background-color: red;
+            &:hover .menu-detail {
+                display: block;
             }
 
-            .detail-btns {
-                display: flex;
-                flex-wrap: wrap;
-                margin-top: .34rem;
-                background-color: green;
+            .menu-right-icon {
+                position: absolute;
+                right: .22rem;
+                color: darken(@lightgrey, 20%);
+                transition: transform .6s;
 
-                li {
-                    margin-right: .2rem;
+                &:hover {
+                    transform: rotateZ(180deg);
+                }
+            }
 
-                    button {
-                        width: 1.52rem;
-                        height: .56rem;
-                        text-align: center;
-                        line-height: .56rem;
-                        margin-bottom: .24rem;
-                        border-radius: 4px;
-                        font-size: .25rem;
-                        border: 1px solid @grey;
-                        background-color: @white;
-                    }
+            .menu-detail {
+                display: none;
+                padding-left: .25rem;
+                box-shadow: 0px 4px 4px -3px @grey;
+                background-color: @lightgrey;
 
-                    .active-button {
-                        color: @orange;
-                        border: 1px solid @orange;
-                        background-color: darken(@orange, -40%);
+                .detail-title {
+                    font-size: .28rem;
+                    padding-top: .1rem;
+                }
+
+                .detail-btns {
+                    display: flex;
+                    flex-wrap: wrap;
+                    margin-top: .34rem;
+
+                    li {
+                        margin-right: .2rem;
+
+                        button {
+                            width: 1.52rem;
+                            height: .56rem;
+                            text-align: center;
+                            line-height: .56rem;
+                            margin-bottom: .24rem;
+                            border-radius: 4px;
+                            font-size: .25rem;
+                            border: 1px solid darken(@lightgrey, 20%);
+                            background-color: @white;
+                        }
+
+                        .active-button {
+                            color: @orange;
+                            border: 1px solid @orange;
+                            background-color: darken(@orange, -40%);
+                        }
                     }
                 }
+            }
+        }
+    }
+}
+
+@img-width: 6.96rem;
+
+.body {
+    position: absolute;
+    top: 1.4rem;
+    width: 100vw;
+
+    .body-recommend {
+        background-color: @darkblue;
+        padding-bottom: 0.266667rem;
+
+        .body-title {
+            color: @white;
+            text-align: center;
+            padding: 0.19rem 0;
+            margin-top: 0.266667rem;
+            background-color: @blue;
+
+            span {
+                font-size: .3rem;
+                padding: .17rem;
+            }
+        }
+
+        .recommend-display {
+            padding: 0 .12rem;
+            margin-top: 0.266667rem;
+
+            img {
+                width: @img-width;
+            }
+
+            .recommend-info {
+                width: @img-width;
+                box-sizing: border-box;
+                padding: .2rem .27rem;
+                background-color: @white;
+
+                .info-top {
+                    display: flex;
+
+                    .info-top-title {
+                        flex: 1;
+                        font-size: .32rem;
+                    }
+
+                    .info-top-price {
+                        font-size: .28rem;
+                        color: @red;
+                        height: 1.5em;
+                        line-height: 1.5em;
+                        position: relative;
+                        display: inline-block;
+                    }
+                }
+
+                .info-bottom {
+                    display: flex;
+
+                    .info-bottom-description {
+                        flex: 1;
+                        margin-top: .18rem;
+                        color: @grey;
+                        font-size: .22rem;
+                        line-height: .3rem;
+                        /* 空白处理：不换行 */
+                        white-space: nowrap;
+                        overflow: hidden;
+                        /* 文字溢出显示方式：省略号 */
+                        text-overflow: ellipsis;
+                    }
+
+                    .info-bottom-btn {
+                        width: 2rem;
+                        background: @red;
+                        border-radius: .05rem;
+                        text-align: center;
+                        color: @white;
+                        font-size: .24rem;
+                        padding: .16rem 0;
+                        font-weight: 700;
+                        border: none;
+                    }
+                }
+            }
+        }
+    }
+
+    .computers-table {
+        .table-title {
+            text-align: center;
+            padding-top: .15rem;
+
+            i {
+                font-size: .3rem;
+            }
+
+            span {
+                font-size: .35rem;
+            }
+        }
+
+        table {
+            margin: .1rem;
+
+            img {
+                padding: .05rem;
+                width: 3.4rem;
+                object-fit: contain;
             }
         }
     }
