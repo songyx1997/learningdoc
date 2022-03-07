@@ -691,3 +691,37 @@ div {
 使用其他文件中的变量与函数，如果导入的文件是`.less`扩展名，则可以将扩展名省略掉。
 
 #### 4. JS
+
+##### 变量
+
+声明的变量不能以数字开头，采用驼峰式命名法。仅声明的变量，其值与类型为`undefined`。
+
+`typeof`用于得到变量的类型，`null`是`Object`对象。
+
+浮点运算可能得到不精确的结果。
+
+`null` 和`undefined`没有`toString()`方法。
+
+`parseInt`和`parseFloat`可以得到字符串中有效的整数和小数。
+
+```javascript
+// 输出为233
+parseInt('233str');
+// 输出为NaN（Not a Number）
+parseInt('str233str');
+```
+
+`&&`第一个值为`true`则返回第二个值；第一个值为`false`，直接返回第一个。
+
+`||`第一个值为`false`则返回第二个值；第一个值为`true`，直接返回第一个。
+
+`NaN`不和任何值相等，包括本身。可以通过`isNaN(n)`判断。
+
+`===`比较时不会做类型转换，类型不同则直接返回`false`。
+
+```javascript
+// true
+'1' == 1
+// false
+'1' === 1
+```
