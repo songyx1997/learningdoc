@@ -725,3 +725,137 @@ parseInt('str233str');
 // false
 '1' === 1
 ```
+
+##### 对象
+
+```js
+var obj = new Object();
+// 增、改
+obj.name = 'songyx';
+obj.age = 24;
+obj.address = 'chengdu';
+console.log(obj);
+// 删
+delete obj.address;
+// 检查对象是否包含指定属性名
+console.log('address' in obj);
+```
+
+**栈内存**主要用于存储各种基本类型（`Boolean`、`Number`、`String`、`Undefined`、`Null`）的变量以及对象的引用。
+
+**堆内存**存储对象的属性值。
+
+<div style="margin:0 auto;width:40%">
+    <img src=".\栈内存与堆内存.png">
+</div>
+
+```js
+var one = { name: 'songyx' };
+var two = {};
+// 栈内存中，拷贝对象的引用
+two = one;
+two.name = 'bison';
+// {name: 'bison'}
+console.log(one);
+// 清除对象的引用
+two = null;
+// {name: 'bison'}
+console.log(one);
+```
+
+`==`在比较对象时，比较的是栈内存中对象的引用是否相同。
+
+遍历对象的属性值与属性名。
+
+```js
+var obj = {
+    name: 'songyx',
+    age: 24
+};
+for (let n in obj) {
+    console.log('属性名：' + n);
+    console.log('属性值：' + obj[n]);
+}
+```
+
+##### 函数
+
+立即执行函数可创建独立的作用域，外面无法访问其中的变量。
+
+```js
+(function add(a, b) {
+    console.log(a + b);
+})(1, 2);
+```
+
+##### 作用域
+
+全局作用域：直接编写在`<script>`之中的代码。在全局作用域中无法访问函数作用域的变量。
+
+|      | 声明提前（全局或函数作用域所有代码之前）   | 未声明提前（需在声明后使用）                         |
+| ---- | ------------------------------------------ | ---------------------------------------------------- |
+| 变量 | var a = 10;                                | a = 10;                                              |
+| 函数 | function add(a, b) { console.log(a + b); } | var divide = function (a, b) { console.log(a - b); } |
+
+函数作用域中使用变量时，从自身开始往上一级作用域寻找，直至全局作用域。
+
+```js
+var c = 30;
+function fun() {
+    // undefined
+    console.log(c);
+    var c = 10;
+}
+fun();
+// 30
+console.log(c);
+```
+
+函数作用域中不使用`var`声明的变量将变成全局变量。
+
+```js
+function fun() {
+    c = 10;
+}
+fun();
+// 10
+console.log(c);
+```
+
+##### this
+
+以函数形式调用，`this`为`window`；以方法形式调用，`this`为调用方法的对象。
+
+```js
+function fun() {
+    console.log(this);
+}
+var obj = {
+    name: 'songyx',
+    objFunction: fun
+}
+// this is window
+fun();
+// this is obj
+obj.objFunction();
+```
+
+##### 原型对象
+
+应将对象中共有的内容设置到原型对象中。当访问对象的属性或方法时，若对象中查找不到，则去原型对象中查找。
+
+```js
+// 构造函数
+function Person(name, age, address) {
+    this.name = name;
+    this.age = age;
+    this.address = address;
+}
+// 避免创建对象时函数被重复创建
+Person.prototype.printName = function (params) {
+    console.log('my name is ' + this.name);
+}
+var my = new Person('songyx', 24, 'chengdu');
+my.printName();
+```
+
