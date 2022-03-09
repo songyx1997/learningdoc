@@ -788,6 +788,16 @@ for (let n in obj) {
 })(1, 2);
 ```
 
+`arguments`中存储实参。
+
+```js
+function add() {
+    console.log(arguments);
+}
+// arguments[0] = 2; arguments[1] = 3;
+add(2, 3);
+```
+
 ##### 作用域
 
 全局作用域：直接编写在`<script>`之中的代码。在全局作用域中无法访问函数作用域的变量。
@@ -840,9 +850,23 @@ fun();
 obj.objFunction();
 ```
 
+`apply()`和`call()`可以指定`this`。
+
+```js
+var one = {
+    name: 'songyx'
+}
+function add(a, b) {
+    console.log(this);
+    console.log(a + b);
+}
+// 或add.apply(one, [2, 3]), this为one
+add.call(one, 2, 3);
+```
+
 ##### 原型对象
 
-应将对象中共有的内容设置到原型对象中。当访问对象的属性或方法时，若对象中查找不到，则去原型对象中查找。
+应将对象中共有的内容设置到原型对象中。当访问对象的属性或方法时，若对象中查找不到，则去原型对象中查找。若仍然查找不到，则去原型对象的原型中去找，直至原型链的最顶端`Object.prototype`。
 
 ```js
 // 构造函数
@@ -855,7 +879,79 @@ function Person(name, age, address) {
 Person.prototype.printName = function (params) {
     console.log('my name is ' + this.name);
 }
+// 覆盖Object.prototype中的toString方法
+Person.prototype.toString = function () {
+    console.log('name:' + this.name + ' age:' + this.age + ' address:' + this.address);
+}
 var my = new Person('songyx', 24, 'chengdu');
 my.printName();
 ```
 
+##### 垃圾回收
+
+```js
+var obj = new Object();
+// 对象在堆内存中的存储就成了垃圾，js自动回收
+obj = null;
+```
+
+##### 数组
+
+元素可以为任意数据类型。
+
+```js
+var arr = [[1, '2', true], null, undefined, { name: 'songyx', age: 24 }];
+```
+
+```js
+// 第三个参数是数组本身
+arr.forEach(function (value, index, arr) {
+    console.log('第一个参数是值：' + value + ' 第二个参数是索引：' + index);
+})
+```
+
+```js
+// 不改变原数组，截取区间为[start, end)
+var newArr = arr.slice(2, 4);
+// 截取区间为[start, arr.length-1]
+var newArr = arr.slice(2);
+// 截取区间为[start, arr.length-3)
+var newArr = arr.slice(1,-3);
+/* 改变原数组，返回值为被删除的元素
+   第一个元素为开始位置，第二个元素为删除个数
+   第三个元素及以后，按顺序将新元素添加到开始位置前 */
+arr.splice(1, 2, 'str1', 'str2');
+```
+
+##### 正则表达式
+
+字符串的一些函数可将[正则表达式](https://deerchao.cn/tutorials/regex/regex.htm#mission)作为入参。
+
+```js
+// ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+var arr = '1a2B3c4D5e6F7g8H9'.split(/[A-z]/);
+// 7
+var index = 'acc|bc|aec'.search(/a[b,e]c/);
+/* ['a', 'B', 'c', 'D', 'e', 'F', 'g', 'H']
+    i为忽略大小写，g为全局匹配
+    若不写g，返回为a */
+var arr2 = '1a2B3c4D5e6F7g8H9'.match(/[a-z]/ig);
+// '1|2|3|4|5|6|7|8|9'
+var str = '1a2B3c4D5e6F7g8H9'.replace(/[a-z]/ig, '|');
+```
+
+##### DOM
+
+```js
+// 该方法可被其他节点调用
+var arr = document.getElementsByTagName('div');
+// false，返回值为nodeList，获取其中的元素arr[1]
+console.log(Array.isArray(arr));
+// <input name="goods" class="search-inp">
+var arr2 = document.getElementsByName('goods');
+// 获取样式类的名称
+console.log(arr2[0].className);
+// 参数为CSS选择器，IE8及以上可以使用
+var obj = document.querySelector('.container a');
+var arr = document.querySelectorAll('.container ~ div');
+```
