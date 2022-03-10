@@ -955,3 +955,77 @@ console.log(arr2[0].className);
 var obj = document.querySelector('.container a');
 var arr = document.querySelectorAll('.container ~ div');
 ```
+
+```js
+var person = document.getElementById('person');
+var age = document.getElementById('age');
+// 增
+var address = document.createElement('li');
+address.innerHTML = 'chengdu';
+person.appendChild(address);
+// 删
+person.removeChild(age);
+// 改
+person.replaceChild(address, age);
+// 插
+age.parentNode.insertBefore(address, age);
+```
+
+##### event
+
+超链接的`onclick`事件，可以通过`return false`避免跳转。
+
+`IE8`中，浏览器不会传递事件对象，事件对象作为`window`的属性保存。
+
+```js
+document.onmousemove = function (event) {
+    event = event || window.event;
+    // 鼠标指针相对于可见窗口的水平坐标
+    console.log(event.clientX); 
+}
+```
+
+事件的冒泡：触发子元素绑定事件，同时也会触发父元素的绑定事件。
+
+```js
+// 取消冒泡
+event.cancelBubble = true;
+```
+
+ 事件的委派：借助事件的冒泡，减少事件绑定的次数，将事件绑定给父元素。
+
+```html
+<html>
+<body>
+    <ul id="person" style="background-color: red;width: 100px;height: 100px;">
+        <li id="name">songyx</li>
+        <li id="age">24</li>
+    </ul>
+</body>
+</html>
+<script>
+    document.getElementById('person').onclick = function (event) {
+        var clickObj = event.target;
+        clickObj.style.backgroundColor = 'orange';
+    }
+</script>
+```
+
+事件的绑定
+
+```js
+// 事件绑定，例如参数为：<div>测试</div>、'click'、function() { console.log(this) }
+function bind(element, eventStr, callback) {
+    if (element.addEventListener) {
+        element.addEventListener(eventStr, callback, false)
+    } else {
+        // IE8及以下
+        element.attachEvent("on" + eventStr, function () {
+            // 借助匿名函数和call()，设定回调函数的this为element（之前为window）
+            callback(element);
+        })
+    }
+}
+```
+
+##### BOM
