@@ -1029,3 +1029,56 @@ function bind(element, eventStr, callback) {
 ```
 
 ##### BOM
+
+`navigator`包含了浏览器的相关信息 ，`userAgent`属性可用于区分浏览器类型。
+
+```js
+if (/firefox/i.test(navigator.userAgent)) {
+    console.log('firefox');
+} else if (/chrome/i.test(navigator.userAgent)) {
+    console.log('chrome');
+} else if (/msie/i.test(navigator.userAgent)) {
+    console.log('IE10及以下');
+} else if ('ActiveXObject' in window) {
+    console.log('IE11');
+}
+```
+
+`history`记录了浏览器的历史信息。
+
+```js
+document.getElementById('btn').onclick = function () {
+    // forward() = go(1)、back() = go(-1)
+    history.go(n);
+}
+```
+
+`location`包含了地址栏信息。
+
+```js
+// 跳转到指定页面，会生成历史记录
+location = 'newUrl';
+// 参数可选，若为ture则是清除缓存加载页面
+location.reload(true);
+// 跳转到指定页面，但不会生成历史记录
+location.replace('newUrl');
+```
+
+`setInterval`返回值为定时器的标识。
+
+```js
+var flag;
+document.getElementById('btn').onclick = function () {
+    // 避免定时器被重复开启
+    clearInterval(flag);
+    var index = 0;
+    flag = setInterval(function () {
+        console.log(index++);
+        if (index > 5) {
+            clearInterval(flag);
+        }
+    }, 500);
+}
+```
+
+`setTimeout`只执行一次，返回值为延时调用的标识。

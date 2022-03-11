@@ -208,16 +208,12 @@ body {
   z-index: 20;
   height: 460px;
 }
-.sideBar .banner-imgs {
+.sideBar .banner-img {
   position: absolute;
-  width: 100%;
-  height: 100%;
-}
-.sideBar .banner-imgs li {
-  position: absolute;
-}
-.sideBar .banner-imgs img {
-  width: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1226px;
 }
 .sideBar .banner-pointers {
   position: absolute;
@@ -229,6 +225,7 @@ body {
   background-color: white;
 }
 .sideBar .banner-pointers a {
+  cursor: pointer;
   float: right;
   width: 6px;
   height: 6px;
