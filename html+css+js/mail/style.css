@@ -207,13 +207,26 @@ body {
   position: relative;
   z-index: 20;
   height: 460px;
+  overflow: hidden;
 }
-.sideBar .banner-img {
+.sideBar .banner-imgs > li {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 1226px;
+  width: 100%;
+}
+.sideBar .banner-imgs > li img {
+  width: 100%;
+}
+.sideBar .banner-imgs > li:nth-of-type(1) {
+  left: 0;
+}
+.sideBar .banner-imgs > li:nth-of-type(2) {
+  left: 1226px;
+}
+.sideBar .banner-imgs > li:nth-of-type(3) {
+  left: 2452px;
 }
 .sideBar .banner-pointers {
   position: absolute;
