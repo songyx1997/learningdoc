@@ -256,30 +256,21 @@ body {
     position: relative;
     z-index: 20;
     height: 460px;
-    overflow: hidden;
 
     .banner-imgs {
-        &>li {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: inherit;
+        overflow: hidden;
+        // 移除行级元素之间的空格
+        font-size: 0;
+
+        li {
+            display: inline-block;
 
             img {
-                width: 100%;
-            }
-
-            &:nth-of-type(1) {
-                left: 0;
-            }
-
-            &:nth-of-type(2) {
-                left: @min-width;
-            }
-
-            &:nth-of-type(3) {
-                left: @min-width*2;
+                width: @min-width;
             }
         }
     }

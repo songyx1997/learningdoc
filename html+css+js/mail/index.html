@@ -124,7 +124,7 @@
         <div class="banner-pointers">
             <a></a>
             <a></a>
-            <a class="pointer-active"></a>
+            <a></a>
         </div>
         <ul class="sideBar-menu">
             <li>
@@ -287,3 +287,17 @@
 </body>
 
 </html>
+<script>
+    pointers = [...document.querySelectorAll('.banner-pointers > a')].reverse();
+    imgs = document.querySelector('.banner-imgs');
+    for (let index = 0; index < pointers.length; index++) {
+        pointers[index].onclick = function () {
+            imgs.style.left = -1226 * index + 'px';
+            pointers.forEach(element => {
+                // 重置为未激活状态
+                element.className = null;
+            });
+            pointers[index].className = 'pointer-active';
+        }
+    }
+</script>
