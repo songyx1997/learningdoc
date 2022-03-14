@@ -256,15 +256,16 @@ body {
     position: relative;
     z-index: 20;
     height: 460px;
+    overflow: hidden;
 
     .banner-imgs {
         position: absolute;
         left: 0;
         top: 0;
-        height: inherit;
-        overflow: hidden;
+        width: 3*@min-width;
         // 移除行级元素之间的空格
         font-size: 0;
+        transition: left .8s;
 
         li {
             display: inline-block;

@@ -207,14 +207,15 @@ body {
   position: relative;
   z-index: 20;
   height: 460px;
+  overflow: hidden;
 }
 .sideBar .banner-imgs {
   position: absolute;
   left: 0;
   top: 0;
-  height: inherit;
-  overflow: hidden;
+  width: 3678px;
   font-size: 0;
+  transition: left 0.8s;
 }
 .sideBar .banner-imgs li {
   display: inline-block;

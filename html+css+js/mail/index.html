@@ -124,7 +124,7 @@
         <div class="banner-pointers">
             <a></a>
             <a></a>
-            <a></a>
+            <a class="pointer-active"></a>
         </div>
         <ul class="sideBar-menu">
             <li>
@@ -288,16 +288,43 @@
 
 </html>
 <script>
-    pointers = [...document.querySelectorAll('.banner-pointers > a')].reverse();
-    imgs = document.querySelector('.banner-imgs');
-    for (let index = 0; index < pointers.length; index++) {
-        pointers[index].onclick = function () {
-            imgs.style.left = -1226 * index + 'px';
-            pointers.forEach(element => {
-                // 重置为未激活状态
-                element.className = null;
-            });
-            pointers[index].className = 'pointer-active';
+    var pointers = [...document.querySelectorAll('.banner-pointers > a')].reverse();
+    var imgs = document.querySelector('.banner-imgs');
+    // 设置定时器变量
+    var index = 0;
+    var flag;
+
+    // 绑定点击事件    
+    for (var i = 0; i < pointers.length; i++) {
+        pointers[i].index = i;
+        // 此处可使用let
+        pointers[i].onclick = function () {
+            clickChange(this.index);
+            setPointer(this.index);
+        };
+    }
+
+    flag = setInterval(function () {
+        index++;
+        setPointer(index);
+        clickChange(index);
+    }, 2400);
+
+    function clickChange(i) {
+        imgs.style.left = -1226 * (i) + 'px';
+        index = i;
+    }
+
+    // 设置轮播图点击状态
+    function setPointer(j) {
+        if (j >= pointers.length) {
+            j = 0;
+            index = 0;
         }
+        pointers.forEach(element => {
+            // 重置为未激活状态
+            element.className = null;
+        });
+        pointers[j].className = 'pointer-active';
     }
 </script>
