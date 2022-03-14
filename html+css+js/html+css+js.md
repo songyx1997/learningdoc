@@ -818,18 +818,17 @@ obj.fun()()
 | 变量 | var a = 10                                | a = 10                                              |
 | 函数 | function add(a, b) { console.log(a + b) } | var divide = function (a, b) { console.log(a - b) } |
 
-函数作用域中使用变量时，从自身开始往上一级作用域寻找，直至全局作用域。
+函数作用域在函数定义时确定，函数作用域中使用变量时，从自身开始往上一级作用域寻找，直至全局作用域。
 
 ```js
+// undefined
+console.log(c)
 var c = 30
 function fun() {
-    // undefined
+    // 30
     console.log(c)
-    var c = 10
 }
 fun()
-// 30
-console.log(c)
 ```
 
 函数作用域中不使用`var`声明的变量将变成全局变量。
@@ -877,7 +876,7 @@ add.call(one, 2, 3)
 
 ##### 原型对象
 
-应将对象中共有的内容设置到原型对象中。当访问对象的属性或方法时，若对象中查找不到，则去原型对象中查找。若仍然查找不到，则去原型对象的原型中去找，直至原型链的最顶端`Object.prototype`。
+应将对象中共有的内容设置到原型对象中。
 
 ```js
 // 构造函数
@@ -1184,9 +1183,9 @@ console.log('当语句均省略分号时，在IIFE前添加分号避免报错')
 $().fun()
 ```
 
-**隐式原型与显式原型的关系？**
+**隐式原型与显式原型的关系？什么是隐式原型链？**
 
-显式原型是定义构造函数时自动添加，默认为空`Object`对象。
+显式原型是定义构造函数时自动添加，默认为空`Object`实例对象。
 
 隐式原型是通过构造函数创建实例时添加，构造函数包含隐藏语句：`this.__proto__ == Person.prototype`。
 
@@ -1195,3 +1194,62 @@ var my = new Person('songyx', 24, 'chengdu')
 // 显式原型为Person.prototype，隐式原型为my.__proto__，返回为true
 console.log(Person.prototype === my.__proto__)
 ```
+
+<div style="margin:0 auto;width:65%">
+    <img src=".\原型对象.png">
+</div>
+
+当访问对象的属性时。若自身查找不到，则沿着`__proto__`这条链向上查找。若仍然查找不到，返回`undefined`。Object的原型对象为原型链的尽头，因为`Object.prototype.__proto__ = null`。
+
+在显式原型中定义的方法`test()`。通过实例`my`进行调用时，在自身的属性中未查找到，则去查找自身隐式原型的属性，由于隐式原型与显式原型的内在关系，保证一定可以查到。
+
+```js
+function F() { }
+Object.prototype.a = function () {
+    console.log('a')
+}
+Function.prototype.b = function () {
+    console.log('b')
+}
+var f = new F()
+// a
+f.a()
+// 报错
+f.b()
+// a
+F.a()
+// b
+F.b()
+// true(特殊)
+console.log(Function.prototype === Function.__proto__)
+```
+
+##### 从原型链的角度解释`instanceof`？
+
+`A instanceof B`，当B的显式原型在A的原型链上，就返回true。
+
+**变量声明提升与函数声明提升如何产生的？**
+
+执行全局代码前对全局数据进行预处理：
+
+1.`var`声明的变量赋值为`undefined`，添加为`window（全局执行上下文）`的属性。
+
+2.`function`赋值为`fun()`，添加为`window`的方法。
+
+3.`this`赋值为`window`。
+
+调用函数前对局部数据进行预处理：
+
+1.形参赋值为实参、`arguments`赋值为实参列表、`var`声明的变量赋值为`undefined`，添加为函数执行上下文（虚拟的，存在于栈内存中）的属性。
+
+2.`function`赋值为`fun()`，添加为函数执行上下文的方法。
+
+3.`this`赋值为调用函数的对象。
+
+函数执行上下文以栈的形式存储，栈的最底层为`window`。开始调用时压栈，结束调用时出栈。
+
+**变量声明提升与函数声明提升的优先级？**
+
+先执行变量声明提升。
+
+**什么是闭包？**
