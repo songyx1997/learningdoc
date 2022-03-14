@@ -706,9 +706,9 @@ div {
 
 ```javascript
 // 输出为233
-parseInt('233str');
+parseInt('233str')
 // 输出为NaN（Not a Number）
-parseInt('str233str');
+parseInt('str233str')
 ```
 
 `&&`第一个值为`true`则返回第二个值；第一个值为`false`，直接返回第一个。
@@ -729,16 +729,16 @@ parseInt('str233str');
 ##### 对象
 
 ```js
-var obj = new Object();
+var obj = new Object()
 // 增、改
-obj.name = 'songyx';
-obj.age = 24;
-obj.address = 'chengdu';
-console.log(obj);
+obj.name = 'songyx'
+obj.age = 24
+obj.address = 'chengdu'
+console.log(obj)
 // 删
-delete obj.address;
+delete obj.address
 // 检查对象是否包含指定属性名
-console.log('address' in obj);
+console.log('address' in obj)
 ```
 
 **栈内存**主要用于存储各种基本类型（`Boolean`、`Number`、`String`、`Undefined`、`Null`）的变量以及对象的引用。
@@ -750,17 +750,17 @@ console.log('address' in obj);
 </div>
 
 ```js
-var one = { name: 'songyx' };
-var two = {};
+var one = { name: 'songyx' }
+var two = {}
 // 栈内存中，拷贝对象的引用
-two = one;
-two.name = 'bison';
+two = one
+two.name = 'bison'
 // {name: 'bison'}
-console.log(one);
+console.log(one)
 // 清除对象的引用
-two = null;
+two = null
 // {name: 'bison'}
-console.log(one);
+console.log(one)
 ```
 
 `==`在比较对象时，比较的是栈内存中对象的引用是否相同。
@@ -771,65 +771,76 @@ console.log(one);
 var obj = {
     name: 'songyx',
     age: 24
-};
+}
 for (let n in obj) {
-    console.log('属性名：' + n);
-    console.log('属性值：' + obj[n]);
+    console.log('属性名：' + n)
+    console.log('属性值：' + obj[n])
 }
 ```
 
 ##### 函数
 
-立即执行函数可创建独立的作用域，外面无法访问其中的变量。
-
-```js
-(function add(a, b) {
-    console.log(a + b);
-})(1, 2);
-```
-
 `arguments`中存储实参。
 
 ```js
 function add() {
-    console.log(arguments);
+    console.log(arguments)
 }
-// arguments[0] = 2; arguments[1] = 3;
-add(2, 3);
+// arguments[0] = 2、arguments[1] = 3
+add(2, 3)
 ```
+
+函数是一种特殊的对象，通过`()`进行调用。
+
+```js
+var obj = {
+    name: 'songyx',
+    age: 24,
+    fun: function () {
+        var money = 0
+        return function () {
+            console.log('my money is ' + money)
+        }
+    }
+}
+// 调用方式
+obj.fun()()
+```
+
+调用函数是对值的拷贝，形参拷贝实参的值。这个值可以是一般数据，也可以是地址数据。
 
 ##### 作用域
 
 全局作用域：直接编写在`<script>`之中的代码。在全局作用域中无法访问函数作用域的变量。
 
-|      | 声明提前（全局或函数作用域所有代码之前）   | 未声明提前（需在声明后使用）                         |
-| ---- | ------------------------------------------ | ---------------------------------------------------- |
-| 变量 | var a = 10;                                | a = 10;                                              |
-| 函数 | function add(a, b) { console.log(a + b); } | var divide = function (a, b) { console.log(a - b); } |
+|      | 声明提前（全局或函数作用域所有代码之前）  | 未声明提前（需在声明后使用）                        |
+| ---- | ----------------------------------------- | --------------------------------------------------- |
+| 变量 | var a = 10                                | a = 10                                              |
+| 函数 | function add(a, b) { console.log(a + b) } | var divide = function (a, b) { console.log(a - b) } |
 
 函数作用域中使用变量时，从自身开始往上一级作用域寻找，直至全局作用域。
 
 ```js
-var c = 30;
+var c = 30
 function fun() {
     // undefined
-    console.log(c);
-    var c = 10;
+    console.log(c)
+    var c = 10
 }
-fun();
+fun()
 // 30
-console.log(c);
+console.log(c)
 ```
 
 函数作用域中不使用`var`声明的变量将变成全局变量。
 
 ```js
 function fun() {
-    c = 10;
+    c = 10
 }
-fun();
+fun()
 // 10
-console.log(c);
+console.log(c)
 ```
 
 ##### this
@@ -838,16 +849,16 @@ console.log(c);
 
 ```js
 function fun() {
-    console.log(this);
+    console.log(this)
 }
 var obj = {
     name: 'songyx',
     objFunction: fun
 }
 // this is window
-fun();
+fun()
 // this is obj
-obj.objFunction();
+obj.objFunction()
 ```
 
 `apply()`和`call()`可以指定`this`。
@@ -857,11 +868,11 @@ var one = {
     name: 'songyx'
 }
 function add(a, b) {
-    console.log(this);
-    console.log(a + b);
+    console.log(this)
+    console.log(a + b)
 }
 // 或add.apply(one, [2, 3]), this为one
-add.call(one, 2, 3);
+add.call(one, 2, 3)
 ```
 
 ##### 原型对象
@@ -871,28 +882,28 @@ add.call(one, 2, 3);
 ```js
 // 构造函数
 function Person(name, age, address) {
-    this.name = name;
-    this.age = age;
-    this.address = address;
+    this.name = name
+    this.age = age
+    this.address = address
 }
 // 避免创建对象时函数被重复创建
 Person.prototype.printName = function (params) {
-    console.log('my name is ' + this.name);
+    console.log('my name is ' + this.name)
 }
 // 覆盖Object.prototype中的toString方法
 Person.prototype.toString = function () {
-    console.log('name:' + this.name + ' age:' + this.age + ' address:' + this.address);
+    console.log('name:' + this.name + ' age:' + this.age + ' address:' + this.address)
 }
-var my = new Person('songyx', 24, 'chengdu');
-my.printName();
+var my = new Person('songyx', 24, 'chengdu')
+my.printName()
 ```
 
 ##### 垃圾回收
 
 ```js
-var obj = new Object();
+var obj = new Object()
 // 对象在堆内存中的存储就成了垃圾，js自动回收
-obj = null;
+obj = null
 ```
 
 ##### 数组
@@ -900,27 +911,27 @@ obj = null;
 元素可以为任意数据类型。
 
 ```js
-var arr = [[1, '2', true], null, undefined, { name: 'songyx', age: 24 }];
+var arr = [[1, '2', true], null, undefined, { name: 'songyx', age: 24 }]
 ```
 
 ```js
 // 第三个参数是数组本身
 arr.forEach(function (value, index, arr) {
-    console.log('第一个参数是值：' + value + ' 第二个参数是索引：' + index);
+    console.log('第一个参数是值：' + value + ' 第二个参数是索引：' + index)
 })
 ```
 
 ```js
 // 不改变原数组，截取区间为[start, end)
-var newArr = arr.slice(2, 4);
+var newArr = arr.slice(2, 4)
 // 截取区间为[start, arr.length-1]
-var newArr = arr.slice(2);
+var newArr = arr.slice(2)
 // 截取区间为[start, arr.length-3)
-var newArr = arr.slice(1,-3);
+var newArr = arr.slice(1,-3)
 /* 改变原数组，返回值为被删除的元素
    第一个元素为开始位置，第二个元素为删除个数
    第三个元素及以后，按顺序将新元素添加到开始位置前 */
-arr.splice(1, 2, 'str1', 'str2');
+arr.splice(1, 2, 'str1', 'str2')
 ```
 
 ##### 正则表达式
@@ -929,46 +940,46 @@ arr.splice(1, 2, 'str1', 'str2');
 
 ```js
 // ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-var arr = '1a2B3c4D5e6F7g8H9'.split(/[A-z]/);
+var arr = '1a2B3c4D5e6F7g8H9'.split(/[A-z]/)
 // 7
-var index = 'acc|bc|aec'.search(/a[b,e]c/);
+var index = 'acc|bc|aec'.search(/a[b,e]c/)
 /* ['a', 'B', 'c', 'D', 'e', 'F', 'g', 'H']
     i为忽略大小写，g为全局匹配
     若不写g，返回为a */
-var arr2 = '1a2B3c4D5e6F7g8H9'.match(/[a-z]/ig);
+var arr2 = '1a2B3c4D5e6F7g8H9'.match(/[a-z]/ig)
 // '1|2|3|4|5|6|7|8|9'
-var str = '1a2B3c4D5e6F7g8H9'.replace(/[a-z]/ig, '|');
+var str = '1a2B3c4D5e6F7g8H9'.replace(/[a-z]/ig, '|')
 ```
 
 ##### DOM
 
 ```js
 // 该方法可被其他节点调用
-var arr = document.getElementsByTagName('div');
+var arr = document.getElementsByTagName('div')
 // false，返回值为nodeList，获取其中的元素arr[1]
-console.log(Array.isArray(arr));
+console.log(Array.isArray(arr))
 // <input name="goods" class="search-inp">
-var arr2 = document.getElementsByName('goods');
+var arr2 = document.getElementsByName('goods')
 // 获取样式类的名称
-console.log(arr2[0].className);
+console.log(arr2[0].className)
 // 参数为CSS选择器，IE8及以上可以使用
-var obj = document.querySelector('.container a');
-var arr = document.querySelectorAll('.container ~ div');
+var obj = document.querySelector('.container a')
+var arr = document.querySelectorAll('.container ~ div')
 ```
 
 ```js
-var person = document.getElementById('person');
-var age = document.getElementById('age');
+var person = document.getElementById('person')
+var age = document.getElementById('age')
 // 增
-var address = document.createElement('li');
-address.innerHTML = 'chengdu';
-person.appendChild(address);
+var address = document.createElement('li')
+address.innerHTML = 'chengdu'
+person.appendChild(address)
 // 删
-person.removeChild(age);
+person.removeChild(age)
 // 改
-person.replaceChild(address, age);
+person.replaceChild(address, age)
 // 插
-age.parentNode.insertBefore(address, age);
+age.parentNode.insertBefore(address, age)
 ```
 
 ##### event
@@ -979,9 +990,9 @@ age.parentNode.insertBefore(address, age);
 
 ```js
 document.onmousemove = function (event) {
-    event = event || window.event;
+    event = event || window.event
     // 鼠标指针相对于可见窗口的水平坐标
-    console.log(event.clientX); 
+    console.log(event.clientX) 
 }
 ```
 
@@ -989,7 +1000,7 @@ document.onmousemove = function (event) {
 
 ```js
 // 取消冒泡
-event.cancelBubble = true;
+event.cancelBubble = true
 ```
 
  事件的委派：借助事件的冒泡，减少事件绑定的次数，将事件绑定给父元素。
@@ -1005,8 +1016,8 @@ event.cancelBubble = true;
 </html>
 <script>
     document.getElementById('person').onclick = function (event) {
-        var clickObj = event.target;
-        clickObj.style.backgroundColor = 'orange';
+        var clickObj = event.target
+        clickObj.style.backgroundColor = 'orange'
     }
 </script>
 ```
@@ -1022,7 +1033,7 @@ function bind(element, eventStr, callback) {
         // IE8及以下
         element.attachEvent("on" + eventStr, function () {
             // 借助匿名函数和call()，设定回调函数的this为element（之前为window）
-            callback(element);
+            callback(element)
         })
     }
 }
@@ -1034,13 +1045,13 @@ function bind(element, eventStr, callback) {
 
 ```js
 if (/firefox/i.test(navigator.userAgent)) {
-    console.log('firefox');
+    console.log('firefox')
 } else if (/chrome/i.test(navigator.userAgent)) {
-    console.log('chrome');
+    console.log('chrome')
 } else if (/msie/i.test(navigator.userAgent)) {
-    console.log('IE10及以下');
+    console.log('IE10及以下')
 } else if ('ActiveXObject' in window) {
-    console.log('IE11');
+    console.log('IE11')
 }
 ```
 
@@ -1049,7 +1060,7 @@ if (/firefox/i.test(navigator.userAgent)) {
 ```js
 document.getElementById('btn').onclick = function () {
     // forward() = go(1)、back() = go(-1)
-    history.go(n);
+    history.go(n)
 }
 ```
 
@@ -1057,28 +1068,130 @@ document.getElementById('btn').onclick = function () {
 
 ```js
 // 跳转到指定页面，会生成历史记录
-location = 'newUrl';
+location = 'newUrl'
 // 参数可选，若为ture则是清除缓存加载页面
-location.reload(true);
+location.reload(true)
 // 跳转到指定页面，但不会生成历史记录
-location.replace('newUrl');
+location.replace('newUrl')
 ```
 
 `setInterval`返回值为定时器的标识。
 
 ```js
-var flag;
+var flag
 document.getElementById('btn').onclick = function () {
     // 避免定时器被重复开启
-    clearInterval(flag);
-    var index = 0;
+    clearInterval(flag)
+    var index = 0
     flag = setInterval(function () {
-        console.log(index++);
+        console.log(index++)
         if (index > 5) {
-            clearInterval(flag);
+            clearInterval(flag)
         }
-    }, 500);
+    }, 500)
 }
 ```
 
 `setTimeout`只执行一次，返回值为延时调用的标识。
+
+##### 类
+
+采用设置类的方式改变样式，浏览器只需渲染一次。
+
+```js
+obj.className += ' ' + 'pointer-active'
+```
+
+##### JSON
+
+`JSON`是特殊格式的字符串，属性名必须加双引号，用于前后端数据传输。
+
+```js
+// 前端接收数据
+var myJSON = '{"name":"songyx","age":24}'
+var myObj = JSON.parse(myJSON)
+// 适配低版本IE浏览器，但执行性能较差且具有安全隐患。
+var myObj = eval('(' + myJSON + ')')
+```
+
+```js
+// 前端发送数据
+var myObj = { name: 'songyx', age: 24 }
+var myJSON = JSON.stringify(myObj)
+```
+
+#### 5. Tips
+
+**`undefined`和`null`的区别？**
+
+`undefined`为声明了但未赋值，`null`为声明了且赋值为`null`。
+
+**何时赋值为`null`？**
+
+1.初始赋值为null，表明之后将要赋值为对象。
+
+2.对象最后赋值为null，利用垃圾回收释放内存。
+
+**内存空间自动释放和垃圾回收的区别？**
+
+```js
+function fun() {
+    var A = {}
+}
+/* 
+ * 函数调用结束后
+ * 局部变量A占用的内存空间（栈内存）自动释放。
+ * A指向的对象在之后的某个时刻被gc回收。
+ */
+fun()
+```
+
+**何时使用`['属性名']`方式？**
+
+变量名不确定的时候。
+
+```js
+var person = {}
+var variable = 'name'
+person[variable] = 'songyx'
+```
+
+**回调函数的特征？常见的回调函数？**
+
+1.你定义的，你没有调用，但最终它执行了。
+
+2.`dom`事件回调函数、定时器回调函数、`ajax`请求回调函数、生命周期回调函数。
+
+**什么是IIFE？**
+
+立即执行函数可创建独立的作用域，作用为隐藏实现、不会污染外部命名空间。
+
+```js
+console.log('当语句均省略分号时，在IIFE前添加分号避免报错')
+; (function () {
+    var str = 'testStr'
+    function test() {
+        console.log(str)
+    }
+    window.$ = function () {
+        return {
+            // 通过暴露出的方法访问隐藏变量str
+            fun: test
+        }
+    }
+})()
+// 输出testStr
+$().fun()
+```
+
+**隐式原型与显式原型的关系？**
+
+显式原型是定义构造函数时自动添加，默认为空`Object`对象。
+
+隐式原型是通过构造函数创建实例时添加，构造函数包含隐藏语句：`this.__proto__ == Person.prototype`。
+
+```js
+var my = new Person('songyx', 24, 'chengdu')
+// 显式原型为Person.prototype，隐式原型为my.__proto__，返回为true
+console.log(Person.prototype === my.__proto__)
+```
