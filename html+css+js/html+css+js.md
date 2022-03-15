@@ -831,17 +831,6 @@ function fun() {
 fun()
 ```
 
-函数作用域中不使用`var`声明的变量将变成全局变量。
-
-```js
-function fun() {
-    c = 10
-}
-fun()
-// 10
-console.log(c)
-```
-
 ##### this
 
 以函数形式调用，`this`为`window`；以方法形式调用，`this`为调用方法的对象。
@@ -1119,19 +1108,23 @@ var myObj = { name: 'songyx', age: 24 }
 var myJSON = JSON.stringify(myObj)
 ```
 
-#### 5. Tips
+#### 5.JQuery
 
-**`undefined`和`null`的区别？**
+#### 6.HTML5
+
+#### 7. JS高阶
+
+##### `undefined`和`null`的区别？
 
 `undefined`为声明了但未赋值，`null`为声明了且赋值为`null`。
 
-**何时赋值为`null`？**
+##### 何时赋值为`null`？
 
 1.初始赋值为null，表明之后将要赋值为对象。
 
 2.对象最后赋值为null，利用垃圾回收释放内存。
 
-**内存空间自动释放和垃圾回收的区别？**
+##### 内存空间自动释放和垃圾回收的区别？
 
 ```js
 function fun() {
@@ -1145,7 +1138,7 @@ function fun() {
 fun()
 ```
 
-**何时使用`['属性名']`方式？**
+##### 何时使用`['属性名']`方式？
 
 变量名不确定的时候。
 
@@ -1155,13 +1148,13 @@ var variable = 'name'
 person[variable] = 'songyx'
 ```
 
-**回调函数的特征？常见的回调函数？**
+##### 回调函数的特征？常见的回调函数？
 
 1.你定义的，你没有调用，但最终它执行了。
 
 2.`dom`事件回调函数、定时器回调函数、`ajax`请求回调函数、生命周期回调函数。
 
-**什么是IIFE？**
+##### 什么是IIFE？
 
 立即执行函数可创建独立的作用域，作用为隐藏实现、不会污染外部命名空间。
 
@@ -1183,7 +1176,7 @@ console.log('当语句均省略分号时，在IIFE前添加分号避免报错')
 $().fun()
 ```
 
-**隐式原型与显式原型的关系？什么是隐式原型链？**
+##### 隐式原型与显式原型的关系？什么是隐式原型链？
 
 显式原型是定义构造函数时自动添加，默认为空`Object`实例对象。
 
@@ -1228,7 +1221,7 @@ console.log(Function.prototype === Function.__proto__)
 
 `A instanceof B`，当B的显式原型在A的原型链上，就返回true。
 
-**变量声明提升与函数声明提升如何产生的？**
+##### 变量声明提升与函数声明提升如何产生的？
 
 执行全局代码前对全局数据进行预处理：
 
@@ -1248,8 +1241,124 @@ console.log(Function.prototype === Function.__proto__)
 
 函数执行上下文以栈的形式存储，栈的最底层为`window`。开始调用时压栈，结束调用时出栈。
 
-**变量声明提升与函数声明提升的优先级？**
+##### 变量声明提升与函数声明提升的优先级？
 
 先执行变量声明提升。
 
-**什么是闭包？**
+##### 什么是闭包？常见的闭包？
+
+内部子函数引用了外部父函数的变量或函数，当调用外部函数（即执行了内部函数定义），就产生了闭包（存在于内部子函数中）。
+
+1.将内部函数作为外部函数的返回值。
+
+```js
+function father() {
+    var a = 1
+    function son() {
+        a++
+        return a
+    }
+    return son
+}
+// 创建一个了内部函数对象
+var f = father()
+// 调用该内部函数对象，输出为2
+console.log(f())
+// 输出为3
+console.log(f())
+// 当包含闭包的函数对象成为垃圾对象时，闭包死亡。
+f = null
+```
+
+局部变量`a`在函数调用后并未被销毁，延长了其生命周期。使得外部函数可以操纵内部数据。
+
+2.将函数作为实参传递给另外一个函数。
+
+```js
+function fun(message, time) {
+    setTimeout(function () {
+        // message导致了闭包
+        console.log(message)
+    }, time)
+}
+fun('测试', 1000)
+```
+
+##### 如何利用闭包实现自定义`JS`模块？
+
+`jQuery`就是通过该方法实现。
+
+```js
+// 分号与形参的使用都是为了代码压缩
+; (function (window) {
+    var now
+    function getStandardDate() {
+        now = new Date()
+        return now.getFullYear() + format(now.getMonth() + 1) + format(now.getDate())
+    }
+    function format(num) {
+        num = num.toString()
+        return num.length == 1 ? '0' + num : num
+    }
+    window.DateUtil = {
+        // 暴露的方法
+        getStandardDate: getStandardDate
+    }
+})(window)
+```
+
+```html
+<head>
+    <script type="text/javascript" src="./DateUtil.js"></script>
+</head>
+<script>
+    console.log(DateUtil.getStandardDate())
+</script>
+```
+
+##### 什么是内存泄漏？常见的内存泄漏？
+
+占用的内存未及时释放。
+
+1.意外的全局变量。函数作用域中不使用`var`声明的变量将变成全局变量。
+
+```js
+function fun() {
+    c = 10
+}
+fun()
+// 10
+console.log(c)
+```
+
+2.闭包未死亡。
+
+##### js如何实现继承？
+
+```js
+// 构造函数继承
+function Father(name, age) {
+    this.name = name
+    this.age = age
+}
+Father.prototype.setName = function (name) {
+    this.name = name
+}
+function Son(name, age, score) {
+    Father.call(this, name, age)
+    this.score = score
+}
+// 原型链继承
+Son.prototype = new Father()
+Son.prototype.constructor = Son
+// 子类方法定义须在原型链继承之后
+Son.prototype.setScore = function (score) {
+    this.score = score
+}
+// 使用
+var son = new Son('songyx', 24, 90)
+son.setName('syx1997')
+son.setScore(80)
+// {name: 'syx1997', age: 24, score: 80}
+console.log(son)
+```
