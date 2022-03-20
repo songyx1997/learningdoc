@@ -1110,7 +1110,7 @@ var myJSON = JSON.stringify(myObj)
 
 #### 5.JQuery
 
-#### 6.HTML5
+#### 6.Ajax
 
 #### 7. JS高阶
 
@@ -1191,6 +1191,7 @@ console.log(Person.prototype === my.__proto__)
 <div style="margin:0 auto;width:65%">
     <img src=".\原型对象.png">
 </div>
+
 
 当访问对象的属性时。若自身查找不到，则沿着`__proto__`这条链向上查找。若仍然查找不到，返回`undefined`。Object的原型对象为原型链的尽头，因为`Object.prototype.__proto__ = null`。
 
@@ -1336,29 +1337,97 @@ console.log(c)
 ##### js如何实现继承？
 
 ```js
-// 构造函数继承
+// 1.
 function Father(name, age) {
     this.name = name
     this.age = age
 }
-Father.prototype.setName = function (name) {
-    this.name = name
+Father.prototype.initName = function () {
+    this.name = 'default'
 }
+// 2.构造函数继承
 function Son(name, age, score) {
     Father.call(this, name, age)
     this.score = score
 }
-// 原型链继承
+// 3.原型链继承
 Son.prototype = new Father()
+// 4.校正显示原型的constructor属性指向
 Son.prototype.constructor = Son
 // 子类方法定义须在原型链继承之后
-Son.prototype.setScore = function (score) {
-    this.score = score
+Son.prototype.initScore = function () {
+    this.score = 0
 }
-// 使用
+// 5.使用
 var son = new Son('songyx', 24, 90)
-son.setName('syx1997')
-son.setScore(80)
-// {name: 'syx1997', age: 24, score: 80}
+son.initName()
+son.initScore()
+// {name: 'default', age: 24, score: 0}
 console.log(son)
 ```
+
+<div style="margin:0 auto;width:75%">
+    <img src=".\组合继承.png">
+</div>
+
+##### 什么是浏览器内核？
+
+支撑浏览器运行的最核心的程序，由很多模块组成。
+
+主线程：`js`引擎、`html,css`文档解析模块、`DOM/CSS`模块、布局和渲染模块。
+
+分线程：定时器模块、事件响应模块、网络请求模块`Ajax`。
+
+##### 什么是事件循环模型？
+
+`js`是单线程执行的。首先执行初始化代码（设置定时器、绑定监听、发送`Ajax`请求），并将其中的回调函数放入回调函数队列。之后遍历队列依次执行回调函数。
+
+<div style="margin:0 auto;width:60%">
+    <img src=".\事件循环模型.png">
+</div>
+
+##### JS如何实现多线程？
+
+使用`Web Workers`创建分线程。
+
+```html
+<html>
+<head>
+    <script type="text/JavaScript" src="./worker.js"></script>
+</head>
+<body>
+    <input class="number">
+    <button id='btn'>点击</button>
+</body>
+</html>
+<script>
+    var input = document.querySelector('.number')
+    // 创建Worker对象
+    var worker = new Worker('worker.js')
+    document.getElementById('btn').onclick = function () {
+        // 发送数据给分线程 
+        worker.postMessage(input.value)
+        worker.onmessage = function (event) {
+            alert(event.data)
+        }
+    }
+</script>
+```
+
+使用`postMessage`双向通信。
+
+```js
+// 分线程接收数据
+var onmessage = function (event) {
+    var number = event.data
+    var result = calculate(number)
+    // 发送数据回主线程
+    postMessage(result)
+    // 注意分线程中全局对象不再是window，alert()等方法失效
+}
+function calculate(number) {
+    return number <= 2 ? 1 : calculate(number - 1) + calculate(number - 2)
+}
+```
+
+不足：不能跨域加载`js`、`worker`内的代码不能访问DOM、有些浏览器不支持。
