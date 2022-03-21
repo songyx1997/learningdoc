@@ -6,7 +6,14 @@ const { request } = require('http')
 const app = express()
 
 // request、response分别为请求、响应报文的封装
-app.get('/', (request, response) => {
+app.get('/getServer', (request, response) => {
+    // 设置允许跨域
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.send('Hello')
+})
+
+app.post('/postServer', (request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', '*');
     response.send('Hello')
 })
 
