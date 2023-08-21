@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test</title>
+</head>
+
+<body>
+    <button id="btn">点击发送请求</button>
+    <input id="text">
+</body>
+
+</html>
+<script>
+    var btn = document.getElementById('btn')
+    var text = document.getElementById('text')
+    btn.onclick = function () {
+        // 创建对象
+        const xhr = new XMLHttpRequest()
+        // 设置请求方法与url
+        xhr.open('POST', 'http://127.0.0.1:8000/postServer')
+        // 发送
+        xhr.send('a=100&b=200')
+        // 处理返回结果
+        xhr.onreadystatechange = function () {
+            // 该状态表示解析已完成
+            if (xhr.readyState === 4) {
+                // 该范围内的状态码均为成功
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    text.value = xhr.response
+                }
+            }
+        }
+    }
+</script>
