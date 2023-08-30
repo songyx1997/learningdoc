@@ -252,8 +252,6 @@ Token：{
 <div style="margin:0 auto;width:55%">
     <img src=".\token序列.png">
 </div>
-
-
 完整源码分析如下：
 
 ```javascript
@@ -512,4 +510,3 @@ for (i = 0 ; i < 10000; i ++ ) {
     a.append(i);   
 }
 ```
-
