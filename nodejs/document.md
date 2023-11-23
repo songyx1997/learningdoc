@@ -176,7 +176,7 @@ console.log(path.resolve(__dirname + path.sep + 'index.html'))
 
 #### http
 
-##### 基础
+##### 启动
 
 ```javascript
 let http = require('http');
@@ -200,3 +200,44 @@ server.listen(10086, () => {
 HTTP的默认端口为80，HTTPS的默认端口为443。
 
 ##### 获取请求报文
+
+```javascript
+let server = http.createServer((req, res) => {
+    // 例如：/search?a=1&b=2
+    console.log(req.url);
+    // 请求头中的键值将被转换为小写，如User-Agent转换为'user-agent'
+    console.log(req.headers);
+    res.end('hello');
+});
+```
+
+##### url
+
+使用url模块去提取请求的路径与查询字符串。
+
+```javascript
+let server = http.createServer((req, res) => {
+    // 请求url为http://localhost:10086/search?a=1&b=2，部分打印结果如下：
+    // pathname: '/search'，searchParams: { 'a': '1', 'b': '2'}
+    let url = new URL(req.url, 'http://localhost:10086/');
+    // 获取请求字符串的value值，需要使用get
+    console.log(url.searchParams.get('a'));
+    res.end('hello');
+});
+```
+
+##### 设置响应报文
+
+```javascript
+let server = http.createServer((req, res) => {
+    res.setHeader('content-type', 'text/html;charset=utf-8');
+    // 响应头的设置，可以为任意内容，但必须为英文
+    res.setHeader('hihihi!', 'I am full!');
+    // write方法持续在响应体中追加文字
+    res.write('ok!');
+    res.write('兄弟们!');
+    res.write('我宣布个事儿!');
+    // end方法有且仅有一个
+    res.end('我是个XX!');
+});
+```
