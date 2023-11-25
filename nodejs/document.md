@@ -241,3 +241,16 @@ let server = http.createServer((req, res) => {
     res.end('我是个XX!');
 });
 ```
+
+响应报文中，也可以传入html。
+
+```javascript
+let server = http.createServer((req, res) => {
+    let dir = path.resolve(__dirname, '../html+css+js/practice/mail/index.html');
+    // 读取html文件
+    let html = fs.readFileSync(dir);
+    res.end(html);
+});
+```
+
+上述代码，html中虽然引入了外部CSS文件，但是会失效。
