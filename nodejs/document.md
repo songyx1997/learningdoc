@@ -8,9 +8,9 @@
 
 #### 注意事项
 
-1.Node.js中不能使用BOM和DOM的API，可以使用console和定时器API。
+1.`Node.js`中不能使用`BOM`和`DOM`的`API`，可以使用`console`和定时器`API`。
 
-2.Node.js中的顶级对象为global，也可以使用globalThis访问。
+2.`Node.js`中的顶级对象为`global`，也可以使用`globalThis`访问。
 
 #### buffer
 
@@ -150,7 +150,7 @@ fs.stat('./word.txt', (error, data) => {
 
 #### path
 
-由于`nodej`的相对路径是相对于命令行的执行路径的，因此路径操作，常使用以下变量。
+由于`Node.js`的相对路径是相对于命令行的执行路径的，因此路径操作，常使用以下变量。
 
 ```javascript
 // 当前文件夹的绝对路径
@@ -197,7 +197,7 @@ server.listen(10086, () => {
 
  浏览器访问`http://localhost:10086/`，网页显示你好。
 
-HTTP的默认端口为80，HTTPS的默认端口为443。
+HTTP的默认端口为`80`，HTTPS的默认端口为`443`。
 
 ##### 获取请求报文
 
@@ -213,13 +213,13 @@ let server = http.createServer((req, res) => {
 
 ##### url
 
-使用url模块去提取请求的路径与查询字符串。
+使用`url`模块去提取请求的路径与查询字符串。
 
 ```javascript
 let server = http.createServer((req, res) => {
     // 请求url为http://localhost:10086/search?a=1&b=2，部分打印结果如下：
     // pathname: '/search'，searchParams: { 'a': '1', 'b': '2'}
-    let url = new URL(req.url, 'http://localhost:10086/');
+    let url = new URL(req.url, 'http://localhost/');
     // 获取请求字符串的value值，需要使用get
     console.log(url.searchParams.get('a'));
     res.end('hello');
@@ -242,7 +242,7 @@ let server = http.createServer((req, res) => {
 });
 ```
 
-响应报文中，也可以传入html。
+响应报文中，也可以传入`html`。
 
 ```javascript
 let server = http.createServer((req, res) => {
@@ -253,4 +253,87 @@ let server = http.createServer((req, res) => {
 });
 ```
 
-上述代码，html中虽然引入了外部CSS文件，但是会失效。
+上述代码，`html`中虽然引入了外部`CSS`文件，但是会失效。
+
+为解决上述问题，搭建静态资源服务器如下：
+
+```javascript
+let server = http.createServer((req, res) => {
+    // 请求url为http://localhost:10086/mail/index.html，因此url.pathname为/mail/index.html
+    let url = new URL(req.url, 'http://localhost/');
+    // 拼接得到静态资源所处的文件路径
+    let filePath = path.resolve(__dirname, `../html+css+js/practice${url.pathname}`);
+    fs.readFile(filePath, (error, data) => {
+        if (error) {
+            res.statusCode = 404;
+            res.end('读取静态资源错误');
+            return;
+        }
+        res.end(data);
+    });
+});
+```
+
+##### 设置MIME类型
+
+HTTP可以设置响应头`content-type`来表明响应体的MIME类型，浏览器根据该类型处理资源，优化上述代码：
+
+```javascript
+// 常见的mime类型
+let mimes = {
+    '.html': 'text/html',
+    '.css': 'text/css',
+    '.js': 'text/javascript',
+    '.png': 'image/png',
+    '.jpg': 'image/jpg',
+    '.json': 'application/json',
+}
+// 获取文件后缀名
+let ext = path.extname(filePath);
+if (mimes[ext]) {
+    if (ext === '.html') {
+        // content-type字符集的优先级高于html中<meta charset="UTF-8">元素
+        res.setHeader('content-type', `${mimes[ext]};charset=utf-8`);
+    } else {
+        // 除了html文件，其他类型不需要添加字符集，使用上没有影响
+        res.setHeader('content-type', mimes[ext]);
+    }
+} else {
+    // 该设置针对未知的资源类型，浏览器会对响应体进行存储，也就是下载
+    res.setHeader('content-type', 'application/octet-stream');
+}
+```
+
+上述代码只是使开发更加规范。实际上，浏览器具备`mime`嗅探功能，会根据响应结果自动判断类型。
+
+##### 错误处理
+
+```javascript
+fs.readFile(filePath, (error, data) => {
+    if (error) {
+        switch (error.code) {
+            case 'ENOENT':
+                res.statusCode = 404;
+                res.end('<h1>404 NOT FOUND</h1>');
+                break;
+            default:
+                break;
+        }
+        return;
+    }
+    res.end(data);
+});
+```
+
+每个`error`都对应一个错误码，比如`404`的错误码为`ENOENT`。
+
+##### GET、POST
+
+1. `GET`主要用来获取数据，`POST`主要用来提交数据。
+2. 参数位置：`GET`带参数请求是将参数缀到`URL`之后，`POST`带参数请求是将参数放到请求体中。
+3. 安全性：`POST`相对`GET`安全一些，因为`GET`的参数暴露在地址栏。
+4. `GET`请求大小有限制，一般为2K，而POST请求没有大小限制。
+
+#### 模块化
+
+模块化的好处：1. 防止命名冲突、2. 高复用性、3. 高维护性。
