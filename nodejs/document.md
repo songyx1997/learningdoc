@@ -5,12 +5,10 @@
         <td>date：2023/08/30</td>
     </tr>
 </table>
-
 #### 注意事项
 
-1.`Node.js`中不能使用`BOM`和`DOM`的`API`，可以使用`console`和定时器`API`。
-
-2.`Node.js`中的顶级对象为`global`，也可以使用`globalThis`访问。
+1. `Node.js`中不能使用`BOM`和`DOM`的`API`，可以使用`console`和定时器`API`。
+2. `Node.js`中的顶级对象为`global`，也可以使用`globalThis`访问。
 
 #### buffer
 
@@ -197,7 +195,7 @@ server.listen(10086, () => {
 
  浏览器访问`http://localhost:10086/`，网页显示你好。
 
-HTTP的默认端口为`80`，HTTPS的默认端口为`443`。
+`HTTP`的默认端口为`80`，HTTPS的默认端口为`443`。
 
 ##### 获取请求报文
 
@@ -276,7 +274,7 @@ let server = http.createServer((req, res) => {
 
 ##### 设置MIME类型
 
-HTTP可以设置响应头`content-type`来表明响应体的MIME类型，浏览器根据该类型处理资源，优化上述代码：
+`HTTP`可以设置响应头`content-type`来表明响应体的MIME类型，浏览器根据该类型处理资源，优化上述代码：
 
 ```javascript
 // 常见的mime类型
@@ -334,6 +332,93 @@ fs.readFile(filePath, (error, data) => {
 3. 安全性：`POST`相对`GET`安全一些，因为`GET`的参数暴露在地址栏。
 4. `GET`请求大小有限制，一般为2K，而POST请求没有大小限制。
 
-#### 模块化
+#### CommonJS
+
+`Node.js`实现了`CommonJS`模块化规范。
 
 模块化的好处：1. 防止命名冲突、2. 高复用性、3. 高维护性。
+
+##### module.exports、exports
+
+暴露数据存在两种方式。
+
+```javascript
+module.exports = {
+    fun1: fun1,
+    fun2: fun2
+}
+```
+
+```javascript
+exports.fun1 = fun1;
+exports.fun2 = fun2;
+```
+
+二者存在差异，`module.exports` 可以暴露任意数据。
+
+```javascript
+// extra.js
+module.exports = 2;
+
+// test.js
+let extra = require('./extra.js');
+// 2
+console.log(extra);
+```
+
+上述代码如果使用`exports = 2`，则输出结果为`{}`。
+
+这是因为存在隐式关系：`exports = module.exports = {}`，并且`require`的返回值为目标模块中`module.exports`的值。
+
+##### require
+
+当导入文件夹时，首先检测文件夹下`package.json`文件中`main`属性对应的文件，如果`main`属性不存在，或者`package.json`文件不存在，则会检测文件夹下的`index.js`和`index.json`。若均不满足，则会报错。
+
+`require`导入自定义模块的基本流程：
+
+1. 将相对路径，如./extra.js转为绝对路径，定位目标文件。
+2. 缓存检测。
+3. 读取目标文件代码。
+4. 包裹成一个函数并执行，即自执行函数。
+5. 缓存模块的值。
+6. 返回`module.exports`的值。
+
+#### npm
+
+##### 初始化
+
+```shell
+npm init
+```
+
+使用该命令，将创建作者所需的`package.json`文件。
+
+##### 生产依赖、开发依赖
+
+```shell
+npm install --save less
+```
+
+依赖信息保存在`package.json`中`dependencies`属性。
+
+```shell
+npm install --save-dev less
+```
+
+依赖信息保存在`package.json`中`devDependencies`属性。
+
+```shell
+npm install --save less@1.0.0
+```
+
+安装指定版本。
+
+```shell
+npm remove less
+```
+
+删除依赖。
+
+####  express
+
+##### 路由
