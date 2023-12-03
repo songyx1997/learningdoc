@@ -422,3 +422,178 @@ npm remove less
 ####  express
 
 ##### 路由
+
+路由请求的方法有三种：`get`、`post`、`all`。
+
+```javascript
+const express = require('express');
+const app = express();
+const { persons } = require('./data.json');
+
+app.get('/person/:name', (req, rsp) => {
+    let { name } = req.params;
+    let person = persons.find(el => el.name === name);
+    if (person) {
+        rsp.end(`<p>age:${person.age}</p><p>address:${person.address}</p>`);
+        return;
+    }
+    rsp.end('404 NOT FOUND');
+});
+
+// 所有请求，且请求条件为通配符
+app.all('*', (req, rsp) => {
+    rsp.end('404 NOT FOUND');
+});
+
+// 设置端口号，启动服务
+app.listen(10086, () => {
+    console.log('启动！')
+});
+```
+
+##### 获取请求报文
+
+```javascript
+// 请求url为http://localhost:10086/test?a=1&b=2
+app.get('/test', (req, rsp) => {
+    // /test
+    console.log(req.path);
+    // { a: '1', b: '2' }
+    console.log(req.query);
+    // localhost:10086
+    console.log(req.get('host'));
+    rsp.end('test');
+});
+```
+
+##### 设置响应报文
+
+```javascript
+// 1.send方法自动设置字符集
+rsp.status(200).set('test', 'text').send(`<p>你好</p>`);
+// 2.重定向
+rsp.redirect('http://www.baidu.com');
+// 3.下载
+rsp.download(path.resolve(__dirname, './data.json'));
+// 4.响应JSON
+let data = require('./data.json');
+rsp.json(data);
+// 5.响应文件内容，但是该html页面的静态资源失效
+rsp.sendFile(path.resolve(__dirname, '../html+css+js/practice/mail/index.html'));
+```
+
+##### Middleware
+
+1. 全局中间件
+
+```javascript
+let middleWare = (res, rsp, next) => {
+    let { url } = res;
+    // 生成浏览器访问日志
+    fs.appendFileSync(path.resolve(__dirname, './log.txt'), `${url} ${new Date().toLocaleString()}\n`);
+    // 1.内部函数，执行后指向后续的路由回调或者中间件函数回调
+    next();
+}
+
+// 2.使用全局中间件
+app.use(middleWare);
+```
+
+2. 路由中间件
+
+```javascript
+let middleWare = (res, rsp, next) => {
+    let { query } = res;
+    if (query.flag == 1) {
+        // 已登录，执行后续的路由回调
+        next();
+    } else {
+        // 未登录，重定向至登陆页面
+        rsp.redirect('login');
+    }
+}
+
+// 路由中间件，放置在需要约束的路由当中
+app.get('/home', middleWare, (req, rsp) => {
+    rsp.end('home page');
+})
+
+app.get('/login', (req, rsp) => {
+    rsp.end('login page');
+})
+```
+3. 静态资源中间件
+
+```javascript
+app.use(express.static(path.resolve(__dirname, '../html+css+js/practice/mail')));
+```
+
+全局中间件的一种，浏览器访问`http://localhost:10086/`可以直接加载`mail`文件夹下的`index.html`，并且该页面的静态资源均成功加载。
+
+注意：若静态资源与路由规则同时匹配，则谁先匹配谁就响应。
+
+```javascript
+// 该内容先响应，取决于代码中的先后顺序
+app.get('/', (req, rsp) => {
+    rsp.end('home page');
+});
+
+app.use(express.static(path.resolve(__dirname, '../html+css+js/practice/mail')));
+```
+
+##### 防盗链
+
+禁止本域名之外的其他网站访问静态资源
+
+```javascript
+// 全局中间件：防盗链
+let antiTheft = (req, rsp, next) => {
+    let referer = req.get('referer');
+    if (referer) {
+        let url = new URL(referer);
+        if (url.hostname !== '127.0.0.1') {
+            rsp.status(404).send('404 NOT FOUND');
+            return;
+        }
+    }
+    next();
+}
+
+app.use(antiTheft);
+app.use(express.static(path.resolve(__dirname, '../html+css+js/practice/mail')));
+```
+
+上述代码的效果是：
+
+1. 使用`http://127.0.0.1:10086/`可正常访问页面。
+2. 使用`http://localhost:10086/`访问页面，静态资源加载失败。
+
+##### 路由模块化
+
+```javascript
+const express = require('express');
+const app = express();
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+
+app.use('/', indexRouter);
+// 设置路由前缀
+app.use('/users', usersRouter);
+```
+
+`users.js`的配置如下：
+
+```javascript
+const express = require('express');
+// 1.创建路由对象
+const router = express.Router();
+
+router.get('/', (req, res) => {
+  res.send('测试用户路由');
+});
+
+// 2.暴露数据
+module.exports = router;
+```
+
+使用`http://localhost:10086/users`可成功访问页面。
