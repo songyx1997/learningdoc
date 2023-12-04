@@ -1,9 +1,13 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const { array } = require('../public/json/data.json')
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+router.get('/', (res, rsp) => {
+  rsp.render('index');
+})
+
+router.post('/add', (res, rsp) => {
+  rsp.render('details', { 'array': array });
+})
 
 module.exports = router;

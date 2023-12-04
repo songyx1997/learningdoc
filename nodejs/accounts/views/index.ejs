@@ -1,11 +1,45 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <link href="/stylesheets/reset.css" rel="stylesheet">
+  <link href="/stylesheets/style.css" rel="stylesheet">
+  <title>记账本</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="title">添加记录</div>
+    <hr>
+    <form class="form" action="/add" name="record" method="POST">
+      <div class="row">
+        <div class="form-text">事项</div>
+        <input name="message" />
+      </div>
+      <div class="row">
+        <div class="form-text">发生时间</div>
+        <input name="time" />
+      </div>
+      <div class="row">
+        <div class="form-text">类型</div>
+        <select name="type">
+          <option value="1">收入</option>
+          <option value="-1">支出</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="form-text">金额</div>
+        <input name="amount" />
+      </div>
+      <div class="row">
+        <div class="form-text">备注</div>
+        <textarea name="remark"></textarea>
+      </div>
+      <hr>
+      <button>添加</button>
+    </form>
+  </div>
+</body>
+
 </html>
