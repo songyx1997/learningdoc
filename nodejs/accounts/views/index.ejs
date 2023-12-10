@@ -3,42 +3,40 @@
 
 <head>
   <meta charset="UTF-8">
-  <link href="/stylesheets/reset.css" rel="stylesheet">
-  <link href="/stylesheets/style.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/reset.css">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/index.css">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/easyui.css">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/icon.css">
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
   <title>记账本</title>
 </head>
 
 <body>
   <div class="container">
-    <div class="title">添加记录</div>
-    <hr>
-    <form class="form" action="/add" name="record" method="POST">
-      <div class="row">
-        <div class="form-text">事项</div>
-        <input name="message" />
-      </div>
-      <div class="row">
-        <div class="form-text">发生时间</div>
-        <input name="time" />
-      </div>
-      <div class="row">
-        <div class="form-text">类型</div>
-        <select name="type">
-          <option value="1">收入</option>
-          <option value="-1">支出</option>
-        </select>
-      </div>
-      <div class="row">
-        <div class="form-text">金额</div>
-        <input name="amount" />
-      </div>
-      <div class="row">
-        <div class="form-text">备注</div>
-        <textarea name="remark"></textarea>
-      </div>
-      <hr>
-      <button>添加</button>
-    </form>
+    <div class="easyui-panel" title="添加记录">
+      <form id="registration" name="registration" method="post" action="/add">
+        <div class="row">
+          <input class="easyui-textbox col" name="message" data-options="label:'事项:',required:true">
+        </div>
+        <div class="row">
+          <input class="easyui-datebox col" name="date" data-options="label:'发生时间:',required:true">
+        </div>
+        <div class="row">
+          <select class="easyui-combobox col" name="type" data-options="label:'类型:',required:true">
+            <option value="-1">支出</option>
+            <option value="1">收入</option>
+          </select>
+        </div>
+        <div class="row">
+          <input class="easyui-textbox col" name="amount" data-options="label:'金额:',required:true">
+        </div>
+        <div class="row">
+          <input class="easyui-textbox col" name="remark" data-options="label:'备注:',required:true">
+        </div>
+        <button>添加</button>
+      </form>
+    </div>
   </div>
 </body>
 
