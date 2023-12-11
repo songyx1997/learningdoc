@@ -601,3 +601,129 @@ module.exports = router;
 #### Mongodb
 
 ##### 模块化
+
+1. 配置`Mongodb`。
+
+```javascript
+// config/db.js
+module.exports = {
+    host: '127.0.0.1',
+    port: '27017',
+    name: 'local',
+}
+```
+
+2. 使用`mongoose`连接`Mongodb`。
+
+```javascript
+// db/index.js
+const mongoose = require('mongoose');
+const config = require('../config/db');
+
+module.exports = (success) => {
+  mongoose.connect(`mongodb://${config.host}:${config.port}/${config.name}`)
+    .then(() => {
+      success();
+    }).catch((e) => {
+      throw e;
+    })
+}
+```
+
+3. 暴露模型对象。
+
+```javascript
+const mongoose = require('mongoose');
+// 创建文档属性以及属性值类型
+let accountSchema = new mongoose.Schema({
+    message: {
+        type: String,
+        require: true
+    },
+    date: {
+        type: Date,
+        require: true
+    },
+    type: {
+        type: Number,
+        require: true
+    },
+    amount: {
+        type: Number,
+        require: true,
+        default: 0
+    },
+    remark: String
+});
+// 创建模型对象
+let accountModel = mongoose.model('accounts', accountSchema);
+module.exports = accountModel;
+```
+4. 在成功回调中启动`HTTP`。
+
+```javascript
+db(() => {
+  ...
+});
+```
+
+##### CRUD
+
+新增
+
+```javascript
+router.post('/add', (res, rsp) => {
+  let params = { ...res.body, date: dayjs(res.body.date).toDate() };
+  accountModel.create(params).then(() => {
+    rsp.render('success', { 'message': '新增成功' });
+  }).catch((e) => {
+    throw e;
+  })
+})
+```
+
+删除
+
+```javascript
+router.get('/deleteOne/:id', (res, rsp) => {
+  let { id } = res.params;
+  accountModel.deleteOne({ _id: id }).then(() => {
+    rsp.render('success', { 'message': '删除成功' });
+  }).catch((e) => {
+    throw e;
+  })
+})
+```
+
+查询
+
+```javascript
+// 1.根据id查询
+accountModel.findById('65771220a543976b6d18783b').then((data) => {
+  console.log(data);
+})
+// 2.根据属性值查询
+accountModel.find({ type: 1 }).then((data) => {
+  console.log(data);
+})
+// 3.条件控制查询（获取amount大于50小于等于1000的数据）
+accountModel.find({ $and: [{ amount: { $gt: 50 } }, { amount: { $lte: 1000 } }] })
+  .then((data) => {
+    console.log(data)
+  })
+// 4.个性化读取（设置字段、排序、截取）
+accountModel.find()
+  // 仅获取message、amount字段，不获取id字段（id默认获取）
+  .select({ message: 1, amount: 1, _id: 0 })
+  // 根据amount降序（默认无序）
+  .sort({ amount: -1 })
+  // 跳过3条数据
+  .skip(3)
+  // 获取3条数据
+  .limit(3)
+  .then((data) => {
+    console.log(data)
+  })
+```
+
+#### API

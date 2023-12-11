@@ -1,6 +1,64 @@
-@min-width: 1226px;
+@min-width: 800px;
 
 .container {
     width: @min-width;
     margin: 0 auto;
+
+    .title {
+        font-size: 36px;
+    }
+
+    .add {
+        height: 36px;
+        background: #337bb8;
+        color: white;
+        display: block;
+        text-align: center;
+        line-height: 36px;
+    }
+
+    ul {
+        li {
+            margin-top: 15px;
+            border: 1px solid;
+            border-radius: 5px;
+            padding: 10px 20px 0;
+
+            &>div:nth-of-type(1) {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                a {
+                    color: red;
+                    cursor: pointer;
+                }
+            }
+
+            .pay-bg {
+                background-color: #f3dde1;
+            }
+
+            .income-bg {
+                background-color: #dff0d9;
+            }
+
+            &>div:nth-of-type(2) {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 40px;
+
+                .pay-text {
+                    color: #fff;
+                    background-color: #e6a74c;
+                }
+
+                .income-text {
+                    color: #fff;
+                    background-color: #5cb861;
+                }
+            }
+        }
+    }
 }
