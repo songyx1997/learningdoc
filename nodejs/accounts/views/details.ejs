@@ -11,7 +11,7 @@
 <body>
     <div class="container">
         <div class="title">记账本</div>
-        <a class="add" href="/">新增</a>
+        <a class="add" href="/api">新增</a>
         <hr>
         <ul>
             <% details.forEach(item=> { %>
@@ -20,7 +20,7 @@
                         <div>
                             <%= dayjs(item.date).format('YYYY-MM-DD') %>
                         </div>
-                        <a href="/deleteOne/<%= item.id %>">删除</a>
+                        <a href="/api/deleteOne/<%= item.id %>">删除</a>
                     </div>
                     <div>
                         <div>

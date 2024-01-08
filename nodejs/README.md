@@ -746,3 +746,14 @@ accountModel.find()
 `PATCH`是局部修改，只需要传输修改的字段。
 
 `PUT`是全部修改，传输完整的对象。理论上若未传输全部字段，则缺了的字段应该被清空。
+
+#### 会话控制
+
+##### cookie
+
+`cookie`是`HTTP`服务器发送到用户浏览器并保存在本地的一小块数据。`cookie`按照域名划分保存。
+
+| 域名             | cookie             |
+| ---------------- | ------------------ |
+| www.bilibili.com | name=songyx;age=26 |
+| www.baidu.com    | a=100;b=200        |
