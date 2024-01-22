@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/reset.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/index.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/easyui.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/icon.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <title>注册</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="easyui-panel" title="注册">
+            <form id="registration" name="registration" method="post" action="/reg">
+                <div class="row">
+                    <input class="easyui-textbox col" name="username" data-options="label:'用户名:',required:true">
+                </div>
+                <div class="row">
+                    <input class="easyui-textbox col" name="password" data-options="label:'密码:',required:true">
+                </div>
+                <button>注册</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

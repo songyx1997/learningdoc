@@ -757,3 +757,93 @@ accountModel.find()
 | ---------------- | ------------------ |
 | www.bilibili.com | name=songyx;age=26 |
 | www.baidu.com    | a=100;b=200        |
+
+```javascript
+/**
+ * 设置cookie
+ * 该请求成功后，发起其他请求，cookie将被放置于请求头中
+ */
+app.get('/set-cookie', (req, res) => {
+    res.cookie('name', 'songyx');
+    // maxAge用于设置cookie的生命周期
+    res.cookie('age', '18', { maxAge: 1000 * 60 });
+    res.send('set-cookie');
+});
+
+// 删除cookie
+app.get('/remove-cookie', (req, res) => {
+    res.clearCookie('age');
+    res.send('remove-cookie');
+});
+```
+
+借助于`cookie-parser`，可以获取请求头中的`cookie`。
+
+```javascript
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+// 获取cookie
+app.get('/get-cookie', (req, res) => {
+    let { name } = req.cookies;
+    res.send(`${name},welcome to you`);
+});
+```
+
+##### session
+
+`cookie`和`session`的区别主要有如下几点：
+
+1. 位置：前者位于浏览器端，后者位于服务端。
+2. 安全性：前者以明文的方式存放于浏览器端，安全性相对较低。
+3. 网络传输量：前者设置内容过多会增大报文体积，影响传输效率；后者存储在服务器，只通过`cookie`传递`id`，不影响传输效率。
+4. 存储限制：浏览器限制单个`cookie`保存的数据不能超过`4k`，且单个域名下的存储数量也有限制。
+
+```javascript
+const express = require('express');
+const app = express();
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const mongoUrl = 'mongodb://127.0.0.1:27017/local';
+
+// 设置session的中间件
+app.use(session({
+    // 设置cookie的name
+    name: 'sessionId',
+    // 加盐
+    secret: 'songyx',
+    // 是否为每次请求都设置一个cookie用来存储session的id
+    saveUninitialized: false,
+    // 是否在每次请求时重新保存session
+    resave: true,
+    // 连接数据库
+    store: MongoStore.create({ mongoUrl: mongoUrl }),
+    cookie: {
+        // 前端无法通过JS操作
+        httpOnly: true,
+        // 过期时间
+        maxAge: 1000 * 60,
+    },
+}))
+
+app.get('/login', (req, res) => {
+    // http://localhost:10086/login?username=admin&password=admin
+    let { username, password } = req.query;
+    if (username == 'admin' && password == 'admin') {
+        req.session.username = username;
+        res.send('登陆成功');
+    } else {
+        res.send('登陆失败');
+    }
+});
+
+app.all('*', (req, res) => {
+    if (req.session.username == 'admin') {
+        res.send('已登录');
+    } else {
+        res.send('未登录');
+    }
+})
+
+app.listen(10086);
+```

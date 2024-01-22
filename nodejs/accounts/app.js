@@ -3,8 +3,11 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 const indexRouter = require('./routes/web/index');
+const authRouter = require('./routes/web/auth');
 const accountRouter = require('./routes/api/account');
 
 var app = express();
@@ -22,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 // 设置路由前缀
 app.use('/api', accountRouter);
+app.use('/', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -38,5 +42,26 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+// 设置session的中间件
+const dbConfig = require('./config/db');
+app.use(session({
+  // 设置cookie的name
+  name: 'sessionId',
+  // 加盐
+  secret: 'songyx',
+  // 是否为每次请求都设置一个cookie用来存储session的id
+  saveUninitialized: false,
+  // 是否在每次请求时重新保存session
+  resave: true,
+  // 连接数据库
+  store: MongoStore.create({ mongoUrl: `mongodb://${dbConfig.host}:${dbConfig.port}/${dbConfig.name}` }),
+  cookie: {
+    // 前端无法通过JS操作
+    httpOnly: true,
+    // 过期时间，10min
+    maxAge: 1000 * 60 * 10,
+  },
+}))
 
 module.exports = app;
