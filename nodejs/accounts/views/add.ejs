@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/reset.css">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/add.css">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/easyui.css">
+  <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/icon.css">
+  <script type="text/javascript" src="/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/jquery.easyui.min.js"></script>
+  <title>新增</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="easyui-panel" title="添加记录">
+      <form id="registration" name="registration" method="post" action="/api/account">
+        <div class="row">
+          <input class="easyui-textbox col" name="message" data-options="label:'事项:',required:true">
+        </div>
+        <div class="row">
+          <input class="easyui-datebox col" name="date" data-options="label:'发生时间:',required:true">
+        </div>
+        <div class="row">
+          <select class="easyui-combobox col" name="type" data-options="label:'类型:',required:true">
+            <option value="-1">支出</option>
+            <option value="1">收入</option>
+          </select>
+        </div>
+        <div class="row">
+          <input class="easyui-textbox col" name="amount" data-options="label:'金额:',required:true">
+        </div>
+        <div class="row">
+          <input class="easyui-textbox col" name="remark" data-options="label:'备注:'">
+        </div>
+        <button>添加</button>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -2,18 +2,22 @@ const express = require('express');
 const accountModel = require('../../models/accountModel');
 const router = express.Router();
 const dayjs = require('dayjs');
+const { checkLogin } = require('../../middleWares/index');
 
-router.get('/', (res, rsp) => {
-    rsp.render('index');
+/**
+ * 新增记录页面
+ */
+router.get('/add', checkLogin, (res, rsp) => {
+    rsp.render('add');
 })
 
 /**
  * 获取全部
  */
-router.get('/account', (res, rsp) => {
+router.get('/', checkLogin, (res, rsp) => {
     // 倒序
     accountModel.find().sort({ date: -1 }).then((data) => {
-        rsp.render('details', { 'details': data, 'dayjs': dayjs });
+        rsp.render('index', { 'details': data, 'dayjs': dayjs });
         // rsp.json({
         //     code: '0000',
         //     msg: '查询成功',
@@ -31,10 +35,10 @@ router.get('/account', (res, rsp) => {
 /**
  * 新增
  */
-router.post('/account', (res, rsp) => {
+router.post('/account', checkLogin, (res, rsp) => {
     let params = { ...res.body, date: dayjs(res.body.date).toDate() };
     accountModel.create(params).then((data) => {
-        rsp.render('success', { 'message': '新增成功' });
+        rsp.render('success', { 'message': '新增成功', 'url': '/api' });
         // rsp.json({
         //     code: '0000',
         //     msg: '新增成功',
@@ -52,10 +56,10 @@ router.post('/account', (res, rsp) => {
 /**
  * 删除
  */
-router.get('/deleteOne/:id', (res, rsp) => {
+router.get('/deleteOne/:id', checkLogin, (res, rsp) => {
     let { id } = res.params;
     accountModel.deleteOne({ _id: id }).then((data) => {
-        rsp.render('success', { 'message': '删除成功' });
+        rsp.render('success', { 'message': '删除成功', 'url': '/api' });
         // rsp.json({
         //     code: '0000',
         //     msg: '删除成功',
@@ -111,5 +115,16 @@ router.get('/deleteOne/:id', (res, rsp) => {
 //         })
 //     })
 // })
+
+/**
+ * 登出，使用post，防止CSRF跨站请求伪造
+ */
+router.post('/logout', (req, res) => {
+    console.log(req.session)
+    req.session.destory(() => {
+        res.render('success', { 'message': '登出成功', 'url': '/login' });
+    })
+})
+
 
 module.exports = router;

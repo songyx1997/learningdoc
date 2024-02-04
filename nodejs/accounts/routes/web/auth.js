@@ -10,7 +10,7 @@ router.get('/reg', (res, rsp) => {
 router.post('/reg', (res, rsp) => {
     let params = { ...res.body, password: md5(res.body.password) };
     userModel.create(params).then((data) => {
-        rsp.render('success', { 'message': '注册成功' });
+        rsp.render('success', { 'message': '注册成功', 'url': '/login' });
     }).catch((e) => {
         throw e;
     })
@@ -28,7 +28,7 @@ router.post('/login', (res, rsp) => {
             res.session.username = data.username;
             // 将session与用户关联
             res.session._id = data._id;
-            rsp.render('success', { 'message': '登录成功' });
+            rsp.render('success', { 'message': '登录成功', 'url': '/api' });
         } else {
             rsp.send('账号或密码错误！')
         }

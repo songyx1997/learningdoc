@@ -6,11 +6,31 @@ var logger = require('morgan');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
-const indexRouter = require('./routes/web/index');
 const authRouter = require('./routes/web/auth');
 const accountRouter = require('./routes/api/account');
 
 var app = express();
+
+// 设置session的中间件，该配置需要在引入路由之前
+const dbConfig = require('./config/db');
+app.use(session({
+  // 设置cookie的name
+  name: 'sessionId',
+  // 加盐
+  secret: 'songyx',
+  // 是否为每次请求都设置一个cookie用来存储session的id
+  saveUninitialized: false,
+  // 是否在每次请求时重新保存session
+  resave: true,
+  // 连接数据库
+  store: MongoStore.create({ mongoUrl: `mongodb://${dbConfig.host}:${dbConfig.port}/${dbConfig.name}` }),
+  cookie: {
+    // 前端无法通过JS操作
+    httpOnly: true,
+    // 过期时间，1min
+    maxAge: 1000 * 60,
+  },
+}))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,7 +42,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
 // 设置路由前缀
 app.use('/api', accountRouter);
 app.use('/', authRouter);
@@ -42,26 +61,5 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-// 设置session的中间件
-const dbConfig = require('./config/db');
-app.use(session({
-  // 设置cookie的name
-  name: 'sessionId',
-  // 加盐
-  secret: 'songyx',
-  // 是否为每次请求都设置一个cookie用来存储session的id
-  saveUninitialized: false,
-  // 是否在每次请求时重新保存session
-  resave: true,
-  // 连接数据库
-  store: MongoStore.create({ mongoUrl: `mongodb://${dbConfig.host}:${dbConfig.port}/${dbConfig.name}` }),
-  cookie: {
-    // 前端无法通过JS操作
-    httpOnly: true,
-    // 过期时间，10min
-    maxAge: 1000 * 60 * 10,
-  },
-}))
 
 module.exports = app;

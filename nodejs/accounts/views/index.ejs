@@ -2,42 +2,50 @@
 <html lang="zh-CN">
 
 <head>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" type="text/css" href="/stylesheets/reset.css">
-  <link rel="stylesheet" type="text/css" href="/stylesheets/index.css">
-  <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/easyui.css">
-  <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/icon.css">
-  <script type="text/javascript" src="js/jquery.min.js"></script>
-  <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
-  <title>记账本</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/reset.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/index.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/easyui.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/easyui/icon.css">
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.easyui.min.js"></script>
+    <title>记账本</title>
 </head>
 
 <body>
-  <div class="container">
-    <div class="easyui-panel" title="添加记录">
-      <form id="registration" name="registration" method="post" action="/api/account">
-        <div class="row">
-          <input class="easyui-textbox col" name="message" data-options="label:'事项:',required:true">
+    <div class="container">
+        <div class="title">记账本</div>
+        <div class="title-btns">
+            <a class="add" href="/api/add">新增</a>
+            <form id="registration" name="registration" method="post" action="/api/logout">
+                <button class="logout">退出登录</button>
+            </form>
         </div>
-        <div class="row">
-          <input class="easyui-datebox col" name="date" data-options="label:'发生时间:',required:true">
-        </div>
-        <div class="row">
-          <select class="easyui-combobox col" name="type" data-options="label:'类型:',required:true">
-            <option value="-1">支出</option>
-            <option value="1">收入</option>
-          </select>
-        </div>
-        <div class="row">
-          <input class="easyui-textbox col" name="amount" data-options="label:'金额:',required:true">
-        </div>
-        <div class="row">
-          <input class="easyui-textbox col" name="remark" data-options="label:'备注:'">
-        </div>
-        <button>添加</button>
-      </form>
+        <hr>
+        <ul>
+            <% details.forEach(item=> { %>
+                <li>
+                    <div class="<%= item.type === -1 ? 'pay-bg' : 'income-bg' %>">
+                        <div>
+                            <%= dayjs(item.date).format('YYYY-MM-DD') %>
+                        </div>
+                        <a href="/api/deleteOne/<%= item.id %>">删除</a>
+                    </div>
+                    <div>
+                        <div>
+                            <%= item.message %>
+                        </div>
+                        <div class="<%= item.type === -1 ? 'pay-text' : 'income-text' %>">
+                            <%= item.type===-1 ? '支出' : '收入' %>
+                        </div>
+                        <div>
+                            <%= item.amount %>
+                        </div>
+                    </div>
+                </li>
+                <% }) %>
+        </ul>
     </div>
-  </div>
 </body>
 
 </html>

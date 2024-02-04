@@ -1,20 +1,64 @@
 .container {
-  width: 600px;
+  width: 800px;
   margin: 0 auto;
 }
-.row {
-  width: 80%;
-  margin: 0 auto;
-  margin-top: 20px;
+.container .title {
+  font-size: 36px;
 }
-.col {
-  width: 450px;
+.container .title-btns {
+  display: flex;
+  justify-content: space-between;
 }
-button {
-  width: 100%;
+.container .title-btns .add,
+.container .title-btns .logout {
   height: 36px;
   background: #337bb8;
-  border: none;
   color: white;
-  margin-top: 20px;
+  display: block;
+  text-align: center;
+  line-height: 36px;
+  width: 100px;
+  border: none;
+  cursor: pointer;
+}
+.container .title-btns .add {
+  background: #337bb8;
+}
+.container .title-btns .logout {
+  background: #c1242a;
+}
+.container ul li {
+  margin-top: 15px;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 10px 20px 0;
+}
+.container ul li > div:nth-of-type(1) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.container ul li > div:nth-of-type(1) a {
+  color: red;
+  cursor: pointer;
+}
+.container ul li .pay-bg {
+  background-color: #f3dde1;
+}
+.container ul li .income-bg {
+  background-color: #dff0d9;
+}
+.container ul li > div:nth-of-type(2) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 40px;
+}
+.container ul li > div:nth-of-type(2) .pay-text {
+  color: #fff;
+  background-color: #e6a74c;
+}
+.container ul li > div:nth-of-type(2) .income-text {
+  color: #fff;
+  background-color: #5cb861;
 }
