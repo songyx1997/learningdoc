@@ -1425,3 +1425,169 @@ function calculate(number) {
 ```
 
 不足：不能跨域加载`js`、`worker`内的代码不能访问DOM、有些浏览器不支持。
+
+#### 6. ES6-ES11
+
+##### let
+
+`let`具有如下特点：
+
+1. 变量不能被重复声明。
+
+2. 不存在变量声明提升。
+
+3. 块儿级作用域。
+
+4. 不影响作用域链。
+
+```javascript
+<script>
+    {
+        let a = 1;
+        function fn() {
+            console.log(a);
+        }
+        // 正常输出1
+        fn();
+    }
+    // 在作用域之外，报错
+    console.log(a);
+</script>
+```
+
+##### const
+const具有如下特点：
+
+1. 要赋初始值，且值**不能修改**。
+2. 块儿级作用域。
+4. 对于数组和对象内部元素的修改，不算做对常量的修改，因为内存地址没有改变。
+
+```javascript
+<script>
+    const ARRAY = ['a', 'b', 'c'];
+    // 可以修改
+    ARRAY.push('d');
+    console.log(ARRAY);
+
+    // 不能修改
+    ARRAY = 'text';
+    console.log(ARRAY);
+</script>
+```
+
+因此可将对象或者数组声明为`const`，避免误操作。
+
+##### 解构赋值
+
+数组和对象都可被解构赋值。
+
+```javascript
+<script>
+    const ARRAY = ['a', 'b', 'c'];
+    let [a, b] = ARRAY;
+    console.log(a);
+    console.log(b);
+
+    const OBJ = {
+        name: 'songyx',
+        age: 26,
+        fun: () => console.log('student')
+    }
+    let { fun } = OBJ;
+    // 多次执行时，可避免多次书写OBJ.fun()
+    fun();
+</script>
+```
+
+##### 对象的简化写法
+
+当对象中元素的`key`和`value`相同时，可采用简化写法。
+
+```javascript
+<script>
+    let a = 'a';
+    let fun1 = () => {
+        console.log('b');
+    }
+
+    const OBJ = {
+        a,
+        fun1,
+        fun2() {
+            console.log('c');
+        }
+    }
+</script>
+```
+
+##### 箭头函数
+
+`=>`具有如下特点：
+
+1. `this`始终指向函数声明时所在作用域。
+2. 不能作为构造实例化对象。
+3. 不能使用`arguments`变量。
+
+```javascript
+<script>
+    let Person = (name, age) => {
+        this.name = name;
+        this.age = age;
+    }
+    // 报错
+    let my = new Person('songyx', 26);
+
+    let fun = () => {
+        console.log(arguments);
+    }
+    // 报错
+    fun(1, 2);
+</script>
+```
+
+`=>`适合与this无关的回调。如定时器，数组的方法回调。
+
+`=>`不适合与this有关的回调。如事件回调，对象的方法。
+
+##### 函数参数的默认值
+
+```javascript
+<script>
+    let fun = (a, b = 10) => {
+        console.log(a + b);
+    }
+    fun(1);
+    fun(1, 2);
+</script>
+```
+
+##### rest参数
+
+ES6中使用`rest`替代`arguments`。
+
+```javascript
+<script>
+    let fun = (a, ...array) => {
+        console.log(a);
+        console.log(array)
+    }
+    // 1
+    // [2, 3, 4, 5]
+    fun(1, 2, 3, 4, 5);
+</script>
+```
+
+##### 扩展运算符
+
+除了可以用来克隆数组或对象，还可以将伪数组转为真正的数组。
+
+```javascript
+<script>
+    let nodeList = document.querySelectorAll('div');
+    // 对象
+    console.log(nodeList);
+    let array = [...nodeList];
+    // 数组
+    console.log(array);
+</script>
+```
