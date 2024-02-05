@@ -6,16 +6,17 @@
     "start": "nodemon ./bin/www"
   },
   "dependencies": {
+    "connect-mongo": "^5.1.0",
     "cookie-parser": "~1.4.4",
     "dayjs": "^1.11.10",
     "debug": "~2.6.9",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
+    "express-session": "^1.17.3",
     "http-errors": "~1.6.3",
-    "mongoose": "^7.6.7",
-    "morgan": "~1.9.1",
+    "jsonwebtoken": "^9.0.2",
     "md5": "^2.3.0",
-    "connect-mongo": "^5.1.0",
-    "express-session": "^1.17.3"
+    "mongoose": "^7.6.7",
+    "morgan": "~1.9.1"
   }
 }

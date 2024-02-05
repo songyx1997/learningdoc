@@ -795,55 +795,166 @@ app.get('/get-cookie', (req, res) => {
 `cookie`和`session`的区别主要有如下几点：
 
 1. 位置：前者位于浏览器端，后者位于服务端。
+
 2. 安全性：前者以明文的方式存放于浏览器端，安全性相对较低。
+
 3. 网络传输量：前者设置内容过多会增大报文体积，影响传输效率；后者存储在服务器，只通过`cookie`传递`id`，不影响传输效率。
+
 4. 存储限制：浏览器限制单个`cookie`保存的数据不能超过`4k`，且单个域名下的存储数量也有限制。
+
+配置`session`中间件
 
 ```javascript
 const express = require('express');
 const app = express();
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const mongoUrl = 'mongodb://127.0.0.1:27017/local';
 
-// 设置session的中间件
+// 设置session的中间件，该配置需要在引入路由之前
+const dbConfig = require('./config/db');
 app.use(session({
-    // 设置cookie的name
-    name: 'sessionId',
-    // 加盐
-    secret: 'songyx',
-    // 是否为每次请求都设置一个cookie用来存储session的id
-    saveUninitialized: false,
-    // 是否在每次请求时重新保存session
-    resave: true,
-    // 连接数据库
-    store: MongoStore.create({ mongoUrl: mongoUrl }),
-    cookie: {
-        // 前端无法通过JS操作
-        httpOnly: true,
-        // 过期时间
-        maxAge: 1000 * 60,
-    },
+  // 设置cookie的name
+  name: 'sessionId',
+  // 加盐
+  secret: 'songyx',
+  // 是否为每次请求都设置一个cookie用来存储session的id
+  saveUninitialized: false,
+  // 是否在每次请求时重新保存session
+  resave: true,
+  // 连接数据库
+  store: MongoStore.create({ mongoUrl: `mongodb://${dbConfig.host}:${dbConfig.port}/${dbConfig.name}` }),
+  cookie: {
+    // 前端无法通过JS操作
+    httpOnly: true,
+    // 过期时间，1min
+    maxAge: 1000 * 60,
+  },
 }))
-
-app.get('/login', (req, res) => {
-    // http://localhost:10086/login?username=admin&password=admin
-    let { username, password } = req.query;
-    if (username == 'admin' && password == 'admin') {
-        req.session.username = username;
-        res.send('登陆成功');
-    } else {
-        res.send('登陆失败');
-    }
-});
-
-app.all('*', (req, res) => {
-    if (req.session.username == 'admin') {
-        res.send('已登录');
-    } else {
-        res.send('未登录');
-    }
-})
-
-app.listen(10086);
 ```
+
+登陆时写入`session`
+
+```javascript
+router.post('/login', (res, rsp) => {
+    let params = { ...res.body, password: md5(res.body.password) };
+    userModel.findOne(params).then((data) => {
+        if (data) {
+            // 写入session
+            res.session.username = data.username;
+            // 将session与用户关联
+            res.session._id = data._id;
+            rsp.render('success', { 'message': '登录成功', 'url': '/api' });
+        } else {
+            rsp.send('账号或密码错误！')
+        }
+    }).catch((e) => {
+        throw e;
+    })
+})
+```
+
+通过中间件保护其他请求
+
+```javascript
+const checkLogin = (req, res, next) => {
+    if (!req.session.username) {
+        res.redirect('/login');
+    } else {
+        next();
+    }
+}
+```
+
+登出时销毁`session`
+
+```javascript
+router.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.render('success', { 'message': '登出成功', 'url': '/login' });
+    })
+})
+```
+
+登出为什么使用`post`？
+
+为了防止`CSRF`（跨站请求伪造），`CSRF`攻击的大致方式如下：某用户登录了A网站，认证信息保存在`cookie`中。当用户访问攻击者创建的B网站时，攻击者通过在B网站发送一个伪造的请求提交到A网站服务器上，让A网站服务器误以为请求来自于自己的网站，于是执行响应的操作。
+
+##### token
+
+`token`是服务端生成并返回给`HTTP`客户端的加密字符串，其中保存着用户信息，主要应用于`app`。
+
+注意：`cookie`是自动携带，`token`是手动携带。
+
+`token`的特点：
+
+1. 数据存储在客户端，服务端压力小。
+2. 数据加密，可以避免`CSRF`，因此相对更安全。
+3. 服务间可以共享，增加服务节点更简单，具有更强的扩展性。
+
+登陆时生成`token`
+
+```javascript
+router.post('/login', (res, rsp) => {
+    let params = { ...res.body, password: md5(res.body.password) };
+    userModel.findOne(params).then((data) => {
+        if (data) {
+            let obj = { username: data.username, _id: data._id };
+            // 配置项，expiresIn（生命周期）单位为秒
+            let config = { expiresIn: 60 };
+            // 创建token
+            let token = jwt.sign(obj, secret, config);
+            // 测试用，将toekn写入本地文件
+            fs.writeFileSync(path.resolve(__dirname, '../../log/token'), token);
+            rsp.render('success', { 'message': '登录成功', 'url': '/api' });
+        } else {
+            rsp.send('账号或密码错误！')
+        }
+    }).catch((e) => {
+        throw e;
+    })
+})
+```
+
+通过中间件保护其他请求
+
+```javascript
+const checkLoginByToken = (req, res, next) => {
+    let token = '';
+    try {
+        token = fs.readFileSync(path.resolve(__dirname, '../log/token')).toString();
+    } catch (e) {
+        token = '';
+    }
+    if (!token) {
+        console.log('token不存在');
+        res.redirect('/login');
+    } else {
+        jwt.verify(token, secret, (err, data) => {
+            if (err) {
+                console.log('token已过期');
+                res.redirect('/login');
+            } else {
+                // 将用户信息存储至请求头
+                req.userInfo = data;
+                next();
+            }
+        })
+    }
+}
+```
+
+登出时销毁`token`
+
+```javascript
+router.post('/logout', (req, res) => {
+    fs.unlink(path.resolve(__dirname, '../../log/token'), error => {
+        if (error) {
+            console.log(error);
+            return;
+        }
+        res.render('success', { 'message': '登出成功', 'url': '/login' });
+    })
+})
+```
+
+实际开发时，`token`应当存储于前端工程中的`localstorage`中。
