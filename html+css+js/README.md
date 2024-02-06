@@ -1591,3 +1591,23 @@ ES6中使用`rest`替代`arguments`。
     console.log(array);
 </script>
 ```
+
+##### symbol
+
+变量的创建
+
+```javascript
+<script>
+    let a = Symbol('a');
+    let b = Symbol('a');
+    // false
+    console.log(a === b);
+
+    let c = Symbol.for('c');
+    let d = Symbol.for('c');
+    // true
+    console.log(c === d);
+</script>
+```
+
+`Symbol.for`会将值登记在全局环境中。
