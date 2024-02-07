@@ -117,3 +117,5 @@ let p2 = Promise.resolve('b');
 // 返回为成功的Promise对象
 let p3 = Promise.race([p1, p2]);
 ```
+
+#### 自定义Promise
