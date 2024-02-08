@@ -118,4 +118,21 @@ let p2 = Promise.resolve('b');
 let p3 = Promise.race([p1, p2]);
 ```
 
-#### 自定义Promise
+#### 关键问题
+
+1. `then`方法内的回调是异步执行的。
+
+```javascript
+<script>
+    let p = new Promise((resolve, reject) => {
+        resolve('yes');
+        console.log(1);
+    })
+    p.then(value => {
+        console.log(2);
+    })
+    console.log(3);
+    // 输出结果为1、2、3
+</script>
+```
+2. 宏任务与微任务
