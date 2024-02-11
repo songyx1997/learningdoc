@@ -406,6 +406,8 @@ class Promise {
 
 #### async与await
 
+ES8的新特性
+
 ##### async
 
 对函数添加该修饰符后，该函数的返回结果与`then`的返回结果一样。返回结果为新的`Promise`对象，但该对象的`PromiseState`和`PromiseResult`，由内部的执行结果决定。

@@ -1611,3 +1611,348 @@ ES6中使用`rest`替代`arguments`。
 ```
 
 `Symbol.for`会将值登记在全局环境中。
+
+用途：给对象添加属性和方法，表示独一无二。
+
+```javascript
+<script>
+    const game = {
+        name: 'test',
+        up: () => {
+            console.log('up');
+        }
+    }
+    const methods = {
+        up: Symbol()
+    }
+    game[methods.up] = () => {
+        console.log('up2');
+    }
+    // 添加成功 {name: 'test', up: ƒ, Symbol(): ƒ}
+    console.log(game);
+    // 分别调用up方法
+    game.up();
+    game[methods.up]();
+</script>
+```
+
+另外的一种方式（初始化添加）也是可以的
+
+```javascript
+<script>
+    const game = {
+        name: 'test',
+        up: () => {
+            console.log('up');
+        },
+        [Symbol('up')]: () => {
+            console.log('up2');
+        }
+    }
+    // 添加成功 {name: 'test', up: ƒ, Symbol(up): ƒ}
+    console.log(game);
+    // 分别调用up方法
+    game.up();
+    const symbolArr = Object.getOwnPropertySymbols(game);
+    game[symbolArr[0]]();
+</script>
+```
+
+`Symbol`的内置属性，如
+
+```javascript
+<script>
+    const arr = [1, 2, 3];
+    const arr2 = [4, 5, 6];
+    // [1, 2, 3, 4, 5, 6]
+    console.log(arr.concat(arr2));
+    arr2[Symbol.isConcatSpreadable] = false;
+    // [1, 2, 3, Array(3)]
+    console.log(arr.concat(arr2));
+</script>
+```
+
+##### 迭代器
+
+工作原理：
+
+1. 创建一个指针对象，指向当前数据结构的起始位置。
+2. 第一次调用对象的`next`方法，指针自动指向数据结构的第一个成员。
+3. 接下来不断调用`next`方法，指针一直往后移动，直至指向最后一个成员。
+4. 每次调用`next`，都会返回一个包含`value`和`done`属性的对象。
+
+```javascript
+<script>
+    const set = new Set([1, 2, 3])
+    let iterator = set[Symbol.iterator]();
+    // {value: 1, done: false}
+    console.log(iterator.next());
+    // {value: 2, done: false}
+    console.log(iterator.next());
+    // {value: 3, done: false}
+    console.log(iterator.next());
+    // {value: undefined, done: true}
+    console.log(iterator.next());
+</script>
+```
+
+自定义遍历数据
+
+```javascript
+<script>
+    const obj = {
+        name: 'persons',
+        ages: [12, 18, 20, 24],
+        // 给该对象添加Symbol.iterator属性
+        [Symbol.iterator]() {
+            let index = 0;
+            return {
+                // 重写next方法
+                next: () => {
+                    if (index < this.ages.length) {
+                        return { value: this.ages[index++], done: false }
+                    } else {
+                        return { value: undefined, done: true }
+                    }
+                }
+            }
+        }
+    }
+
+    for (const iterator of obj) {
+        console.log(iterator)
+    }
+</script>
+```
+
+##### 生成器
+
+可以用来解决，回调地狱的问题。
+
+```javascript
+<script>
+    function* gen() {
+        let users = yield step('users', 1000);
+        console.log(users);
+        let orders = yield step('orders', 2000);
+        console.log(orders);
+        let goods = yield step('goods', 3000);
+        console.log(goods);
+    }
+
+    function step(text, time) {
+        setTimeout(() => {
+            // 继续执行，入参将作为上一次yield的返回值
+            iterator.next(text);
+        }, time);
+    }
+
+    const iterator = gen();
+    // 初次调用
+    iterator.next();
+</script>
+```
+
+##### 模块化
+
+为什么`import`有以下两种形式？
+
+```javascript
+<script type="module">
+    import { A, fun_a } from './a.js';
+    import { B, fun_b } from './b.js';
+    import mc from './c.js';
+    fun_a();
+    fun_b();
+    mc.fun_c();
+    console.log(mc.C);
+</script>
+```
+
+因为暴露数据的方式有三种。
+
+分别暴露，此方式`import`采用解构赋值
+
+```javascript
+// a.js
+export const A = 'A';
+export function fun_a() {
+    console.log('a')
+}
+```
+
+统一暴露，此方式`import`采用解构赋值
+
+```javascript
+// b.js
+const B = 'B';
+function fun_b() {
+    console.log('b')
+}
+export { B, fun_b }
+```
+
+默认暴露，此方式`import`采用简便形式
+
+```javascript
+// c.js，且采用了object的简化写法
+export default { C: 'C', fun_c() { console.log('c') } }
+```
+
+##### Object扩展
+
+ES6
+
+`Object.is`：判断两个值是否完全相等，该方法基本等同于`===`。
+
+```javascript
+<script>
+    console.log(Object.is('a', 'a'));
+    console.log('a' === 'a');
+    // 除了NaN
+    // true
+    console.log(Object.is(NaN, NaN));
+    // false
+    console.log(NaN === NaN);
+</script>
+```
+
+`Object.assign`：合并对象。可使用扩展运算符合并，达到相同的效果。
+
+```javascript
+<script>
+    const objOne = {
+        name: 'songyx',
+        age: 26,
+    }
+    const objTwo = {
+        height: 179,
+        weight: 150,
+        age: 27
+    }
+    console.log({ ...objOne, ...objTwo });
+    console.log(Object.assign(objOne, objTwo));
+</script>
+```
+
+ES8
+
+```javascript
+<script>
+    const person = { name: 'songyx', projects: ['math', 'english'] };
+    // 键值数组
+    console.log(Object.keys(person));
+    console.log(Object.values(person));
+    // 二维数据，可用于快速创建map
+    let map = new Map(Object.entries(person))
+    console.log(map);
+</script>
+```
+
+ES10
+
+`Object.fromEntries`基本上是`Object.entries`的逆运算
+
+```javascript
+<script>
+    const map = new Map();
+    map.set('name', 'songyx');
+    map.set('age', 26);
+    // 将map转换为对象
+    console.log(Object.fromEntries(map));
+    const array = [['name', 'songyx'], ['age', 26]];
+    // 将二维数组转换为对象
+    console.log(Object.fromEntries(array));
+</script>
+```
+
+##### 数组扩展
+
+ES10
+
+```javascript
+<script>
+    // 降低数组的维度
+    const array = [1, 2, 3, [4, 5, [6, 7]]];
+    // [1, 2, 3, 4, 5, Array(2)]
+    console.log(array.flat());
+    // [1, 2, 3, 4, 5, 6, 7]
+    console.log(array.flat(2));
+</script>
+```
+
+##### Symbol扩展
+
+ES10
+
+对于创建的`Symbol`类型变量，如何获取其描述？
+
+```javascript
+<script>
+    let a = Symbol('a');
+    console.log(a.description);
+    let b = Symbol.for('b');
+    console.log(b.description)
+</script>
+```
+
+##### Promise扩展
+
+ES11
+
+```javascript
+<script>
+    let p1 = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve('yes');
+        }, 1000);
+    })
+    let p2 = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            reject('no');
+        }, 2000);
+    })
+    console.log(Promise.allSettled([p1, p2]));
+</script>
+```
+
+`Promise.allSettled`返回的结果，`Promisestate`一定是`resolved`，`Promiseresult`则是一个数组。数组中，包含入参的`promise`的异步执行状态和结果。
+
+```javascript
+// 0: {status: 'fulfilled', value: 'yes'}
+// 1: {status: 'rejected', reason: 'no'}
+```
+
+##### BigInt
+
+初始化
+
+```javascript
+<script>
+    let num1 = 123n;
+    let num2 = BigInt(123);
+</script>
+```
+
+运算
+
+```javascript
+<script>
+    // 9007199254740991
+    let max = Number.MAX_SAFE_INTEGER;
+    // 计算成功
+    console.log(max + 1);
+    // 计算失败
+    console.log(max + 2);
+
+    let num = BigInt(max);
+    // 计算成功
+    console.log(num + BigInt(1));
+    // 计算成功，9007199254740993n
+    console.log(num + BigInt(2));
+</script>
+```
+
+##### globalThis
+
+始终指向全局对象。在浏览器环境中指向`window`，在`Node.js`中指向`global`。
