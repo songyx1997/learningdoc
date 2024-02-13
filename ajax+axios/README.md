@@ -312,4 +312,75 @@ btns[0].onclick = () => {
 }
 ```
 
-##### 源码分析
+#### axios源码
+
+为什么`axios`既能当函数使用，也可以当对象使用？
+
+```javascript
+// 函数
+axios({ method: 'GET', url: '/posts' }).then(value => console.log(value));
+```
+
+```javascript
+// 对象
+axios.request({ method: 'GET', url: '/posts' }).then(value => console.log(value));
+axios.get('/posts').then(value => console.log(value));
+```
+
+##### 入口
+
+```javascript
+const axios = createInstance(defaults);
+export default axios
+```
+
+##### 创建实例
+
+```javascript
+function createInstance(defaultConfig) {
+  // 1.调用构造函数，创建实例对象
+  const context = new Axios(defaultConfig);
+  // 2.创建函数
+  const instance = bind(Axios.prototype.request, context);
+  // 3.将原型对象内容注入函数，使该函数可以使用原型对象中的全部方法
+  utils.extend(instance, Axios.prototype, context, {allOwnKeys: true});
+  // 4.将实例对象的属性注入函数，使该函数可以当作对象使用
+  utils.extend(instance, context, null, {allOwnKeys: true});
+  return instance;
+}
+```
+
+##### 构造函数
+
+```javascript
+constructor(instanceConfig) {
+    // 导入默认配置
+    this.defaults = instanceConfig;
+    // 初始化拦截器
+    this.interceptors = {
+        request: new InterceptorManager(),
+        response: new InterceptorManager()
+    };
+}
+```
+
+并给显式原型添加方法，这样实例对象均可以使用。
+
+```javascript
+utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  Axios.prototype[method] = function (url, config) {
+    // 内部调用request方法
+    return this.request(mergeConfig(config || {}, {
+      method,
+      url,
+      data: (config || {}).data
+    }));
+  };
+});
+```
+
+方法共有三种类型：
+
+1. `['request'](config)`
+2. `['delete', 'get', 'head', 'options'](url, config)`
+3. `['post', 'put', 'patch'](url, data, config)`
