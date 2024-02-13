@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>axios another</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
+</head>
+
+<body>
+    <div>
+        <button>GET</button>
+        <button>GET All</button>
+        <button>POST</button>
+        <button>PATCH</button>
+        <button>PUT</button>
+        <button>DELETE</button>
+    </div>
+    <p id="message"></p>
+</body>
+
+<script>
+    let btns = document.querySelectorAll('button');
+    // 请求单个
+    btns[0].onclick = () => {
+        axios.get('http://localhost:3000/posts/2').then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 请求全部
+    btns[1].onclick = () => {
+        axios.get('http://localhost:3000/posts').then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 新增
+    btns[2].onclick = () => {
+        axios.post('http://localhost:3000/posts', {
+            title: '永恒之王',
+            views: 99
+        }).then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 更新部分
+    btns[3].onclick = () => {
+        axios.patch('http://localhost:3000/posts/2', { title: '亚尔斯兰战记' }).then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 更新全部
+    btns[4].onclick = () => {
+        axios.put('http://localhost:3000/posts/2', {
+            title: '荷马史诗',
+            views: 30
+        }).then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 删除
+    btns[5].onclick = () => {
+        axios.delete('http://localhost:3000/posts/3542').then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        }).catch((reason) => {
+            alert(reason);
+        })
+    }
+</script>
+
+<style>
+    button {
+        cursor: pointer;
+        height: 50px;
+        min-width: 100px;
+        background: #ccffce;
+    }
+</style>
+
+</html>

@@ -1,6 +1,6 @@
 <table>
     <tr>
-        <td>title：ajax</td>
+        <td>title：ajax+axios</td>
         <td>author：songyx</td>
         <td>date：2024/02/11</td>
     </tr>
@@ -202,3 +202,114 @@ res.setHeader('Access-Control-Allow-Origin', '*');
 ```
 
 #### axios
+
+##### config[params]
+
+设置`url`参数。
+
+```javascript
+// 请求url为http://localhost:3000/posts?id=1，但这样不符合restful API风格
+axios.get('http://localhost:3000/posts', { params: { id: 1 } }).then((value) => {
+    document.getElementById('message').innerHTML = JSON.stringify(value.data);
+})
+```
+
+##### defaults
+
+```javascript
+// 默认请求方式
+axios.defaults.method = 'GET';
+// 默认请求地址，后续使用时可简写
+axios.defaults.baseURL = 'http://localhost:3000'
+// 默认超时时间
+axios.defaults.timeout = 3000;
+```
+
+##### 实例对象
+
+当存在两个后端微服务（A、B）时，一些请求需要发送到A，一些请求需要发送到B。
+
+创建出来的实例对象`axios_A`、`axios_B`与`axios`具有几乎一样的功能。
+
+```javascript
+const axios_A = axios.create({
+    // 对应后端微服务-用户
+    baseURL: 'http://localhost:3000/user',
+    timeout: 3000
+})
+const axios_B = axios.create({
+    // 对应后端微服务-角色
+    baseURL: 'http://localhost:3000/role',
+    timeout: 3000
+})
+```
+
+##### 拦截器
+
+```javascript
+// 加载遮罩
+let loading = false;
+
+// 请求拦截器
+axios.interceptors.request.use((config) => {
+    // 每次请求均添加token
+    if (config.data) {
+        config.data.token = 'songyx';
+    }
+    // 打开加载遮罩
+    this.loading = true;
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+// 响应拦截器
+axios.interceptors.response.use((response) => {
+    // 关闭加载遮罩
+    this.loading = false;
+    // 直接获取返回值，忽略其他返回信息
+    return response.data;
+}, (error) => {
+    return Promise.reject(error);
+});
+```
+
+若进入了拦截器的异常回调，则返回状态为`rejected`的`Promise`对象，则只需在请求的最后添加`catch`方法，执行`onRejected`回调即可。
+
+```javascript
+axios.request({
+    method: 'GET',
+    url: '/posts/2'
+}).then((value) => {
+    console.log(value);
+}).catch((reason) => {
+    alert(reason);
+})
+```
+
+此外，当存在多个拦截器时，请求拦截器的执行顺序类似于栈，响应拦截器的执行顺序类似于队列。
+
+##### 取消请求
+
+当用户重复发送请求时。首先检测之前的请求是否处理完成，若未完成则取消，发送新请求。
+
+```javascript
+let cancel = null;
+// 请求单个
+btns[0].onclick = () => {
+    if (cancel) {
+        // 若未处理完成，则取消
+        cancel();
+    }
+    axios.request({
+        method: 'GET',
+        url: '/posts/2',
+        cancelToken: new axios.CancelToken(c => cancel = c)
+    }).then((value) => {
+        cancel = null;
+        console.log(value);
+    })
+}
+```
+
+##### 源码分析

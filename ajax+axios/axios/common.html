@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>axios common</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
+</head>
+
+<body>
+    <div>
+        <button>GET</button>
+        <button>GET All</button>
+        <button>POST</button>
+        <button>PATCH</button>
+        <button>PUT</button>
+        <button>DELETE</button>
+    </div>
+    <p id="message"></p>
+</body>
+
+<script>
+    let btns = document.querySelectorAll('button');
+    // 默认请求方式
+    axios.defaults.method = 'GET';
+    // 默认请求地址，后续使用时可简写
+    axios.defaults.baseURL = 'http://localhost:3000'
+    // 默认超时时间
+    axios.defaults.timeout = 3000;
+    // 请求单个
+    btns[0].onclick = () => {
+        axios.request({
+            method: 'GET',
+            url: '/posts/2'
+        }).then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 请求全部
+    btns[1].onclick = () => {
+        axios.request({
+            method: 'GET',
+            url: '/posts'
+        }).then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 新增
+    btns[2].onclick = () => {
+        axios.request({
+            method: 'POST',
+            url: '/posts',
+            data: {
+                title: '永恒之王',
+                views: 99
+            }
+        }).then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 更新部分
+    btns[3].onclick = () => {
+        axios.request({
+            method: 'PATCH',
+            url: '/posts/2',
+            data: {
+                title: '亚尔斯兰战记'
+            }
+        }).then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 更新全部
+    btns[4].onclick = () => {
+        axios.request({
+            method: 'PUT',
+            url: '/posts/2',
+            data: {
+                title: '荷马史诗',
+                views: 30
+            }
+        }).then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+    // 删除
+    btns[5].onclick = () => {
+        axios.request({
+            method: 'DELETE',
+            url: '/posts/6f50',
+        }).then((value) => {
+            document.getElementById('message').innerHTML = JSON.stringify(value.data);
+        })
+    }
+</script>
+
+<style>
+    button {
+        cursor: pointer;
+        height: 50px;
+        min-width: 100px;
+        background: #ccffce;
+    }
+</style>
+
+</html>
