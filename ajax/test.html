@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ajax</title>
+</head>
+
+<body>
+    <button id="btn">点击上传</button>
+    <div>
+        <textarea style="height: 150px;" id="text"></textarea>
+    </div>
+</body>
+<script>
+    let btn = document.getElementById('btn');
+    btn.onclick = () => {
+        let text = document.getElementById('text').value;
+        let xhr = new XMLHttpRequest();
+        // 1.open（初始化，设置请求方法与url）
+        xhr.open('POST', `http://localhost:10086/server?t=${Date.now()}`);
+        // 设置MIME类型
+        xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
+        // 2.发送数据
+        xhr.send(`text=${text}`);
+        // 3.处理返回结果
+        xhr.onreadystatechange = () => {
+            // 请求已完成
+            if (xhr.readyState === 4) {
+                // 2xx-成功
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    let data = JSON.parse(xhr.response);
+                    alert(data.data);
+                }
+            }
+        }
+    }
+</script>
+
+
+</html>
