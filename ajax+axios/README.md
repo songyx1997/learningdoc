@@ -384,3 +384,284 @@ utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData
 1. `['request'](config)`
 2. `['delete', 'get', 'head', 'options'](url, config)`
 3. `['post', 'put', 'patch'](url, data, config)`
+
+##### 发送请求、拦截器
+
+
+拦截器的构造函数及其`use`方法如下。每次调用`use`，就往`handlers`添加`{fulfilled,rejected}`执行对。
+
+```javascript
+class InterceptorManager {
+  constructor() {
+    this.handlers = [];
+  }
+  use(fulfilled, rejected, options) {
+    this.handlers.push({
+      fulfilled,
+      rejected,
+    });
+    return this.handlers.length - 1;
+  }
+}
+```
+`axios`发送请求其实就是调用`request`方法，该方法是对`Promise`链进行处理。
+
+`dispatchRequest`即发送请求，`undefined`用于占位。因为`Promise`的`resolve`和`reject`是成对出现的。
+
+```javascript
+// Axios.prototype.request方法
+const chain = [dispatchRequest.bind(this), undefined];
+// 添加请求拦截器-unshift。在请求组之前压入请求拦截器，导致实际执行时类似于栈
+for (const request of this.interceptors.request.handlers) {
+    chain.unshift(request.onResolved, request.onRejected);
+}
+// 添加响应拦截器-push。在请求组之后放入响应拦截器，导致实际执行时类似于队列
+for (const response of this.interceptors.response.handlers) {
+    chain.push(response.onResolved, response.onRejected);
+}
+len = chain.length;
+// 创建成功的promise对象，因此调用then方法时，参数config将被传递给chain[i++]。
+promise = Promise.resolve(config);
+// Promise链全部执行结束
+while (i < len) {
+    promise = promise.then(chain[i++], chain[i++]);
+}
+return promise;
+```
+
+```javascript
+function dispatchRequest(config) {
+    const adapter = adapters.getAdapter(config.adapter || defaults.adapter);
+    return adapter(config).then(function onAdapterResolution(response) {
+        // 省略：对响应进行转换
+        return response;
+    }
+};
+```
+
+以`xhr`适配器为例，在其中封装`ajax`请求，并对请求返回结果进行分装。适配器返回为`Promise`对象。
+
+```javascript
+// 调用适配器，发送请求
+function xhrAdapter(config) {
+    return new Promise((resolve, reject) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open(config.method, config.url);
+        xhr.send(config.data);
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    let data = JSON.parse(xhr.response);
+                    // 组装axios的返回数据
+                    resolve({
+                        config,
+                        data,
+                        headers: xhr.getAllResponseHeaders(),
+                        request: xhr,
+                        status: xhr.status,
+                        statusText: xhr.statusText
+                    });
+                } else {
+                    reject('发送请求异常')
+                }
+            }
+        }
+    })
+}
+```
+
+##### 取消请求
+
+通过构建内部`Promise`实例，将取消操作暴露出去。
+
+```javascript
+Axios.prototype.CancelToken = function (executor) {
+    let resolvePromise;
+    this.selfPromise = new Promise((resolve, reject) => {
+        // 当resolvePromise()执行时，selfPromise将变为成功
+        resolvePromise = resolve;
+    })
+    executor(function () {
+        resolvePromise();
+    })
+}
+```
+
+而在适配器中，通过`selfPromise`的状态，确认是否执行`abort`方法。
+
+```javascript
+xhr.open(config.method, config.url);
+// 如果配置了取消操作
+if (config.cancelToken) {
+    // 当状态为pending时，then方法一直不会被执行
+    // 但是暴露出去的cancel方法一旦执行，就会将状态修改为resolved
+    config.cancelToken.selfPromise.then(() => {
+        xhr.abort();
+    })
+}
+xhr.send(config.data);
+```
+
+##### 总结
+
+`axios`与`Axios`的关系？
+
+1. `axios`通过`createInstance`方法创建。
+2. `axios`是通过`bind`函数，修改了`this`指向的`Axios.prototype.request`。
+3. `axios`作为对象时，拥有`Axios`原型对象上的全部方法，拥有`Axios`实例的全部属性。
+
+------
+
+`instance`与`axios`的关系？
+
+前者是后者的子集，前者不具备后者后面添加的一些方法。
+
+```javascript
+const axios = createInstance(defaults);
+axios.Axios = Axios;
+axios.CanceledError = CanceledError;
+axios.CancelToken = CancelToken;
+axios.isCancel = isCancel;
+axios.VERSION = VERSION;
+axios.toFormData = toFormData;
+```
+
+------
+
+整体流程？
+
+<div style="margin:0 auto;width:80%">
+    <img src=".\整体流程.png">
+</div>
+
+##### 自定义
+
+```javascript
+// 构造函数
+function Axios(config) {
+    this.defaults = config;
+    this.interceptors = {
+        request: new Interceptor(),
+        response: new Interceptor()
+    };
+}
+
+// 构造函数-拦截器
+function Interceptor() {
+    this.handlers = [];
+}
+
+Interceptor.prototype.use = function (onResolved, onRejected) {
+    this.handlers.push({ onResolved, onRejected })
+}
+
+// 添加request方法
+Axios.prototype.request = function (config) {
+    console.log(`发送${config.method}请求`);
+    // promise链，undefined用于占位
+    let chain = [dispatchRequest, undefined];
+    // 添加请求拦截器-unshift
+    for (const request of this.interceptors.request.handlers) {
+        chain.unshift(request.onResolved, request.onRejected);
+    }
+    // 添加响应拦截器-push
+    for (const response of this.interceptors.response.handlers) {
+        chain.push(response.onResolved, response.onRejected);
+    }
+    let promise = Promise.resolve(config);
+    // 依次取出回调函数并执行
+    while (chain.length > 0) {
+        promise = promise.then(chain.shift(), chain.shift());
+    }
+    return promise;
+}
+
+// 发送请求
+function dispatchRequest(config) {
+    return xhrAdapter(config).then((value) => {
+        // 对响应结果进行处理
+        return value;
+    }, (reason) => {
+        throw reason;
+    });
+}
+
+// 调用适配器，发送请求
+function xhrAdapter(config) {
+    return new Promise((resolve, reject) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open(config.method, config.url);
+        // 如果配置了取消操作
+        if (config.cancelToken) {
+            // 当状态为pending时，then方法一直不会被执行
+            // 但是暴露出去的cancel方法一旦执行，就会将状态修改为resolved
+            config.cancelToken.selfPromise.then(() => {
+                xhr.abort();
+            })
+        }
+        xhr.send(config.data);
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    let data = JSON.parse(xhr.response);
+                    // 组装axios的返回数据
+                    resolve({
+                        config,
+                        data,
+                        headers: xhr.getAllResponseHeaders(),
+                        request: xhr,
+                        status: xhr.status,
+                        statusText: xhr.statusText
+                    });
+                } else {
+                    reject('发送请求异常')
+                }
+            }
+        }
+    })
+}
+
+// 添加get方法
+Axios.prototype.get = function (url, config) {
+    let newConfig = { ...config, url };
+    newConfig.method = 'GET';
+    return this.request(newConfig);
+}
+
+// 添加post方法
+Axios.prototype.post = function (url, data, config) {
+    let newConfig = { ...config, url, data };
+    newConfig.method = 'POST';
+    return this.request(newConfig);
+}
+
+// 取消-构造函数，通过构建内部promise对象，将取消操作暴露出去
+Axios.prototype.CancelToken = function (executor) {
+    let resolvePromise;
+    this.selfPromise = new Promise((resolve, reject) => {
+        // 当resolvePromise()执行时，selfPromise将变为成功
+        resolvePromise = resolve;
+    })
+    executor(function () {
+        resolvePromise();
+    })
+}
+
+function createInstance(config) {
+    // 创建实例
+    let context = new Axios(config);
+    // 创建函数，并修改request的this指向
+    let instance = Axios.prototype.request.bind(context);
+    // 给该函数添加get、post方法，并修改this指向
+    for (const method of Object.keys(Axios.prototype)) {
+        instance[method] = Axios.prototype[method].bind(context);
+    }
+    // 给函数添加实例内的属性
+    for (const element of Object.keys(context)) {
+        instance[element] = context[element]
+    }
+    return instance;
+}
+
+export default createInstance();
+```

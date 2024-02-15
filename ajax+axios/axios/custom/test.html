@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>axios</title>
+</head>
+
+<body>
+    <button id="send">发送请求</button>
+    <button id="cancel">取消请求</button>
+</body>
+
+<script type="module">
+    import axios from './axios.js';
+    // 拦截器
+    axios.interceptors.request.use(function one(config) {
+        console.log('请求拦截器一号')
+        return config;
+    }, function (error) {
+        return Promise.reject(error);
+    });
+    axios.interceptors.request.use(function two(config) {
+        console.log('请求拦截器二号')
+        return config;
+    }, function (error) {
+        return Promise.reject(error);
+    });
+    axios.interceptors.response.use(function one(response) {
+        console.log('响应拦截器一号')
+        return response;
+    }, function (error) {
+        return Promise.reject(error);
+    })
+    axios.interceptors.response.use(function two(response) {
+        console.log('响应拦截器二号')
+        return response;
+    }, function (error) {
+        return Promise.reject(error);
+    })
+
+    // 取消函数
+    let cancel = null;
+
+    // 发送请求
+    let sendBtn = document.getElementById('send');
+    sendBtn.onclick = function () {
+        axios.get('http://localhost:3000/posts', {
+            cancelToken: new axios.CancelToken(function (c) {
+                cancel = c;
+            })
+        }).then((value) => {
+            console.log(value);
+        })
+        console.dir(axios);
+    }
+
+    // 取消请求
+    let cancelBtn = document.getElementById('cancel');
+    cancelBtn.onclick = function () {
+        cancel();
+    }
+</script>
+
+</html>
