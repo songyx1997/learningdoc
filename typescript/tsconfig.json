@@ -1,0 +1,18 @@
+{
+    // 指定哪些文件需要被编译
+    // **表示任意目录
+    // *表示任意文件
+    "include": [
+        "./src/**/*"
+    ],
+    // 默认值包括node_modules
+    "exclude": [],
+    // 编译器选项
+    "compilerOptions": {
+        // 指定编译出的js版本
+        // ESNext表示永远指向下一个版本
+        "target": "ES5",
+        // 模块化规范
+        "module": "CommonJS"
+    }
+}
