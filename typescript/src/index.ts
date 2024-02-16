@@ -1,4 +1,4 @@
-import { sum, success } from './method';
+import { sum, success, fun, student, Young } from './method';
 
 enum Gender {
     Male = 1,
@@ -10,3 +10,8 @@ person = { name: 'songyx', gender: Gender.Male };
 
 console.log(sum(1, 2));
 console.log(success);
+
+fun(1000, 'test');
+
+let my: Young = new Young('songyx', 26, 'chengdu');
+console.log(student(my))

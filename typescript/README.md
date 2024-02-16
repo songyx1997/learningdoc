@@ -252,3 +252,24 @@ module.exports = {
     ]
 }
 ```
+
+#### 类、接口、泛型
+
+##### 泛型
+
+```typescript
+// 泛型可以同时指定多个
+const fun: <T, K>(t: T, k: K) => T = (t, k) => {
+    console.log(k);
+    return t;
+}
+// 调用时会自动进行类型推断
+fun(1000, 'test');
+```
+
+```typescript
+// 泛型T必须是Person的实现类（子类）
+const student: <T extends Person>(s: T) => string = (s) => {
+    return `${s.name}-${s.age}-${s.toString()}`
+}
+```
