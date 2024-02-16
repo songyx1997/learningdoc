@@ -13,6 +13,28 @@
         // ESNext表示永远指向下一个版本
         "target": "ES5",
         // 模块化规范
-        "module": "CommonJS"
+        "module": "CommonJS",
+        // 编译后文件所在目录
+        "outDir": "./dist",
+        // 所有的全局作用域中的代码会合并到一个文件中
+        // "outFile": "./dist/app.js"
+        // 是否编译目录下的js文件
+        "allowJs": true,
+        // 是否检查js代码是否符合语法规范
+        "checkJs": false,
+        // 是否移除注释
+        "removeComments": true,
+        // 当存在错误时不生成编译后的文件
+        "noEmitOnError": true,
+        // 所有严格检查的总开关，包括以下四项
+        "strict": true,
+        // 是否将编译后的文件指定为严格模式
+        // "alwaysStrict": true,
+        // 不允许隐式的any类型
+        // "noImplicitAny": true,
+        // 不允许不明确类型的this
+        // "noImplicitThis": true,
+        // 严格检查空值
+        // "strictNullChecks": true
     }
 }
