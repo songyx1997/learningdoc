@@ -1,0 +1,6 @@
+{
+    "[vue]": {
+        "editor.defaultFormatter": "Vue.volar"
+    },
+    "vue.autoInsert.dotValue": true
+}
