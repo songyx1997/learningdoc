@@ -15,10 +15,14 @@
 
 `webpack`构建与`vite`构建对比如下：
 
-<div style="display:flex;width:50%">
+<div style="margin:0 auto;width:85%">
     <img src=".\webpack构建.png">
+</div>
+
+<div style="margin:0 auto;width:70%">
     <img src=".\vite构建.png">
 </div>
+
 
 ##### OptionsAPI、CompositionAPI
 
@@ -26,10 +30,11 @@
 
 `Vue3`采用的是`CompositionAPI`（组合式）。采用函数的方式，更加优雅的组织代码，将相关功能的代码更加有有序的组织在一起。
 
-<div style="display:flex;width:50%">
-    <img src=".\OptionsAPI与CompositionAPI_1.gif">
-    <img src=".\OptionsAPI与CompositionAPI_2.gif">
+<div style="display:flex;justify-content: center;">
+    <img src=".\OptionsAPI与CompositionAPI_1.gif" style="width:48%">
+    <img src=".\OptionsAPI与CompositionAPI_2.gif" style="width:48%">
 </div>
+
 
 ##### setup
 
@@ -143,3 +148,372 @@ function changeJob() {
   job.value = { work: '学生', seniority: 4 };
 }
 ```
+
+##### toRefs、toRef
+
+```typescript
+let job = reactive({ work: '程序员', seniority: 3 });
+// 解构赋值出来的数据，并非响应式，数据的变化无法反映在页面中
+let { work, seniority } = job;
+```
+
+`toRefs`会将`job`的每个属性均转换为`RefImpl`实例对象。
+
+```typescript
+let newJob = toRefs(job);
+let { work } = newJob;
+let { seniority } = newJob;
+```
+
+`toRef`会将`job`的指定属性转换为`RefImpl`实例对象。
+
+```typescript
+let work = toRef(job.work);
+```
+
+##### 双向绑定
+
+为什么会使用双向绑定？
+
+当然可以用`js`代码修改页面中的信息。
+
+但是当页面数据发生变化时，比如`input`。`js`需要获取到页面中输入的数据，因此就需要使用双向绑定。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+// 基本类型数据，name转变为了RefImpl实例对象
+let name = ref('songyx');
+</script>
+
+<template>
+  <div class="person">
+    <div>姓名:<input v-model="name" /></div>
+    <div>域名信息({{ name.substring(0, 1) + (Math.random() * 10000).toFixed(0) }})</div>
+  </div>
+</template>
+```
+
+##### computed
+
+`Vue`要求模板应该尽量简单，因此上面的代码需要使用计算属性替代。
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+// 基本类型数据，name转变为了RefImpl实例对象
+let name = ref('songyx');
+// domainName为ComputedRefImpl实例对象
+let domainName = computed(() => {
+  // 计算时所依赖的数据发生变化，就进行重新计算
+  // 计算属性是存在缓存的，而方法没有。每次修改name，计算只执行1次。但是方法会执行3次。
+  console.log('执行计算');
+  return name.value.substring(0, 1) + (Math.random() * 10000).toFixed(0)
+})
+</script>
+
+<template>
+  <div class="person">
+    <div>姓名:<input v-model="name" /></div>
+    <div>域名信息({{ domainName }})</div>
+    <div>域名信息({{ domainName }})</div>
+    <div>域名信息({{ domainName }})</div>
+  </div>
+</template>
+```
+
+计算属性`domainName`是**只读**的，直接赋值是不被允许的，
+
+```typescript
+domainName.value = 'mbp2024';
+```
+
+为了使计算属性可以修改，需要定义`get、set`方法。内部的`set`方法应该反向修改其依赖的数据，才具有意义。
+
+```typescript
+let domainName = computed({
+  get() {
+    return name.value.substring(0, 1) + (Math.random() * 10000).toFixed(0)
+  },
+  set(value) {
+    // 只是记录日志，并没有实际意义
+    console.log(value);
+    // 对计算属性的赋值，反向修改其依赖的数据name，并反映在页面中，具有其意义
+    name.value = value.substring(0, value.length - 4);
+  }
+})
+```
+
+##### watch
+
+能监视4种数据，共5个场景。四种数据包括：
+
+1. `ref`定义的响应式数据。
+2. `reactive`定义的响应式数据。
+3. 函数的返回值。
+4. 上述三种数据组成的数组。
+
+场景一：`ref`定义的**基本类型数据**
+
+```vue
+<script setup lang="ts">
+import { reactive, ref, watch } from 'vue';
+let age = ref(26);
+function changeAge() {
+  age.value++;
+}
+// 新值和旧值都能够正确输出
+watch(age, (newValue, oldValue) => {
+  console.log(newValue);
+  console.log(oldValue);
+})
+</script>
+```
+
+场景二：`ref`定义的**对象类型数据**
+
+`watch`监听的其实是对象的地址值。
+
+```typescript
+let car = ref({ one: '奔驰', two: '奥迪' });
+// 对象进行了重新赋值，地址值发生了变化。新值和旧值都能够正确输出。
+function changeAllCar() {
+  car.value = { one: 'f1', two: 'f4' };
+}
+watch(car, (newValue, oldValue) => {
+  console.log(newValue);
+  console.log(oldValue);
+})
+```
+
+为了能够监听对象内部属性的变化，需要开始深度监听。但是对象内部属性的变化，并没有修改对象的地址值。因此新值和旧值将保持一致，都是新值。
+
+```typescript
+let car = ref({ one: '奔驰', two: '奥迪' });
+function changeCarOne() {
+  car.value.one = '雅迪';
+}
+function changeCarTwo() {
+  car.value.two = '爱玛';
+}
+watch(car, (newValue, oldValue) => {
+  console.log(newValue);
+  console.log(oldValue);
+}, { deep: true })
+```
+
+场景三：`reactive`定义的**对象类型数据**
+
+```typescript
+function changeAllCar() {
+  // 该方法其实是对象的合并，因此并未修改car的地址值
+  Object.assign(car, { one: 'f1', two: 'f4' });
+}
+watch(car, (newValue, oldValue) => {
+  console.log(newValue);
+  console.log(oldValue);
+})
+```
+
+`watch`隐式开启了深度监听。对于对象的变化和对象内部属性的变化均能监听到，但是由于地址值均未被修改，因此新值和旧值将保持一致，都是新值。
+
+场景四：函数的返回值
+
+该方式用于单独监听对象的内部属性变化。
+
+```typescript
+// 即使ref修改为reactive，下面两个监听的结果也是一致的
+// 监听方式为()=>person.car，监听的就是person.car的地址值变化
+// 在此基础上添加深度监听，则可以监听person.car内部属性的变化
+let person = ref({
+  name: 'songyx',
+  age: 26,
+  car: { one: '奔驰', two: '奥迪' }
+})
+// 全部修改，才能监听到，新值和旧值均能正确输出
+watch(() => person.value.car, (newValue, oldValue) => {
+  console.log(newValue);
+  console.log(oldValue);
+})
+// 添加深度监听，均能监听到。修改内部属性，新值和旧值均为新值。
+watch(() => person.value.car, (newValue, oldValue) => {
+  console.log(newValue);
+  console.log(oldValue);
+}, { deep: true })
+```
+
+场景五：上述三种数据组成的数组
+
+```typescript
+// 同时监听name和car
+// 新值和旧值的输出，其实就是单独监听的结果进行组合
+watch([() => person.value.name, () => person.value.car], (newValue, oldValue) => {
+  console.log(newValue);
+  console.log(oldValue);
+})
+```
+
+`watch`方法的返回值为停止监听的方法
+
+```typescript
+let stop = watch([() => person.value.age, () => person.value.car], (newValue, oldValue) => {
+  console.log(newValue);
+  console.log(oldValue);
+  if (person.value.age >= 30) {
+    // 停止监听
+    stop();
+  }
+})
+```
+
+##### watchEffect
+
+```typescript
+// 初始化时，就会自动执行一次
+// 当需要同时监听的内容很多时，使用[]会更加冗长，可以使用watchEffect替代
+let stop = watchEffect(() => {
+  console.log(person);
+  // 内部使用了age，因此改变age的方法的调用，都会被监听
+  if (person.value.age >= 30) {
+    // 停止监听
+    stop();
+  }
+})
+```
+
+##### 标签中的ref
+
+`HTML`标签中的`ref`
+
+```vue
+<template>
+  <div id="idx" value="text2"></div>
+  <Person />
+</template>
+```
+
+```vue
+<script setup lang="ts">
+function showDOM() {
+  console.log(document.getElementById('idx'));
+}
+</script>
+
+<template>
+  <div class="person">
+    <button @click="showDOM">输出DOM对象</button>
+    <div id="idx" value="text1"></div>
+  </div>
+</template>
+```
+
+因为`id`重复。输出时，外部的`div`干扰了内部的`div`的输出。
+
+需要借助`ref`给节点添加标记，这样就建立起了隔离。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+// 创建容器存储ref
+let idx = ref();
+function showDOM() {
+  console.log(idx.value);
+}
+</script>
+
+<template>
+  <div class="person">
+    <button @click="showDOM">输出DOM对象</button>
+    <div ref="idx" value="text1"></div>
+  </div>
+</template>
+```
+
+`components`标签中的`ref`
+
+通过`defineExpose`将组件内部的元素（`name、age、job`）和方法（`changeJob`）暴露出来。
+
+```vue
+defineExpose({ name, age, job, changeJob });
+```
+
+```vue
+<script setup lang="ts">
+import Person from '@/components/person.vue'
+import { ref } from 'vue';
+let person = ref();
+function getSubElement() {
+  console.log(person.value.name)
+  console.log(person.value.age)
+  console.log(person.value.job)
+  // 调用组件内部的方法
+  person.value.changeJob();
+}
+</script>
+
+<template>
+  <Person ref="person" />
+  <button @click="getSubElement">获取组件内部的数据与方法</button>
+</template>
+```
+
+##### props
+
+```vue
+<script setup lang="ts">
+// props内部的属性均为只读
+const props = defineProps({
+  name: {
+    type: String,
+    default: ''
+  },
+  age: {
+    type: Number,
+    default: 0
+  },
+  car: {
+    type: Object,
+    default: () => {
+      return { one: '汽车一', two: '汽车二' }
+    }
+  }
+})
+</script>
+
+<template>
+  <div class="person">
+    <div>姓名:{{ props.name }}</div>
+    <div>年龄:{{ props.age }}</div>
+    <div>汽车:{{ props.car.one }}、{{ props.car.two }}</div>
+  </div>
+</template>
+```
+
+```vue
+<script setup lang="ts">
+import Person from '@/components/person.vue';
+import { reactive } from 'vue';
+let car = reactive({ one: '', two: '' });
+function editCar() {
+  car.one = '奔驰';
+  car.two = '宝马';
+}
+</script>
+
+<template>
+  <Person name="songyx" :age="26" :car="car" />
+  <button @click="editCar">修改汽车</button>
+</template>
+```
+
+##### 生命周期
+
+#### Vue2
+
+##### 生命周期
+
+| 创建-创建组件时触发                         | beforeCreate-创建前  | created-创建完毕   |
+| ------------------------------------------- | -------------------- | ------------------ |
+| 挂载-将组件放置于页面中时触发               | beforeMount-挂载前   | mounted-挂载完毕   |
+| 更新-钩子函数的调用次数取决于数据变化的次数 | beforeUpdate-更新前  | updated-更新完毕   |
+| 销毁-组件销毁时触发                         | beforeDestory-销毁前 | destoryed-销毁完毕 |
