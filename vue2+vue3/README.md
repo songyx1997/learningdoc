@@ -507,13 +507,120 @@ function editCar() {
 ```
 
 ##### 生命周期
+| 创建-创建组件时触发                         | setup(){}               | setup(){}           |
+| ------------------------------------------- | ----------------------- | ------------------- |
+| 挂载-将组件放置于页面中时触发               | onBeforeMount(()=>{})   | onMounted(()=>{})   |
+| 更新-钩子函数的调用次数取决于数据变化的次数 | onBeforeUpdate(()=>{})  | onUpdated(()=>{})   |
+| 卸载                                        | onBeforeUnmount(()=>{}) | onUnmounted(()=>{}) |
+
+当父组件与子组件均使用了生命周期钩子函数时，如`onMounted`。子组件挂载在父组件之前。因此`App.vue`是最后才挂载完毕的。
+
+##### hooks
+
+让一个功能的数据与方法贴合在一起（即封装，类似于`Vue2`中的`mixin`）。
+
+命名规范：`use+功能名称`。如该功能是订单相关的，则该文件为`useOrder.ts`。
+
+正是因为使用了`hooks`，才体现出`CompositionAPI`的特征。
+
+```typescript
+import { ref, computed, onMounted } from 'vue';
+
+// 默认暴露，使用函数包裹，并提供自定义返回值
+export default function () {
+    // 数据
+    let person = ref({
+        name: 'songyx',
+        age: 26,
+        car: { one: '奔驰', two: '奥迪' }
+    })
+    // 数据（计算属性）
+    let domainName = computed(() => {
+        return person.value.name.substring(0, 2).toUpperCase() + (Math.random() * 1000).toFixed(0);
+    })
+
+    // 方法（钩子函数）
+    onMounted(() => {
+        // 进入页面，就调用一次
+        changeName();
+        changeAge();
+    })
+    // 方法
+    function changeName() {
+        person.value.name += '~';
+    }
+    function changeAge() {
+        person.value.age++;
+    }
+    function changeCarOne() {
+        person.value.car.one = '雅迪';
+    }
+    function changeCarTwo() {
+        person.value.car.two = '爱玛';
+    }
+    function changeAllCar() {
+        person.value.car = { one: 'f1', two: 'f4' };
+    }
+
+    return { person, domainName, changeName, changeAge, changeCarOne, changeCarTwo, changeAllCar }
+}
+```
+
+在页面中调用`hooks`的函数。
+
+```vue
+<script setup lang="ts">
+import usePerson from '@/hooks/usePerson';
+// 解构赋值，使用hooks
+const {
+  person,
+  domainName,
+  changeName,
+  changeAge,
+  changeCarOne,
+  changeCarTwo,
+  changeAllCar
+} = usePerson();
+</script>
+```
+
+##### 路由
+
+在工程中使用
+
+1. 创建路由文件`router/index.ts`。
+2. 在`main.ts`中进行全局注册。
+3. 在`App.vue`中使用`router-view`进行占位。
+
+当路由切换时，之前的页面将被卸载`onUnmounted`，新的页面将被挂载`onMounted`。
+
+路由器的工作模式
+
+|         | Vue2           | Vue3                           |
+| ------- | -------------- | ------------------------------ |
+| history | mode:'history' | history:createWebHistory()     |
+| hash    | mode:'hash'    | history:createWebHashHistory() |
+
+`history`模式的优缺点？
+
+优点：`url`更加美观，不带`#`。
+
+缺点：项目上线时，需要在`ngnix`中配置重定向`try_files`。
+
+`hash`模式的优缺点？
+
+优点：兼容性更好，不需要服务器端处理路径。
+
+缺点：`url`中带有`#`，且`SEO`优化方面相对较差。
+
+后台项目更在乎稳定，常采用`hash`模式。前台项目客户使用，常采用`history`模式。
 
 #### Vue2
 
 ##### 生命周期
 
-| 创建-创建组件时触发                         | beforeCreate-创建前  | created-创建完毕   |
-| ------------------------------------------- | -------------------- | ------------------ |
-| 挂载-将组件放置于页面中时触发               | beforeMount-挂载前   | mounted-挂载完毕   |
-| 更新-钩子函数的调用次数取决于数据变化的次数 | beforeUpdate-更新前  | updated-更新完毕   |
-| 销毁-组件销毁时触发                         | beforeDestory-销毁前 | destoryed-销毁完毕 |
+| 创建-创建组件时触发                         | beforeCreate(){}  | created(){}   |
+| ------------------------------------------- | ----------------- | ------------- |
+| 挂载-将组件放置于页面中时触发               | beforeMount(){}   | mounted(){}   |
+| 更新-钩子函数的调用次数取决于数据变化的次数 | beforeUpdate(){}  | updated(){}   |
+| 销毁-组件销毁时触发                         | beforeDestory(){} | destoryed(){} |

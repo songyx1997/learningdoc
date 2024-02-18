@@ -1,25 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-let person = ref({
-  name: 'songyx',
-  age: 26,
-  car: { one: '奔驰', two: '奥迪' }
-})
-function changeName() {
-  person.value.name += '~';
-}
-function changeAge() {
-  person.value.age++;
-}
-function changeCarOne() {
-  person.value.car.one = '雅迪';
-}
-function changeCarTwo() {
-  person.value.car.two = '爱玛';
-}
-function changeAllCar() {
-  person.value.car = { one: 'f1', two: 'f4' };
-}
+import usePerson from '@/hooks/usePerson';
+// 解构赋值，使用hooks
+const {
+  person,
+  domainName,
+  changeName,
+  changeAge,
+  changeCarOne,
+  changeCarTwo,
+  changeAllCar
+} = usePerson();
 </script>
 
 <template>
@@ -27,6 +17,7 @@ function changeAllCar() {
     <div>姓名:{{ person.name }}</div>
     <div>年龄:{{ person.age }}</div>
     <div>汽车:{{ person.car.one }}、{{ person.car.two }}</div>
+    <div>域名:{{ domainName }}</div>
     <button @click="changeName">修改名字</button>
     <button @click="changeAge">修改年龄</button>
     <button @click="changeCarOne">修改第一辆汽车</button>
