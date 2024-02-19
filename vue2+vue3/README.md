@@ -745,7 +745,166 @@ let { query } = toRefs(route);
 
 `store`是`pinia`的一个具体体现。
 
-#### Vue2
+首先采用`OptionsAPI`的写法
+
+```typescript
+import { defineStore } from 'pinia';
+// 注意命名方式
+export const useCountStore = defineStore('count', {
+    state() {
+        return { num: 0, des: '默认描述' }
+    },
+    // 动作函数
+    actions: {
+        test(num: number, des: string) {
+            // 添加封装逻辑
+            console.log('调用动作函数');
+        }
+    },
+    // 对数据进行二次加工
+    getters: {
+        bigSum(state) {
+            return state.num * 10;
+        }
+    }
+})
+```
+
+在`main.ts`中引入
+
+```typescript
+import { createPinia } from 'pinia';
+const app = createApp(App);
+const pinia = createPinia();
+app.use(pinia);
+```
+
+具体使用时，修改`state`数值的方式有三种。
+
+```vue
+<script setup lang="ts">
+import { useCountStore } from '@/store/count';
+import { storeToRefs } from 'pinia';
+const countStore = useCountStore();
+// num是ObjectRefImpl实例。但是进行解构赋值，将丧失响应式。
+// let { num, des } = countStore;
+// storeToRefs仅将其中的state数据转换为响应式。
+let { num, des, bigSum } = storeToRefs(countStore);
+function add() {
+    // 方式一：不同于Vue2中的store，数据只能通过action进行修改。pinia可以直接修改。
+    num.value++;
+}
+function divide() {
+    num.value--;
+}
+function reset() {
+    // 方式二：调用patch方法进行部分更新，或者全部更新
+    countStore.$patch({
+        num: 100,
+        des: '重新赋值'
+    })
+    // 方式三：调用动作函数，函数中可对state数据进行操作
+    countStore.test(num.value, des.value);
+    // getters内部的方法，有些类似于计算属性
+    console.log(countStore.bigSum)
+}
+</script>
+
+<template>
+    <div>数目:{{ num }}</div>
+    <div>描述:{{ des }}</div>
+    <div>扩大10倍的数据:{{ bigSum }}</div>
+    <button @click="add">加</button>
+    <button @click="divide">减</button>
+    <button @click="reset">重新赋值</button>
+</template>
+```
+
+实际开发时，更习惯将`store`编写为`CompositionAPI`的形式。
+
+`state`转换为`ref`或者`reactive`定义的响应式数据，`actions`转换为方法，`getters`转换为计算属性。
+
+```typescript
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
+
+export const useCountStore = defineStore('count', () => {
+    // 数据
+    let num = ref(0);
+    let des = ref('默认描述')
+    // 数据（计算属性）
+    let bigSum = computed(() => {
+        return num.value * 10;
+    })
+    // 方法
+    function test(num: number, des: string) {
+        // 添加封装逻辑
+        console.log('调用动作函数');
+    }
+    return { num, des, bigSum, test };
+})
+```
+
+##### 组件通信
+
+方式一：`props`。
+
+方式二：自定义事件（专门用于子传父）。
+
+父组件
+
+```vue
+<script setup lang="ts">
+import Son from '@/components/son.vue';
+import { ref } from 'vue';
+let str = ref('');
+function saveValue(a: number, b: number) {
+    str.value = `[a:${a}、b:${b}]`
+}
+</script>
+
+<template>
+    <div class="father">
+        <div>父组件</div>
+        <div>从子组件获取数据为{{ str }}</div>
+        <!-- 1.父组件中绑自定义事件 -->
+        <!-- 事件的命名为kebab-case。当子组件中该事件调用时，即执行回调saveValue） -->
+        <Son @get-value="saveValue" />
+    </div>
+</template>
+```
+
+子组件
+
+```vue
+<script setup lang="ts">
+// 2.声明自定义事件
+const emit = defineEmits(['get-value']);
+function sendData() {
+    let a = Math.random();
+    let b = Math.random();
+    // 3.调用自定义事件，a和b为reset参数
+    emit('get-value', a, b);
+}
+</script>
+
+<template>
+    <div class="son">子组件</div>
+    <button @click="sendData">给父组件传递数据</button>
+</template>
+```
+
+方式三：扩展依赖`Mitt`，可以实现任意组件之间的通信。但是注意销毁组件时，也需要销毁，防止内存泄漏。
+
+方式四：`v-model`
+
+`UI`组件库很多都是通过`v-model`进行组件通信的。
+
+为什么`v-model`是双向绑定的？因为即实现了`defineProps`，又实现了`defineEmits`。
+
+甚至在一个组件中，我们可以使用多个`v-model`。
+
+#### Vue2 
 
 ##### 生命周期
 

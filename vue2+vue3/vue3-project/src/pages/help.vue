@@ -6,7 +6,7 @@ const countStore = useCountStore();
 // num是ObjectRefImpl实例。但是进行解构赋值，将丧失响应式。
 // let { num, des } = countStore;
 // storeToRefs仅将其中的state数据转换为响应式。
-let { num, des } = storeToRefs(countStore);
+let { num, des, bigSum } = storeToRefs(countStore);
 
 function add() {
     // 不同于Vue2中的store，数据只能通过action进行修改。pinia可以直接修改。
@@ -33,6 +33,7 @@ function reset() {
 <template>
     <div>数目:{{ num }}</div>
     <div>描述:{{ des }}</div>
+    <div>扩大10倍的数据:{{ bigSum }}</div>
     <button @click="add">加</button>
     <button @click="divide">减</button>
     <button @click="reset">重新赋值</button>

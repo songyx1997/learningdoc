@@ -21,6 +21,7 @@ import Header from '@/components/header.vue';
   bottom: 0;
   margin: 0;
   padding: 0;
+  display: block;
 }
 
 .container {
