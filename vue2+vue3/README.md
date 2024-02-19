@@ -586,20 +586,69 @@ const {
 
 ##### 路由
 
-在工程中使用
+基本使用
 
-1. 创建路由文件`router/index.ts`。
-2. 在`main.ts`中进行全局注册。
-3. 在`App.vue`中使用`router-view`进行占位。
+```typescript
+// 1.创建路由文件router/index.ts
+import { createRouter, createWebHashHistory } from 'vue-router';
+import Home from '@/pages/home.vue';
+import Person from '@/pages/person.vue';
+import Help from '@/pages/help.vue';
 
-当路由切换时，之前的页面将被卸载`onUnmounted`，新的页面将被挂载`onMounted`。
+const router = createRouter({
+    // 写法与Vue2中有所差别，Vue2中为mode:'history'
+    history: createWebHashHistory(),
+    routes: [
+        {
+            path: '/',
+            name: 'home',
+            component: Home
+        },
+        {
+            path: '/person',
+            name: 'person',
+            component: Person
+        },
+        {
+            path: '/help',
+            name: 'help',
+            component: Help
+        }
+    ]
+});
 
-路由器的工作模式
+export default router;
+```
 
-|         | Vue2           | Vue3                           |
-| ------- | -------------- | ------------------------------ |
-| history | mode:'history' | history:createWebHistory()     |
-| hash    | mode:'hash'    | history:createWebHashHistory() |
+```typescript
+// 2.在main.ts中进行全局注册
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router/index';
+
+const app = createApp(App);
+app.use(router)
+```
+
+```vue
+<script setup lang="ts">
+import Header from '@/components/header.vue';
+</script>
+
+<template>
+  <div class="container">
+    <Header />
+    <div class="main">
+      <!-- 在App.vue中使用router-view进行占位 -->
+      <RouterView></RouterView>
+    </div>
+  </div>
+</template>
+```
+
+注意：当路由切换时，之前的页面将被卸载`onUnmounted`，新的页面将被挂载`onMounted`。
+
+路由的工作模式
 
 `history`模式的优缺点？
 
@@ -614,6 +663,87 @@ const {
 缺点：`url`中带有`#`，且`SEO`优化方面相对较差。
 
 后台项目更在乎稳定，常采用`hash`模式。前台项目客户使用，常采用`history`模式。
+
+------
+
+传参？
+
+传参的方式，有`query`和`params`两种。
+
+使用`query`
+
+```typescript
+function onPush(route: RouteRecordRaw) {
+    if (route.name === 'person') {
+        router.push({
+            name: route.name,
+            query: {
+                money: '10w'
+            }
+        })
+    } else {
+        router.push({
+            name: route.name
+        })
+    }
+}
+```
+
+接收参数是需要使用到`useRoute`。且该方法调用后，创建的是当前页面的`Proxy`实例。
+
+```vue
+<script setup lang="ts">
+import { toRefs } from 'vue';
+import { useRoute } from 'vue-router';
+// Proxy实例，为reactive定义的响应式对象类型
+let route = useRoute();
+// 解构赋值，防止丢失响应式
+let { query } = toRefs(route);
+</script>
+
+<template>
+  <div class="person">
+    <div>薪资:{{ query.money }}</div>
+  </div>
+</template>
+```
+
+使用`params`
+
+首先要在路由中配置
+
+```typescript
+{
+    // id可选参数
+    path: '/person/:id?/:money',
+    name: 'person',
+    component: Person,
+},
+```
+
+传参和接收参数与`query`一致。
+
+------
+
+`push`和`replace`？
+
+`push`就是将页面推入栈内。从`A`页面到`B`页面，再从`B`页面到`C`页面，依次将`A、B、C`压栈。因此可以查看历史记录。
+
+`replace`是对页面进行了替换，因此无法查看历史记录。
+
+------
+
+编程式路由导航？
+
+将`router-link`进行了替代，结合`push`和`replace`方法使用。
+
+在`Vue2`中，编程式路由导航，重复跳转，将会报错。而在`Vue3`中则不会。
+
+##### pinia
+
+与`vuex`相同，都是用于集中式状态管理。
+
+`store`是`pinia`的一个具体体现。
 
 #### Vue2
 

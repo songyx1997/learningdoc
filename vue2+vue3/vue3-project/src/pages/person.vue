@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import usePerson from '@/hooks/usePerson';
+import { toRefs } from 'vue';
+import { useRoute } from 'vue-router';
 // 解构赋值，使用hooks
 const {
   person,
@@ -10,10 +12,17 @@ const {
   changeCarTwo,
   changeAllCar
 } = usePerson();
+
+// Proxy实例，为reactive定义的响应式对象类型
+let route = useRoute();
+// 解构赋值，防止丢失响应式
+let { query } = toRefs(route);
+
 </script>
 
 <template>
   <div class="person">
+    <div>薪资:{{ query.money }}</div>
     <div>姓名:{{ person.name }}</div>
     <div>年龄:{{ person.age }}</div>
     <div>汽车:{{ person.car.one }}、{{ person.car.two }}</div>
