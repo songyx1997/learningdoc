@@ -10,12 +10,14 @@ function sendData() {
 </script>
 
 <template>
-    <div class="son">子组件</div>
-    <button @click="sendData">给父组件传递数据</button>
+    <div class="son">子组件
+        <div><button @click="sendData">给父组件传递数据</button></div>
+    </div>
 </template>
 
 <style lang="less" scoped>
 .son {
     background-color: aqua;
+    margin: 10px;
 }
 </style>

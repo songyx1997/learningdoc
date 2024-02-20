@@ -845,6 +845,15 @@ export const useCountStore = defineStore('count', () => {
 })
 ```
 
+`$subscribe`（每次state的变化都会被监听到）
+
+```typescript
+// 因此可以用于将数据存储到缓存中
+countStore.$subscribe((mutation, state) => {
+    localStorage.setItem('data', JSON.stringify(state));
+})
+```
+
 ##### 组件通信
 
 方式一：`props`。
@@ -900,9 +909,77 @@ function sendData() {
 
 `UI`组件库很多都是通过`v-model`进行组件通信的。
 
-为什么`v-model`是双向绑定的？因为即实现了`defineProps`，又实现了`defineEmits`。
+为什么`v-model`是双向绑定的？
+
+```vue
+<div>
+    <MyInput v-model="userName" />
+    <!-- 该语句等同于 -->
+    <!-- <MyInput :modelValue="userName" @update:modelValue="userName = $event" /> -->
+</div>
+```
+
+因此需要在组件中实现`:modelValue（defineProps）`和`@update:modelValue（defineEmits）`。
+
+```vue
+<script setup lang="ts">
+// 对props进行实现
+const props = defineProps({
+    modelValue: {
+        type: String,
+        default: ''
+    }
+})
+// 对emit进行实现
+const emit = defineEmits(['update:modelValue']);
+function onInput(event: Event) {
+    let el = event.target as HTMLInputElement;
+    emit('update:modelValue', el.value);
+}
+</script>
+
+<template>
+    <input :value="modelValue" @input="onInput" />
+</template>
+```
 
 甚至在一个组件中，我们可以使用多个`v-model`。
+
+```vue
+<LoginForm v-model:name="loginForm.name" v-model:password="loginForm.password" />
+```
+
+在组件中实现时
+
+```vue
+<script setup lang="ts">
+// 对props进行实现
+const props = defineProps({
+    name: {
+        type: String,
+        default: ''
+    },
+    password: {
+        type: String,
+        default: ''
+    }
+})
+// 对emit进行实现
+const emit = defineEmits(['update:name', 'update:password']);
+function onInputName(event: Event) {
+    let el = event.target as HTMLInputElement;
+    emit('update:name', el.value);
+}
+function onInputPassword(event: Event) {
+    let el = event.target as HTMLInputElement;
+    emit('update:password', el.value);
+}
+</script>
+```
+
+方式五：`$attrs`，实现祖先与后代之间的传递，常用于组件继承。
+
+方式六：`$refs、$parent`
 
 #### Vue2 
 
