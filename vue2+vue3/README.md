@@ -442,18 +442,22 @@ defineExpose({ name, age, job, changeJob });
 import Person from '@/components/person.vue'
 import { ref } from 'vue';
 let person = ref();
-function getSubElement() {
+function getSubElement(refs: any) {
   console.log(person.value.name)
   console.log(person.value.age)
   console.log(person.value.job)
   // 调用组件内部的方法
   person.value.changeJob();
+  // 当多个组件被使用时，可以通过refs获取，进行批量处理
+  for (const iterator in refs) {
+      console.log(refs[iterator]);
+  }
 }
 </script>
 
 <template>
   <Person ref="person" />
-  <button @click="getSubElement">获取组件内部的数据与方法</button>
+  <button @click="getSubElement($refs)">获取组件内部的数据与方法</button>
 </template>
 ```
 
@@ -980,6 +984,63 @@ function onInputPassword(event: Event) {
 方式五：`$attrs`，实现祖先与后代之间的传递，常用于组件继承。
 
 方式六：`$refs、$parent`
+
+`$refs`用于同时操纵多个子组件内部的数据，`$parent`用于操纵父组件内部的数据。
+
+方式七：`provide(提供)、inject(注入)`用于隔代相互传递数据与方法。
+
+##### 插槽
+
+插槽有三种：默认插槽、具名插槽、作用域插槽
+
+为什么使用`UI`组件库中的`table`时，能够通过插槽获取`row(每一行)`数据？
+
+```vue
+<template>
+  <el-table :data="tableData">
+    <el-table-column>
+      <template slot-scope="scope">
+        <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+</template>
+```
+
+通过作用域插槽，将子组件内部的数据传递给父组件。
+
+```vue
+<script setup lang="ts">
+const props = defineProps({
+    dataSource: {
+        type: Array<{ id: number, name: string }>,
+        default: () => {
+            return [];
+        }
+    }
+})
+</script>
+
+<template>
+    <div v-for="(item, index) in dataSource" :key="index">
+        id:{{ item.id }}、name:{{ item.name }}
+        <!-- 将每一行的数据传输给父组件 -->
+        <slot name="option" :record="item"></slot>
+    </div>
+</template>
+```
+
+```vue
+<template>
+    <MyList :dataSource="list">
+        <template #option="{ record }">
+            <button @click="onClickRow(record)">查看</button>
+        </template>
+    </MyList>
+</template>
+```
+
+##### 其他API
 
 #### Vue2 
 

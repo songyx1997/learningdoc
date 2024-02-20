@@ -9,6 +9,19 @@ function saveValue(a: number, b: number) {
 }
 let userName = ref('');
 let loginForm = reactive({ name: '', password: '' })
+import MyList from '@/components/myList.vue'
+
+let list = ref(
+    [
+        { id: 1, name: '张三' },
+        { id: 2, name: '李四' },
+        { id: 3, name: '王五' }
+    ]
+)
+
+function onClickRow(record: any) {
+    record.name += '~';
+}
 </script>
 
 <template>
@@ -29,6 +42,14 @@ let loginForm = reactive({ name: '', password: '' })
     <div>4.组件通信：多个v-model，实现登陆表单</div>
     <div>
         <LoginForm v-model:name="loginForm.name" v-model:password="loginForm.password" />
+    </div>
+    <div>5.作用域插槽</div>
+    <div>
+        <MyList :dataSource="list">
+            <template #option="{ record }">
+                <button @click="onClickRow(record)">查看</button>
+            </template>
+        </MyList>
     </div>
 </template>
 
