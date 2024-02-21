@@ -15,15 +15,12 @@
 
 `webpack`构建与`vite`构建对比如下：
 
-<div style="margin:0 auto;width:85%">
+<div style="margin:0 auto;width:85%;">
     <img src=".\webpack构建.png">
 </div>
-
 <div style="margin:0 auto;width:70%">
     <img src=".\vite构建.png">
 </div>
-
-
 ##### OptionsAPI、CompositionAPI
 
 `Vue2`采用的是`OptionsAPI`（配置项式）。
@@ -34,8 +31,6 @@
     <img src=".\OptionsAPI与CompositionAPI_1.gif" style="width:48%">
     <img src=".\OptionsAPI与CompositionAPI_2.gif" style="width:48%">
 </div>
-
-
 ##### setup
 
 组合式`API`需要编写在`setup`中。
@@ -1202,6 +1197,78 @@ const posts = await res.json()
 
 #### Vue2 
 
+##### MVVM
+
+`MVVM`是`Model-View-ViewModel`的简写。
+
+1. `M`：模型（`Model`）：`Vue`实例中`data`配置项里的数据。
+2. `V`：视图（`View`）：模板。
+3. `VM`：视图模型（`ViewModel`）：`Vue`实例对象。
+
+<div style="margin:0 auto;border:2px solid #42b883">
+    <img src=".\MVVM.png">
+</div>
+
+##### 数据代理
+
+`Vue`借助`Object.defineProperty`实现数据代理，使更加方便的操纵`data`中的数据。
+
+```html
+<script type="module">
+    import Vue from './vue.js';
+    const vm = new Vue({
+        data() {
+            return {
+                name: 'songyx',
+                age: 26
+            }
+        }
+    })
+    vm.name = 'oldMan';
+    vm.age = 80;
+    console.dir(vm);
+</script>
+```
+
+```typescript
+function Vue(options) {
+    if (options.data) {
+        let data = options.data();
+        this._data = data;
+        // 将data添加至vm
+        for (const key in data) {
+            Object.defineProperty(this, key, ({
+                get: () => {
+                    return data[key];
+                },
+                set: (value) => {
+                    data[key] = value;
+                },
+                enumerable: true,
+                configurable: true
+            }))
+        }
+    }
+}
+export default Vue;
+```
+
+<div style="margin:0 auto;border:2px solid #42b883">
+    <img src=".\数据代理.png">
+</div>
+
+在`MVVM`模型中，`data`中数据的变化都会反映在`<template>`中，因此实现了响应式。
+
+其他入参：
+1. `value`，属性值。
+2. `writable`，该属性是否可写，默认`false`。
+3. `configrable`该属性是否配置，以及可否删除，默认`false`。
+4. `enumerable`该属性是否可枚举，默认`false`。
+
+用了`value/writable`其一，就不能用`get/set`了。不过`configurable`与`enumerable`这两个属性可以与上面两种属性任意搭配。
+
+##### 事件修饰符
+
 ##### 生命周期
 
 | 创建-创建组件时触发                         | beforeCreate(){}  | created(){}   |
@@ -1210,5 +1277,4 @@ const posts = await res.json()
 | 更新-钩子函数的调用次数取决于数据变化的次数 | beforeUpdate(){}  | updated(){}   |
 | 销毁-组件销毁时触发                         | beforeDestory(){} | destoryed(){} |
 
-##### Vue2和Vue3的区别
-
+#### Vue2和Vue3的区别
