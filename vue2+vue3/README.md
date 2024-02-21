@@ -1042,6 +1042,164 @@ const props = defineProps({
 
 ##### 其他API
 
+`shallowRef、shallowReactive`
+
+数据具有浅层的响应式（常用于对大型数据结构的性能优化或是与外部的状态管理系统集成）
+
+```typescript
+let state = shallowRef({ count: 1 })
+// 不会触发更改
+state.value.count = 2
+// 会触发更改
+state.value = { count: 2 }
+```
+
+```typescript
+let state = shallowReactive({
+  foo: 1,
+  nested: {
+    bar: 2
+  }
+})
+// 更改状态自身的属性是响应式的
+state.foo++
+// ...但下层嵌套对象不会被转为响应式
+isReactive(state.nested) // false
+// 不是响应式的
+state.nested.bar++
+```
+
+`readonly、shallowReadonly`
+
+只读代理是深层的：对任何嵌套属性的访问都将是只读的。它的`ref`解包行为与`reactive`相同，但解包得到的值是只读的。要避免深层级的转换行为，请使用`shallowReadonly`。
+
+```typescript
+const original = reactive({ count: 0 })
+const copy = readonly(original)
+watchEffect(() => {
+  // 用来做响应性追踪
+  console.log(copy.count)
+})
+// 更改源属性会触发其依赖的侦听器
+original.count++
+// 更改该只读副本将会失败，并会得到一个警告
+copy.count++
+```
+
+`customRef`
+
+常常被写在`hooks`中，`customRef`接收两个参数，分别是`track`、`trigger`。
+
+`track`：通知`Vue`，该数据需要被跟踪。
+
+`trigger`：通知`Vue`，该数据已经被修改。
+
+举例：编写一个延迟显示的响应式信息。
+
+```typescript
+import { customRef } from "vue";
+
+export default function (initValue: string, delay: number) {
+    let timer: number;
+    let msg = customRef((track, trigger) => {
+        return {
+            get: () => {
+                track();
+                return initValue;
+            },
+            set: (value: string) => {
+                timer = setTimeout(() => {
+                    // 每次set都会导致定时器的创建，因此需要先销毁
+                    // 防抖
+                    clearTimeout(timer);
+                    initValue = value;
+                    trigger();
+                }, delay)
+            }
+        }
+    })
+    return { msg };
+}
+```
+
+```vue
+<script setup lang="ts">
+import useCustomMsg from '@/hooks/useCustomMsg';
+let { msg } = useCustomMsg('', 5000);
+</script>
+
+<template>
+    <div>
+        <input v-model="msg" />
+        <div>{{ msg }}</div>
+    </div>
+</template>
+```
+
+`toRaw、markRaw`
+
+`toRaw`，当把响应式对象暴露给第三方库时，为了确保第三方库的方法修改该响应式对象，但是不影响当前页面，暴露前使用`toRaw`将其转换为普通对象。
+
+```typescript
+const foo = {}
+const reactiveFoo = reactive(foo)
+console.log(toRaw(reactiveFoo) === foo) // true
+```
+
+`markRaw`，将一个对象标记，使其永远不能转换为响应式数据。比如引用第三方库的数据，如`mockjs`。为了防止之后误操作将其转换为响应式，先进行标记。
+
+`Teleport`
+
+`<Teleport>` 是一个内置组件，它可以将一个组件内部的一部分模板传送到该组件的`DOM`结构外层的位置去。
+
+```vue
+<template>
+    <!-- to指向追加到的位置 -->
+    <Teleport to="body">
+        <div class="help">
+            <div>数目:{{ num }}</div>
+            <div>描述:{{ des }}</div>
+            <div>扩大10倍的数据:{{ bigSum }}</div>
+            <button @click="add">加</button>
+            <button @click="divide">减</button>
+            <button @click="reset">重新赋值</button>
+        </div>
+    </Teleport>
+</template>
+<style scoped>
+.help {
+    margin-top: 100px;
+    position: fixed;
+    left: 50%;
+}
+</style>
+```
+
+`Suspense`
+
+该组件仍然是实验性的，常用于`setup`中存在异步操作。
+
+```vue
+<script setup>
+const res = await fetch(...)
+const posts = await res.json()
+</script>
+<template>
+  {{ posts }}
+</template>
+```
+
+```vue
+<Suspense>
+  <!-- 具有深层异步依赖的组件 -->
+  <Dashboard />
+  <!-- 在 #fallback 插槽中显示 “正在加载中” -->
+  <template #fallback>
+    Loading...
+  </template>
+</Suspense>
+```
+
 #### Vue2 
 
 ##### 生命周期
@@ -1051,3 +1209,6 @@ const props = defineProps({
 | 挂载-将组件放置于页面中时触发               | beforeMount(){}   | mounted(){}   |
 | 更新-钩子函数的调用次数取决于数据变化的次数 | beforeUpdate(){}  | updated(){}   |
 | 销毁-组件销毁时触发                         | beforeDestory(){} | destoryed(){} |
+
+##### Vue2和Vue3的区别
+
