@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./Vue.js"></script>
+    <title>Vue2</title>
+</head>
+
+<body>
+    <div id="app">
+        <div>姓名：{{name}}</div>
+        <div>年龄：{{age}}</div>
+        <div>爱好：</div>
+        <ul>
+            <li v-for="(item,index) in hobby" :key="index">{{item}}</li>
+        </ul>
+        <div>地址：{{info.address}}</div>
+        <div>工作：{{info.job}}</div>
+        <div>性别：{{info.sex}}</div>
+        <div>
+            <button @click="onChangeHobby">翻译爱好</button>
+            <button @click="onAddHobby">添加爱好</button>
+            <button @click="onAddSex">添加性别</button>
+        </div>
+    </div>
+</body>
+
+<script>
+    const vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                name: 'songyx',
+                age: 26,
+                hobby: ['game', 'bicycle'],
+                info: {
+                    address: 'chengdu',
+                    job: '牛马'
+                }
+            }
+        },
+        methods: {
+            onChangeHobby() {
+                this.hobby.splice(1, 1, '骑行');
+            },
+            onAddSex() {
+                // 给data内的对象添加属性，直接给data添加属性则会获得一个警告
+                this.$set(this.info, 'sex', '男');
+            },
+            onAddHobby() {
+                // 添加数据至数组
+                this.$set(this.hobby, this.hobby.length, 'football');
+            },
+        }
+    })
+</script>
+
+</html>

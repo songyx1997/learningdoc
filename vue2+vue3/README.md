@@ -18,9 +18,11 @@
 <div style="margin:0 auto;width:85%;">
     <img src=".\webpack构建.png">
 </div>
+
 <div style="margin:0 auto;width:70%">
     <img src=".\vite构建.png">
 </div>
+
 ##### OptionsAPI、CompositionAPI
 
 `Vue2`采用的是`OptionsAPI`（配置项式）。
@@ -1269,6 +1271,194 @@ export default Vue;
 
 ##### 事件修饰符
 
+```vue
+<template>
+  <div>1.事件修饰符:prevent-防止执行预设的行为</div>
+  <div>
+    <a href="#" @click.prevent="onClickLink">点击，但是阻止默认跳转</a>
+  </div>
+  <div>2.事件修饰符:stop-阻止事件冒泡</div>
+  <div @click="onClickOutside">
+    outside
+    <!-- 注意修饰符的添加位置 -->
+    <button @click.stop="onClickInside">inside</button>
+  </div>
+  <div>3.事件修饰符:once-事件只执行一次</div>
+  <div>
+    <button @click.once="onClickOnce">只能执行一次</button>
+  </div>
+  <div>4.事件修饰符:capture-使用事件的捕获模式:先捕获后冒泡，捕获从外到内</div>
+  <!-- 注意修饰符的添加位置 -->
+  <div @click.capture="onClickOutside">
+    outside
+    <button @click="onClickInside">inside</button>
+  </div>
+  <div>5.事件修饰符:self-只有event.target是当前操作的元素时才触发事件</div>
+  <!-- 同样实现了阻止冒泡的效果 -->
+  <div @click.self="onClickOutside">
+    outside
+    <button @click="onClickInside">inside</button>
+  </div>
+</template>
+```
+
+此外还有`passive`事件的默认行为立即执行，无需等待事件回调执行完毕。
+
+##### computed vs watch
+
+1.  当`computed`与`watch`均能实现需求时，`computed`的实现更为简单。
+2. `computed`中不能包含异步操作，而`watch`中可以。
+
+```typescript
+// Vue3，页面中未成功加载domainName
+let domainName = computed(() => {
+    let value = '';
+    console.log(`name的值${name.value}发生变化，就重新计算`);
+    setTimeout(() => {
+        value = name.value.substring(0, 1) + (Math.random() * 10000).toFixed(0);
+        console.log(value);
+    }, 2000);
+    return value;
+})
+```
+
+##### v-for中key的原理
+
+当对数据进行了**破坏顺序(逆序添加、逆序删除)**的操作，且使用`index`作为`key`，将可能会出现`BUG`。
+
+<div style="margin:0 auto">
+    <img src=".\key原理示例.png">
+</div>
+
+虚拟`DOM`对比算法，比较时遍历新的虚拟`DOM`列表，以`key`为基准。
+<div style="margin:0 auto">
+    <img src=".\key原理.png">
+</div>
+##### 数据监测
+
+数据代理给属性添加`getter`和`setter`，当`setter`被调用，`<template>`中的数据就发生变化。
+
+对于对象，`Vue2`会递归给每个属性都添加上`getter`和`setter`。
+
+对于数组，`Vue2`则不会。
+
+```typescript
+data() {
+    return {
+        name: 'songyx',
+        age: 26,
+        hobby: ['game', 'bicycle'],
+        info: {
+            address: 'chengdu',
+            job: '牛马'
+        }
+    }
+},
+methods: {
+    onChangeHobby() {
+        // 每个元素上并不存在getter/setter方法
+        // 不生效
+        // this.hobby[0] = '打游戏';
+        // this.hobby[1] = '骑行';
+        // 整个对象上存在getter/setter方法，因此生效
+        this.hobby = ['打游戏', '骑行'];
+    }
+}
+```
+
+<div style="margin:0 auto;border:2px solid #42b883">
+    <img src=".\监测数据.png">
+</div>
+
+```typescript
+onChangeHobby() {
+    // 此外，Vue2封装了数组的操作方法
+    // 封装：首先调用数组自带的方法，然后继续渲染虚拟DOM等操作
+    // 生效
+    this.hobby.splice(1, 1, '骑行');
+},
+```
+
+`Vue.set()、this.$set()`
+
+`Vue2`中可以借助`set`方法添加数据，这样的数据将会是响应式的。
+
+```typescript
+onAddSex() {
+    // 给data内的对象添加属性，直接给data添加属性则会获得一个警告
+    this.$set(this.info, 'sex', '男');
+},
+onAddHobby() {
+    // 添加数据至数组
+    this.$set(this.hobby, this.hobby.length, 'football');
+},
+```
+
+##### v-model修饰符
+
+1. `v-model.lazy`：失去焦点再收集数据。
+2. `v-model.number`：输入字符串转换为有效的数字。
+3. `v-model.trim`：字符串首尾空格过滤。
+
+##### 过滤器
+过滤器可以用在两个地方：双花括号插值和`v-bind`表达式。
+
+```vue
+<template>
+  <div>
+    <h3 :id="id | test">{{ message | test }}</h3>
+  </div>
+</template>
+<script>
+export default {
+  data () {
+    return {
+      id: 'testId',
+      message: '测试'
+    }
+  },
+  filters: {
+    test: function (value) {
+      let parrern = new RegExp('^[a-zA-Z]+$')
+      return parrern.test(value) ? value : value + '文本'
+    }
+  }
+}
+</script>
+```
+
+显示结果如下：`<h3 id="testId">测试文本</h3>`
+
+此外，还有全局过滤器。
+
+##### v-cloak
+
+```vue
+<div v-cloak>
+  {{ message }}
+</div>
+```
+
+```css
+[v-cloak] {
+  display: none;
+}
+```
+
+当使用直接在`DOM`中书写的模板时，网速过慢，用户可能先看到的是还没编译完成的双大括号标签，直到挂载的组件将它们替换为实际渲染的内容。
+
+`v-cloak` 会保留在所绑定的元素上，直到相关组件实例被挂载后才移除。
+
+##### v-once
+
+仅渲染元素和组件一次，并跳过之后的更新。可用于性能优化。
+
+##### v-pre
+
+元素内具有 `v-pre`，所有`Vue`模板语法都会被保留并按原样渲染。
+
+最常见的用例：显示原始双大括号标签及内容。
+
 ##### 生命周期
 
 | 创建-创建组件时触发                         | beforeCreate(){}  | created(){}   |
@@ -1277,4 +1467,43 @@ export default Vue;
 | 更新-钩子函数的调用次数取决于数据变化的次数 | beforeUpdate(){}  | updated(){}   |
 | 销毁-组件销毁时触发                         | beforeDestory(){} | destoryed(){} |
 
-#### Vue2和Vue3的区别
+<div style="margin:0 auto">
+    <img src=".\生命周期.png">
+</div>
+
+##### 自定义指令
+```vue
+<template>
+  <div>
+    <div v-pin:[color]="{ size: '25px', weight: 900 }">测试文本</div>
+  </div>
+</template>
+<script>
+export default {
+  directives: {
+    pin: {
+      bind (el, binding) {
+        el.style.color = binding.arg
+        el.style.fontWeight = binding.value.weight
+        el.style.fontSize = binding.value.size
+      }
+    }
+  },
+  computed: {
+    color () {
+      return 'red'
+    }
+  }
+}
+</script>
+```
+
+显示结果为：`<div style="color: red; font-weight: 900; font-size: 25px;">测试文本</div>`
+
+#### Tips
+
+##### 编写函数
+
+1. 被`Vue`管理的函数，应当写成普通函数，这样`this`的指向为`vm`或组件实例对象。
+2. 不被`Vue`管理的函数（定时器回调、`ajax`回调），应当写成箭头函数，这样`this`的指向为`vm`或组件实例对象。
+
