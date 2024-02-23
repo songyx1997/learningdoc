@@ -1470,35 +1470,182 @@ export default {
 <div style="margin:0 auto">
     <img src=".\生命周期.png">
 </div>
-
 ##### 自定义指令
+
+自定义指令：函数式
+
 ```vue
-<template>
-  <div>
-    <div v-pin:[color]="{ size: '25px', weight: 900 }">测试文本</div>
-  </div>
-</template>
+<body>
+    <div id="app">
+        <!-- 注意多词时自定义指令的写法 -->
+        <div v-big-age="age"></div>
+    </div>
+</body>
+
 <script>
-export default {
-  directives: {
-    pin: {
-      bind (el, binding) {
-        el.style.color = binding.arg
-        el.style.fontWeight = binding.value.weight
-        el.style.fontSize = binding.value.size
-      }
-    }
-  },
-  computed: {
-    color () {
-      return 'red'
-    }
-  }
-}
+    // 全局定义自定义指令
+    Vue.directive('big-age', function (element, binding) {
+        element.innerHTML = `年龄放大10倍：${binding.value * 10}`;
+    })
+    const vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                age: 26
+            }
+        },
+        directives: {
+            'big-age'(element, binding) {
+                element.innerHTML = `年龄放大10倍：${binding.value * 10}`;
+            }
+        }
+    })
 </script>
 ```
 
-显示结果为：`<div style="color: red; font-weight: 900; font-size: 25px;">测试文本</div>`
+自定义指令：对象式
+
+```vue
+<body>
+    <div id="app">
+        <label>数值:</label>
+        <input v-focus="value" />
+        <button @click="onChangeValue">增加数值</button>
+    </div>
+</body>
+
+<script>
+    const vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                value: 0
+            }
+        },
+        methods: {
+            onChangeValue() {
+                this.value++
+            }
+        },
+        directives: {
+            focus: {
+                // 钩子：指令与元素成功绑定时调用
+                bind(element, binding) {
+                    element.value = binding.value;
+                },
+                // 钩子：指令所造元素被插入页面时调用
+                inserted(element, binding) {
+                    // 获取焦点
+                    element.focus();
+                },
+                // 钩子：指令所在模板结构被重新解析时调用
+                update(element, binding) {
+                    // 更新数据
+                    element.value = binding.value;
+                    // 重新获取焦点
+                    element.focus();
+                },
+            }
+        }
+    })
+</script>
+```
+
+##### 对组件的理解
+
+```vue
+<body>
+    <div id="app">
+        <div>{{value}}</div>
+        <school />
+    </div>
+</body>
+<script>
+    let school = Vue.extend({
+        template: `<div>{{address}}</div>`,
+        data() {
+            return {
+                address: 'chengdu'
+            }
+        },
+    })
+    console.dir(school);
+    const vm = new Vue({
+        el: '#app',
+        // data既可以是函数式，也可以是对象式
+        data: {
+            value: 0
+        },
+        components: {
+            school
+        }
+    })
+    // true
+    console.log(school.prototype.__proto__ === Vue.prototype);
+</script>
+```
+
+1. `Vue.extend(extendOptions)`的入参基本与`new Vue(options)`一致。但是组件中的`data`必须为函数式，后者既可以是函数式，也可以是对象式。**这是为了当组件被多次使用时，数据都是重新创建的，之间不存在相互干扰**。
+2. `Vue.extend`的返回值为构造函数`function VueComponent(options) {}`。但是每次调用的返回值都是一个新的构造函数，这是由源码决定的。且当在`<template>`中使用了组件，则`Vue`会创建组件实例，即`new VueComponent()`，因此组件中的`this`指向该实例。
+```javascript
+Vue.extend = function (extendOptions) {
+    // ...
+    var Sub = function VueComponent(options) {
+        this._init(options);
+    };
+    // ...
+    return Sub
+};
+```
+3. `VueComponent.prototype.__proto__ === Vue.prototype`。通过该关系式，借助于原型链，**使得组件的实例可以使用Vue原型对象上的数据与方法**。
+
+<div style="margin:0 auto">
+    <img src=".\组件原型链.jpg">
+</div>
+##### 全局事件总线
+
+往`Vue`原型对象上添加数据或方法，则全局（包括组件内）都可以使用，都依赖于原型链。
+
+```typescript
+new Vue({
+  render: h => h(App),
+  // 安装全局事件总线
+  beforeCreate() {
+    Vue.prototype.$bus = () => {
+      console.log('全局方法');
+    }
+  }
+}).$mount('#app')
+```
+
+##### render
+
+当引入的`vue`为不能解析`<template>`的版本，就需要`render`函数。
+
+```javascript
+import Vue from 'vue'
+import App from './App.vue'
+new Vue({
+  // 简写方式
+  // render: h => h(App),
+  render(createElement) {
+    // 当传入为组件时
+    return createElement(App);
+    // 当传入为DOM时
+    // return createElement('div', 'text');
+  }
+}).$mount('#app')
+```
+
+##### mixin
+
+当组件使用混入对象时，所有混入对象的选项将进入该组件本身的选项。
+
+混入时的合并操作：
+
+1. 数据对象在内部会进行递归合并，并在发生冲突时以组件数据优先。
+2. 同名钩子函数将都将被调用，但混入对象的钩子将在组件自身钩子之前调用。
+3. `methods、components 和directives`合并时，若两个对象键名发生冲突，以组件对象优先。
 
 #### Tips
 
