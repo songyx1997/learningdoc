@@ -1647,6 +1647,113 @@ new Vue({
 2. 同名钩子函数将都将被调用，但混入对象的钩子将在组件自身钩子之前调用。
 3. `methods、components 和directives`合并时，若两个对象键名发生冲突，以组件对象优先。
 
+##### $nextTick
+
+```vue
+<template>
+    <div>
+        <label>我的输入框：</label>
+        <input v-if="editFlag" ref="myInputRef" v-model="myInputValue" />
+        <span v-else>{{ myInputValue }}</span>
+        <button @click="onClick">修改</button>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'myInput',
+    data() {
+        return {
+            editFlag: false,
+            myInputValue: 'defaultText'
+        }
+    },
+    methods: {
+        onClick() {
+            this.editFlag = true;
+            // 报错：由于dom元素未完成加载，该方法无法生效
+            this.$refs.myInputRef.focus();
+        }
+    }
+}
+</script>
+```
+
+修改`editFlag`后，并不会立即重新解析模板，而是等代码全部执行完毕。
+
+有三种方式解决该问题。
+
+方式一：生命周期函数`updated`。
+
+```javascript
+updated() {
+    this.$refs.myInputRef.focus();
+}
+```
+
+方式二：放入异步函数中。
+
+```javascript
+onClick() {
+    this.editFlag = true;
+    setTimeout(() => {
+        this.$refs.myInputRef.focus();
+    }, 0);
+}
+```
+
+方式三：使用`$nextTick`。
+
+```javascript
+onClick() {
+    this.editFlag = true;
+    this.$nextTick(() => {
+        this.$refs.myInputRef.focus();
+    })
+}
+```
+
+`$nextTick`的作用是，在下一次`DOM`更新结束后执行其指定的回调。
+
+##### 过渡
+
+`Vue`中有6种过渡类名，具体使用方式如下：
+
+```vue
+<transition name="fade" mode="out-in">
+    <router-view :key="key" />
+</transition>
+<style>
+.fade-leave-active,
+.fade-enter-active {
+  transition: all 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
+```
+
+`Vue`中有2种过渡模式。`in-out`：新元素先进行过渡，完成之后当前元素过渡离开。`out-in`：当前元素先进行过渡，完成之后新元素过渡进入。
+
+##### Vuex
+
+<div style="margin:0 auto;">
+    <img src=".\Vuex构成.jpg">
+</div>
+
+`state`是存储的单一状态，是存储的基本数据。
+
+`getters`是`store`的计算属性，对`state`的加工，是派生出来的数据。就像`computed`计算属性一样，`getter`返回的值会根据它的依赖被缓存起来，且只有当它的依赖值发生改变才会被重新计算。
+
+`mutations`提交更改数据，使用`store.commit`方法更改`state`存储的状态。
+
+`actions`像一个装饰器，提交`mutation`，而不是直接变更状态，可以包含任何**异步操作**。
+
+`Module`是`store`分割的模块，每个模块拥有自己的`state、getters、mutations、actions`。
+
 #### Tips
 
 ##### 编写函数
