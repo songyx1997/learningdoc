@@ -33,6 +33,22 @@
     <img src=".\OptionsAPI与CompositionAPI_1.gif" style="width:48%">
     <img src=".\OptionsAPI与CompositionAPI_2.gif" style="width:48%">
 </div>
+##### Fragment
+
+在`Vue3`中不需要写`<div>`根标签，内部的标签将会被包含在`Fragment`虚拟元素内。
+
+```vue
+<template>
+    <!-- <Fragment> -->
+        <div>数目:{{ num }}</div>
+        <div>描述:{{ des }}</div>
+        <div>扩大10倍的数据:{{ bigSum }}</div>
+    <!-- </Fragment> -->
+</template>
+```
+
+好处是减少标签层级，减少内存占用。
+
 ##### setup
 
 组合式`API`需要编写在`setup`中。
@@ -1754,6 +1770,27 @@ onClick() {
 
 `Module`是`store`分割的模块，每个模块拥有自己的`state、getters、mutations、actions`。
 
+##### activated、deactivated
+
+这两个钩子（激活、失活），只有使用了`keep-alive`时才起作用。
+
+使用场景：页面中有计数器，但是页面被缓存了，因此使用`beforeDestory`，无法销毁计时器，而使用`deactivated`可以解决这个问题。
+
+##### 路由守卫
+
+不同组件之间路由跳转的执行顺序：
+
+1. 导航被触发（A–>B）
+2. 调用A组件内路由守卫`beforeRouteLeave(to,from,next)`
+3. 调用全局路由前置守卫`router.beforeEach(to,from,next)`
+4. 调用B路由独享守卫 `beforeEnter(to,from,next)`
+5. 解析异步路由组件B
+6. 调用B的组件内路由守卫`beforeRouteEnter(to,from,next)`
+7. 调用全局路由解析守卫` router.beforeResolve(to,from,next)`
+8. 导航被确认
+9. 调用全局路由钩子`router.afterEach(to,from)`
+10. 渲染B组件`DOM`
+
 #### Tips
 
 ##### 编写函数
@@ -1761,3 +1798,12 @@ onClick() {
 1. 被`Vue`管理的函数，应当写成普通函数，这样`this`的指向为`vm`或组件实例对象。
 2. 不被`Vue`管理的函数（定时器回调、`ajax`回调），应当写成箭头函数，这样`this`的指向为`vm`或组件实例对象。
 
+##### Vue3的改变
+
+1. 全局API的转移，如`Vue.prototype > app.config.globalProperties`。
+2. `data`都必须声明为函数，即使不是组件中的。
+3. 过度类名，更加语义化。
+4. 移除`keyCode`作为`v-on`的修饰符，如`@keyup.13`。
+5. 移除事件修饰符`.native`（为了避免组件上的方法被视为自定义事件，如`@click.native`）。
+6. 移除过滤器，因为其具有实现成本，打破了`{{}}`内只有`js`的假设，推荐使用计算属性。
+7. ...
