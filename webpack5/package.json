@@ -1,0 +1,16 @@
+{
+  "name": "webpack5-project",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "webpack": "npx webpack"
+  },
+  "devDependencies": {
+    "css-loader": "^6.10.0",
+    "less": "^4.2.0",
+    "less-loader": "^12.2.0",
+    "style-loader": "^3.3.4",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4"
+  }
+}

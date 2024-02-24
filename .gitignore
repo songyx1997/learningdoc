@@ -1,3 +1,4 @@
 node_modules/
 package-lock.json
 nodejs/accounts/log/token
+dist/
