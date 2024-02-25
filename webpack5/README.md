@@ -5,8 +5,9 @@
         <td>date：2024/02/24</td>
     </tr>
 </table>
+### 基础
 
-#### 基础
+#### 开发模式
 
 ##### 安装
 
@@ -32,7 +33,10 @@ module.exports = {
     entry: './main.js',
     output: {
         path: path.resolve(__dirname, './dist'),
-        filename: 'bundle.js',
+        // 入口文件打包输出的文件名
+        filename: 'js/bundle.js',
+        // 在打包前，将path整个目录清空，再进行打包
+        clean: true,
     },
     module: {
         rules: [],
@@ -43,6 +47,25 @@ module.exports = {
 ```
 
 注意：`loader`从右到左（或从下到上）地取值(`evaluate`)/执行(`execute`)。
+
+##### resolve
+
+定义模块如何被解析和定位，在构建过程中，`webpack`需要处理各种导入语句（`import、require`）。
+
+最常用的有`alias`（别名）、`extensions`（可以作为模块的文件）
+
+```typescript
+module.exports = {
+    resolve: {
+        // 配置别名
+        alias: {
+            '@': path.resolve(__dirname, './src')
+        },
+        // 设置引用模块（设置哪些文件可以作为模块使用）。若使用ts，这里必须配置
+        extensions: ['.ts', '.js']
+    }
+}
+```
 
 ##### 处理css、less
 
@@ -66,15 +89,361 @@ module.exports = {
             {
                 test: /\.less$/i,
                 use: [
-                  'style-loader',
-                  'css-loader',
-                  'less-loader',
+                    'style-loader',
+                    'css-loader',
+                    'less-loader',
                 ],
-              },
+            },
+        ],
+    },
+}
+```
+
+##### 处理图片
+
+`webpack5`内置了对图片资源的处理，不需要添加加载器，但是实际开发中会进行定制。
+
+如：小于`10kb`的图片转换为`base64`(将图片转换为字符串，转换后体积将会变大，因此常用于小图片)。**可以减少网络请求**。
+
+```javascript
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.(jpe?g|png|webp|gif|bmp)$/i,
+                // 图片会转换为base64
+                type: 'asset',
+                parser: {
+                    dataUrlCondition: {
+                        // 最大10kb，10kb以内的将被转换为base64
+                        maxSize: 10 * 1024,
+                    }
+                },
+                generator: {
+                    // 指定输出的文件目录
+                    // hash-文件名、ext-文件后缀、query-查询字符串
+                    filename: 'static/images/[hash][ext][query]'
+                }
+            }
         ],
     }
 }
 ```
 
-##### 处理less
+##### 处理字体图标、其他资源
 
+注意这里的`type: 'asset/resource'`，因为这些资源都要保持原样，不能转换为`base64`。
+
+```typescript
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.(ttf|woff2?|mp3|mp4|avi)$/i,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'static/media/[hash][ext][query]'
+                }
+            }
+        ],
+    }
+}
+```
+
+##### eslint
+
+`eslint`的配置文件位于根目录，以`.eslintrc.js`为例，如下：
+
+```typescript
+module.exports = {
+    // 解析选项
+    parserOptions: {
+        // ES语法版本。若这里指定5，那么代码中使用ES6语法将会报错
+        ecmaVersion: 6,
+        // ES模块化
+        sourceType: 'module'
+    },
+    env: {
+        // 启用node中的全局变量，如globalThis
+        node: true,
+        // 启动浏览器中的全局变量，如console
+        browser: true
+    },
+    // 具体检查规则，优先级高于继承的规则
+    rules: {
+        // 比如，禁止使用var定义变量
+        'no-var': 2
+    },
+    // 继承其他规则（这里继承了Vue、eslint的官方规则）
+    extends: ['plugin:vue/vue3-recommended', 'eslint:recommended']
+}
+```
+
+对于规则，有如下三个选择：
+
+1. `off`或`0`，关闭规则。
+2. `warn`或`1`，开启规则，但不会导致程序退出。
+3. `error`或`2`，开启规则，当触发时，程序退出。
+
+在`webpack`中进行配置，是配置在`plugins`选项中
+
+```typescript
+const path = require('path');
+const ESLintPlugin = require('eslint-webpack-plugin');
+
+module.exports = {
+    plugins: [
+        new ESLintPlugin({
+            // 待检查的文件目录，绝对路径
+            context: path.resolve(__dirname, './src')
+        })
+    ]
+}
+```
+
+##### babel
+
+`eslint`的配置文件位于根目录，以`babel.config.js`为例，如下：
+
+```typescript
+module.exports = {
+    // 预设
+    presets: [
+        // 智能预设，将最新js编译为es5
+        ['@babel/preset-env', {
+            targets: {
+                // 兼容的浏览器版本
+                'ie': '11'
+            },
+            // 指定的corejs版本
+            // 当使用promise时，从corejs内引入promise源码
+            corejs: 3,
+            // 使用corejs的方式：按需加载
+            useBuiltIns: 'usage'
+        }],
+        // 将ts编译为js
+        '@babel/preset-typescript'
+    ]
+}
+```
+
+在`webpack`中进行配置，配置在`loader`选项中。
+
+```typescript
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.ts$/i,
+                exclude: /(node_modules)/,
+                // loader只能写单个加载器
+                loader: 'babel-loader'
+            }
+        ]
+    }
+}
+```
+
+##### 处理HTML
+
+自动将`js`导入`HTML`，配置在`plugins`选项中。
+
+```typescript
+module.exports = {
+    plugins: [
+        new HTMLWebpackPlugin({
+            // 使用public下的模板文件，保持DOM结构一致，同时自动引入js
+            template: path.resolve(__dirname, './public/index.html')
+        }),
+    ]
+}
+```
+
+打包后的`index.html`引入`js`的代码如下
+
+```html
+<script defer src="js/bundle.js"></script>
+```
+
+`defer`是布尔属性，添加了该属性的脚本会异步加载。浏览器解析`HTML`时并行下载，但是会等到`HTML`解析完成后才会按照顺序执行。这样有助于优化网页性能，确保下渲染路径不受阻塞，从而改善用户体验。
+
+#### 生产模式
+
+##### MiniCssExtractPlugin
+
+之前的打包方案中，将`css`打包进`js`中。这样当网速较慢时，`js`载入完成，页面中的样式才会加载，用户体验较差，应该优化为创建单独的`css`文件，并通过`link`标签自动载入。
+
+```typescript
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.css$/i,
+                use: [
+                    // 用插件中的loader替换style-loader
+                    MiniCssExtractPlugin.loader,
+                    'css-loader'
+                ]
+            },
+            {
+                test: /\.less$/i,
+                use: [
+                    // 用插件中的loader替换style-loader
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'less-loader',
+                ],
+            }
+        ],
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            // 指定文件名和路径
+            filename: 'static/css/all.css'
+        })
+    ],
+    mode: 'production'
+}
+```
+
+该插件将全部用到的`css`文件打包到`all.css`文件中，并实现了异步加载。
+
+##### postcss-loader
+
+使用该加载器，进行`css`兼容性处理。
+
+`postcss`可以使用单独的配置文件`postcss.config.js`
+
+```typescript
+module.exports = {
+    plugins: [
+        [
+            'postcss-preset-env'
+        ],
+    ],
+};
+```
+
+同时注意加载器的位置
+
+```typescript
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.css$/i,
+                use: [
+                    // 用插件中的loader替换style-loader
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    // 注意postcss-loader的位置
+                    'postcss-loader'
+                ]
+            },
+            {
+                test: /\.less$/i,
+                use: [
+                    // 用插件中的loader替换style-loader
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    // 注意postcss-loader的位置
+                    'postcss-loader',
+                    'less-loader'
+                ],
+            }
+        ]
+    }
+}
+```
+
+在`package.json`中配置浏览器选项：`browserslist`。
+
+```json
+{
+  "browserslist": [
+    "ie >= 8"
+  ]
+}
+```
+
+上面表示浏览器最低版本为IE8。打包后，比如`display: flex`，将会被打包为`display: -ms-flexbox`。
+
+实际开发中常用配置如下：
+
+```json
+{
+  "browserslist": [
+    "last 2 version",
+    "> 1%",
+    "not dead"
+  ]
+}
+```
+
+1. `last 2 version`：最新的两个大版本。
+
+2. `> 1%`：覆盖市面上`99%`的浏览器。
+
+3.  `not dead`：去除掉死掉的版本。
+
+当使用`,`或者`or`时，表示或。当使用`and`时，表示且。当使用`not`时，表示非。
+
+##### 封装
+
+将重复的配置项进行封装。
+
+```typescript
+/**
+ * 获取样式加载器
+ */
+function getStyleLoader(loaders) {
+    let defaultLoaders = [
+        // 用插件中的loader替换style-loader
+        MiniCssExtractPlugin.loader,
+        'css-loader',
+        // 注意postcss-loader的位置
+        'postcss-loader'
+    ];
+    return loaders ? [...defaultLoaders, ...loaders] : defaultLoaders;
+}
+
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.css$/i,
+                use: getStyleLoader()
+            },
+            {
+                test: /\.less$/i,
+                use: getStyleLoader(['less-loader'])
+            }
+        ],
+    }
+}
+```
+
+##### CssMinimizerWebpackPlugin
+
+压缩`css`，并支持缓存和并发模式下运行。
+
+```typescript
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+
+module.exports = {
+    plugins: [
+        new MiniCssExtractPlugin({
+            // 指定文件名和路径
+            filename: 'static/css/all.css'
+        }),
+        new CssMinimizerPlugin()
+    ],
+    mode: 'production'
+}
+```
+
+##### 其他压缩
+
+生产模式默认开启了`html`压缩与`js`压缩。
