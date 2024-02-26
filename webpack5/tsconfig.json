@@ -15,7 +15,7 @@
         // 模块化规范
         "module": "ES6",
         // 编译后文件所在目录
-        "outDir": "./dist",
+        // "outDir": "./dist",
         // 所有的全局作用域中的代码会合并到一个文件中
         // "outFile": "./dist/app.js"
         // 是否编译目录下的js文件

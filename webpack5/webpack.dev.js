@@ -17,48 +17,53 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts$/i,
-                exclude: /(node_modules)/,
-                // loader只能写单个加载器
-                loader: 'babel-loader'
-            },
-            {
-                test: /\.css$/i,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
-            },
-            {
-                test: /\.less$/i,
-                use: [
-                    'style-loader',
-                    'css-loader',
-                    'less-loader',
-                ],
-            },
-            {
-                test: /\.(jpe?g|png|webp|gif|bmp)$/i,
-                // 图片会转换为base64
-                type: 'asset',
-                parser: {
-                    dataUrlCondition: {
-                        // 最大10kb，10kb以内的将被转换为base64
-                        maxSize: 10 * 1024,
+                // 每个文件只能被其中一个加载器处理
+                oneOf: [
+                    {
+                        test: /\.ts$/i,
+                        exclude: /(node_modules)/,
+                        // loader只能写单个加载器
+                        loader: 'babel-loader'
+                    },
+                    {
+                        test: /\.css$/i,
+                        use: [
+                            'style-loader',
+                            'css-loader'
+                        ]
+                    },
+                    {
+                        test: /\.less$/i,
+                        use: [
+                            'style-loader',
+                            'css-loader',
+                            'less-loader',
+                        ],
+                    },
+                    {
+                        test: /\.(jpe?g|png|webp|gif|bmp)$/i,
+                        // 图片会转换为base64
+                        type: 'asset',
+                        parser: {
+                            dataUrlCondition: {
+                                // 最大10kb，10kb以内的将被转换为base64
+                                maxSize: 10 * 1024,
+                            }
+                        },
+                        generator: {
+                            // 指定输出的文件目录
+                            // hash-文件名、ext-文件后缀、query-查询字符串
+                            filename: 'static/images/[hash][ext][query]'
+                        }
+                    },
+                    {
+                        test: /\.(ttf|woff2?|mp3|mp4|avi)$/i,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: 'static/media/[hash][ext][query]'
+                        }
                     }
-                },
-                generator: {
-                    // 指定输出的文件目录
-                    // hash-文件名、ext-文件后缀、query-查询字符串
-                    filename: 'static/images/[hash][ext][query]'
-                }
-            },
-            {
-                test: /\.(ttf|woff2?|mp3|mp4|avi)$/i,
-                type: 'asset/resource',
-                generator: {
-                    filename: 'static/media/[hash][ext][query]'
-                }
+                ]
             }
         ],
     },
@@ -85,6 +90,9 @@ module.exports = {
     devServer: {
         host: 'localhost',
         port: '3000',
-        open: true
-    }
+        open: true,
+        // 开启热模块替换（默认值为true）
+        hot: true
+    },
+    devtool: 'cheap-module-source-map'
 }

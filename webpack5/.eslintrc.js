@@ -1,10 +1,13 @@
 module.exports = {
     // 解析选项
+    parser: '@typescript-eslint/parser',
     parserOptions: {
         // ES语法版本。若这里指定5，那么代码中使用ES6语法将会报错
         ecmaVersion: 6,
         // ES模块化
-        sourceType: 'module'
+        sourceType: 'module',
+        // 引入ts配置文件
+        project: './tsconfig.json'
     },
     env: {
         // 启用node中的全局变量，如globalThis
@@ -17,6 +20,13 @@ module.exports = {
         // 比如，禁止使用var定义变量
         'no-var': 2
     },
-    // 继承其他规则（这里继承了Vue、eslint的官方规则）
-    extends: ['plugin:vue/vue3-recommended', 'eslint:recommended']
+    plugins: [
+        // 引入ts插件
+        '@typescript-eslint'
+    ],
+    // 继承其他规则（这里继承了eslint、ts的官方规则）
+    extends: [
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended'
+    ]
 }

@@ -447,3 +447,175 @@ module.exports = {
 ##### 其他压缩
 
 生产模式默认开启了`html`压缩与`js`压缩。
+
+### 高级
+
+#### 提升开发体验
+
+##### sourceMap
+
+为了方便排查错误。
+
+配置`devtool`，不同的值会明显影响到构建`(build)`和重新构建`(rebuild)`的速度。
+
+开发模式下使用`cheap-module-source-map`，打包编译速度快，但只包含行映射（因为开发模式下，代码都是格式化的，不需要列映射），报错时显示文件的哪一行。
+
+```typescript
+module.exports = {
+    mode: 'development',
+    devtool: 'cheap-module-source-map'
+}
+```
+
+生产模式下使用`source-map`。因为代码被压缩，既需要行映射，也需要列映射。
+
+```typescript
+module.exports = {
+    mode: 'production',
+    devtool: 'source-map'
+}
+```
+
+#### 提升打包构建速度
+
+##### HMR
+
+热模块替换`(HotModuleReplacement)`。当程序运行时，替换、添加或删除模块，无需加载整个页面。
+
+开发模式下是默认开启的。
+
+```typescript
+module.exports = {
+    mode: 'development',
+    devServer: {
+        host: 'localhost',
+        port: '3000',
+        open: true,
+        // 开启热模块替换（默认值为true）
+        hot: true
+    },
+}
+```
+
+针对`css`文件，`style-loader`中实现了`HMR`。
+
+针对`js`文件，`vue-loader、react-hot-loader`中实现了`HMR`。
+
+##### oneOf
+
+开发模式或生产模式，都会提升打包速度。
+
+```typescript
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.ts$/i,
+                exclude: /(node_modules)/,
+                // loader只能写单个加载器
+                loader: 'babel-loader'
+            },
+            {
+                test: /\.css$/i,
+                use: [
+                    'style-loader',
+                    'css-loader'
+                ]
+            }
+        ]
+    }
+}
+```
+
+不同文件打包时，按照顺序采用`module.rules`数组中的规则。如果是`ts`文件，则第一条规则就命中。但如果是`css`文件，到第二条规则才会命中。
+
+```typescript
+module.exports = {
+    module: {
+        rules: [
+            {
+                // 每个文件只能被其中一个加载器处理
+                oneOf: [
+                    {
+                        test: /\.ts$/i,
+                        exclude: /(node_modules)/,
+                        // loader只能写单个加载器
+                        loader: 'babel-loader'
+                    },
+                    {
+                        test: /\.css$/i,
+                        use: getStyleLoader()
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+
+##### include/exclude
+
+主要针对`js`文件，主要排除`node_modules`，因为开发项目很少使用外部`css`文件。
+
+##### cache
+
+为`eslint、babel`建立缓存。初次打包完成后，之后打包只针对修改的文件。
+
+对于`babel`，需要注意的是`babel.config.js`用于处理预设(`presets`)和插件(`plugins`)，缓存的配置项应放置在`loader: 'babel-loader'`下面。
+
+缓存文件的默认路径为：`node_modules\.cache\babel-loader`。
+
+```typescript
+module.exports = {
+    module: {
+        rules: [
+            {
+                // 每个文件只能被其中一个加载器处理
+                oneOf: [
+                    {
+                        test: /\.ts$/i,
+                        exclude: /(node_modules)/,
+                        // loader只能写单个加载器
+                        loader: 'babel-loader',
+                        options: {
+                            // 开启缓存
+                            cacheDirectory: true,
+                            // 关闭缓存压缩
+                            // 缓存文件并不会上线，仅占用本地存储空间
+                            // 且压缩缓存文件，会影响打包速度
+                            cacheCompression: false,
+                        }
+                    },
+                ]
+            }
+        ]
+    }
+}
+```
+
+对于`eslint`，缓存文件的默认路径为：`node_modules/.cache/eslint-webpack-plugin/.eslintcache`。
+
+```typescript
+module.exports = {
+    plugins: [
+        new ESLintPlugin({
+            // 待检查的文件目录，绝对路径
+            context: path.resolve(__dirname, './src'),
+            // 若检查ts，需指定文件类型
+            extensions: ['.ts', '.js'],
+            // 出现错误时终止构建
+            failOnError: true,
+            // 开启缓存
+            cache: true
+        })
+    ]
+}
+```
+
+##### thead
+
+多进程打包(`thead[θred]`)。
+
+提升代码打包速度，主要针对`js`。针对`js`的处理有三个工具：`eslint、babel、terser[ˈtɜrsər]`。
+
+`terser`是`webpack`内置的插件，用于`js`代码压缩。

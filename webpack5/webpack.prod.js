@@ -34,48 +34,68 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts$/i,
-                exclude: /(node_modules)/,
-                // loader只能写单个加载器
-                loader: 'babel-loader'
-            },
-            {
-                test: /\.css$/i,
-                use: getStyleLoader()
-            },
-            {
-                test: /\.less$/i,
-                use: getStyleLoader(['less-loader'])
-            },
-            {
-                test: /\.(jpe?g|png|webp|gif|bmp)$/i,
-                // 图片会转换为base64
-                type: 'asset',
-                parser: {
-                    dataUrlCondition: {
-                        // 最大10kb，10kb以内的将被转换为base64
-                        maxSize: 10 * 1024,
+                // 每个文件只能被其中一个加载器处理
+                oneOf: [
+                    {
+                        test: /\.ts$/i,
+                        exclude: /(node_modules)/,
+                        // loader只能写单个加载器
+                        loader: 'babel-loader',
+                        options: {
+                            // 开启缓存
+                            cacheDirectory: true,
+                            // 关闭缓存压缩，缓存文件并不会上线，仅占用本地存储空间
+                            // 且压缩缓存文件，会影响打包速度
+                            cacheCompression: false,
+                        }
+                    },
+                    {
+                        test: /\.css$/i,
+                        use: getStyleLoader()
+                    },
+                    {
+                        test: /\.less$/i,
+                        use: getStyleLoader(['less-loader'])
+                    },
+                    {
+                        test: /\.(jpe?g|png|webp|gif|bmp)$/i,
+                        // 图片会转换为base64
+                        type: 'asset',
+                        parser: {
+                            dataUrlCondition: {
+                                // 最大10kb，10kb以内的将被转换为base64
+                                maxSize: 10 * 1024,
+                            }
+                        },
+                        generator: {
+                            // 指定输出的文件目录
+                            // hash-文件名、ext-文件后缀、query-查询字符串
+                            filename: 'static/images/[hash][ext][query]'
+                        }
+                    },
+                    {
+                        test: /\.(ttf|woff2?|mp3|mp4|avi)$/i,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: 'static/media/[hash][ext][query]'
+                        }
                     }
-                },
-                generator: {
-                    // 指定输出的文件目录
-                    // hash-文件名、ext-文件后缀、query-查询字符串
-                    filename: 'static/images/[hash][ext][query]'
-                }
-            },
-            {
-                test: /\.(ttf|woff2?|mp3|mp4|avi)$/i,
-                type: 'asset/resource',
-                generator: {
-                    filename: 'static/media/[hash][ext][query]'
-                }
+                ]
             }
         ],
     },
     plugins: [
         new ESLintPlugin({
             // 待检查的文件目录，绝对路径
-            context: path.resolve(__dirname, './src')
+            context: path.resolve(__dirname, './src'),
+            // 若检查ts，需指定文件类型
+            extensions: ['.ts', '.js'],
+            // 出现错误时终止构建
+            failOnError: true,
+            // 开启缓存
+            // 缓存文件的默认路径为
+            // node_modules/.cache/eslint-webpack-plugin/.eslintcache
+            cache: true
         }),
         new HTMLWebpackPlugin({
             // 使用public下的模板文件，保持DOM结构一致，同时自动引入js
@@ -95,5 +115,6 @@ module.exports = {
         // 设置引用模块（设置哪些文件可以作为模块使用）。若使用ts，这里必须配置
         extensions: ['.ts', '.js']
     },
-    mode: 'production'
+    mode: 'production',
+    devtool: 'source-map'
 }
