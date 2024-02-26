@@ -15,5 +15,8 @@ module.exports = {
         }],
         // 将ts编译为js
         '@babel/preset-typescript'
+    ],
+    plugins: [
+        '@babel/plugin-transform-runtime'
     ]
 }

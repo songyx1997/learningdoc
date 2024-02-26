@@ -424,9 +424,9 @@ module.exports = {
 }
 ```
 
-##### CssMinimizerWebpackPlugin
+##### 压缩css
 
-压缩`css`，并支持缓存和并发模式下运行。
+压缩`css`使用插件`css-minimizer-webpack-plugin`，并支持缓存和并发模式下运行。
 
 ```typescript
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -476,7 +476,7 @@ module.exports = {
 }
 ```
 
-#### 提升打包构建速度
+#### 提升打包速度
 
 ##### HMR
 
@@ -616,6 +616,121 @@ module.exports = {
 
 多进程打包(`thead[θred]`)。
 
-提升代码打包速度，主要针对`js`。针对`js`的处理有三个工具：`eslint、babel、terser[ˈtɜrsər]`。
+开启多进程打包，应该针对比较耗时的操作（如`js`），因为每个进程启动需要`600ms`左右的开销。
 
-`terser`是`webpack`内置的插件，用于`js`代码压缩。
+```typescript
+const os = require('os');
+module.exports = {
+    module: {
+        rules: [
+            {
+                oneOf: [
+                    {
+                        test: /\.ts$/i,
+                        exclude: /(node_modules)/,
+                        use: [
+                            {
+                                loader: 'thread-loader',
+                                options: {
+                                    workers: os.cpus().length
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+    }
+}
+```
+
+另外，代码压缩也可以开启多进程。`terser`是`webpack`内置的插件，用于`js`代码压缩。
+
+```typescript
+const os = require('os');
+module.exports = {
+    // 官方文档，将压缩操作配置在optimization中
+    optimization: {
+        minimize: true,
+        minimizer: [
+            // css压缩插件
+            new CssMinimizerPlugin(),
+            // webpack5内置js压缩操作
+            new TerserPlugin({
+                parallel: os.cpus().length
+            })
+        ],
+    }
+}
+```
+
+#### 减少代码体积
+
+##### Tree Shaking
+
+字面意思为树摇，去掉多余的枯叶。
+
+生产模式下默认开启。作用是引入第三方库时，打包时去除没有使用上的代码。
+
+##### babel
+
+对于公共代码，`babel`会添加辅助代码，如`_extend`。并被添加至每一个需要它的文件内，造成了重复定义。
+
+在`babel.config.js`中引入插件`@babel/plugin-transform-runtime`。其作用是需要辅助代码时，从该插件中引入，而避免重复定义。
+
+```typescript
+module.exports = {
+    presets: [],
+    plugins: [
+        '@babel/plugin-transform-runtime'
+    ]
+}
+```
+
+##### 图片压缩
+
+主要使用插件`image-minimizer-webpack-plugin`。
+
+压缩方式包括：无损压缩、有损压缩。
+
+#### 优化代码运行性能
+
+##### 代码分割
+
+代码分割(`code split`)实现了：
+
+1. 分割文件：将打包生成的文件进行分割，生成多个`js`文件。
+2. 按需加载：需要哪个`js`文件就加载哪个。
+
+实现代码分割有多种方式。
+
+方式一：多入口(`entry`)与多输出(`output`)
+
+```typescript
+module.exports = {
+    entry: {
+        one: './src/main.ts',
+        two: './src/app.ts'
+    },
+    output: {
+        path: path.resolve(__dirname, './dist'),
+        // [name]指entry中的key值（上面的one、two）
+        filename: 'static/js/[name].js',
+    }
+}
+```
+
+`Tips`：多入口文件，每个文件都被称为`chunk`；多输出的文件，每个文件都被称为`bundle`。
+
+需要注意的一点，当多入口文件引用了公共代码，就希望将公共的代码在打包时单独形成`js`文件，而不是将公共的代码都打包进`bundle`中。
+
+```typescript
+module.exports = {
+    optimization: {
+        splitChunks: {
+            // 所有模块（即main.ts、app.ts）都进行分割
+            chunks: 'all',
+        },
+    },
+};
+```

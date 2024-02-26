@@ -1,8 +1,10 @@
 const path = require('path');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const os = require('os');
+const TerserPlugin = require('terser-webpack-plugin');
 
 /**
  * 获取样式加载器
@@ -19,11 +21,14 @@ function getStyleLoader(loaders) {
 }
 
 module.exports = {
-    entry: './src/main.ts',
+    entry: {
+        one: './src/main.ts',
+        two: './src/app.ts'
+    },
     output: {
         path: path.resolve(__dirname, './dist'),
-        // 入口文件打包输出的文件名
-        filename: 'static/js/bundle.js',
+        // [name]指entry中的key值（上面的one、two）
+        filename: 'static/js/[name].js',
         // 在打包前，将path整个目录清空，再进行打包
         clean: true,
         environment: {
@@ -39,15 +44,24 @@ module.exports = {
                     {
                         test: /\.ts$/i,
                         exclude: /(node_modules)/,
-                        // loader只能写单个加载器
-                        loader: 'babel-loader',
-                        options: {
-                            // 开启缓存
-                            cacheDirectory: true,
-                            // 关闭缓存压缩，缓存文件并不会上线，仅占用本地存储空间
-                            // 且压缩缓存文件，会影响打包速度
-                            cacheCompression: false,
-                        }
+                        use: [
+                            {
+                                loader: 'thread-loader',
+                                options: {
+                                    workers: os.cpus().length
+                                }
+                            },
+                            {
+                                loader: 'babel-loader',
+                                options: {
+                                    // 开启缓存
+                                    cacheDirectory: true,
+                                    // 关闭缓存压缩，缓存文件并不会上线，仅占用本地存储空间
+                                    // 且压缩缓存文件，会影响打包速度
+                                    cacheCompression: false,
+                                }
+                            }
+                        ]
                     },
                     {
                         test: /\.css$/i,
@@ -104,9 +118,24 @@ module.exports = {
         new MiniCssExtractPlugin({
             // 指定文件名和路径
             filename: 'static/css/all.css'
-        }),
-        new CssMinimizerPlugin()
+        })
     ],
+    // 官方文档，将压缩操作配置在optimization中
+    optimization: {
+        minimize: true,
+        minimizer: [
+            // css压缩插件
+            new CssMinimizerPlugin(),
+            // webpack5内置js压缩操作
+            new TerserPlugin({
+                parallel: os.cpus().length
+            })
+        ],
+        splitChunks: {
+            // 所有模块（即main.ts、app.ts）都进行分割
+            chunks: 'all',
+        },
+    },
     resolve: {
         // 配置别名
         alias: {
