@@ -503,30 +503,6 @@ module.exports = {
 
 ##### oneOf
 
-开发模式或生产模式，都会提升打包速度。
-
-```typescript
-module.exports = {
-    module: {
-        rules: [
-            {
-                test: /\.ts$/i,
-                exclude: /(node_modules)/,
-                // loader只能写单个加载器
-                loader: 'babel-loader'
-            },
-            {
-                test: /\.css$/i,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
-            }
-        ]
-    }
-}
-```
-
 不同文件打包时，按照顺序采用`module.rules`数组中的规则。如果是`ts`文件，则第一条规则就命中。但如果是`css`文件，到第二条规则才会命中。
 
 ```typescript
@@ -700,7 +676,7 @@ module.exports = {
 代码分割(`code split`)实现了：
 
 1. 分割文件：将打包生成的文件进行分割，生成多个`js`文件。
-2. 按需加载：需要哪个`js`文件就加载哪个。
+2. 懒加载：需要哪个`js`文件就加载哪个。
 
 实现代码分割有多种方式。
 
@@ -730,7 +706,190 @@ module.exports = {
         splitChunks: {
             // 所有模块（即main.ts、app.ts）都进行分割
             chunks: 'all',
+            // 该插件有很多默认配置，以下代码进行默认配置的覆盖
+            cacheGroups: {
+                default: {
+                    // 默认打包的文件大小为20kb，这里修改为0
+                    minSize: 0,
+                    // 让自定义组获得更高的优先级
+                    priority: -20,
+                    // 被拆分出的模块将被重用
+                    reuseExistingChunk: true,
+                }
+            },
         },
     },
 };
 ```
+
+方式二：懒加载
+
+场景：点击按钮时，才去拉取点击事件的相关代码。
+
+首先配置`eslint`，引入插件`eslint-plugin-import`。`.eslintrc.js`文件中
+
+```typescript
+module.exports = {
+    plugins: [
+        // 引入ts插件
+        '@typescript-eslint',
+        // 解决动态导入语法错误
+        'import'
+    ]
+}
+```
+
+在`main.ts`入口中调用模块`method.ts`的代码。
+
+在`app.ts`入口中也调用模块`method.ts`的代码。
+
+```typescript
+const el = document.getElementById('demand-loading-one') as HTMLButtonElement;
+el.onclick = function () {
+    import('./common/method').then((value) => {
+        const { onDemandLoadingOne } = value;
+        onDemandLoadingOne();
+    }).catch(() => {
+        console.log('模块加载失败~');
+    })
+}
+```
+
+进行打包，点击按钮。将`method.ts`中被用到的方法，打包进`755.js`，并在点击事件触发时被拉取。
+
+<div style="border:2px solid #42b883"><img src=".\懒加载.png"></div>
+
+方式三：单入口文件
+
+配置了`splitChunks`，仅能将`node_modules`中的代码提取成单独的`chunk`。
+
+```typescript
+module.exports = {
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+        },
+    },
+};
+```
+
+但是懒加载的代码，依然会被打包成单独的`chunk`。
+
+##### 命名规范
+
+首先给动态导入指定`webpack魔法注释`。
+
+```typescript
+const el = document.getElementById('demand-loading-one') as HTMLButtonElement;
+el.onclick = function () {
+    // webpack魔法命名
+    import(/* webpackChunkName: 'method' */'./common/method').then((value) => {
+        const { onDemandLoadingOne } = value;
+        onDemandLoadingOne();
+    }).catch(() => {
+        console.log('模块加载失败~');
+    })
+}
+```
+
+这样在配置文件中就可以使用`[name]`。
+
+```typescript
+module.exports = {
+    entry: {
+        main: './src/main.ts',
+        app: './src/app.ts'
+    },
+    output: {
+        // [name]指entry中的key值
+        filename: 'static/js/[name].js',
+        chunkFilename: 'static/js/[name].chunk.js',
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            // css也可以使用多入口、动态导入
+            // 命名规范和js类似
+            filename: 'static/css/[name].css',
+            chunkFilename: 'static/css/[name].chunk.css',
+        })
+    ]
+}
+```
+
+##### Preload、Prefetch
+
+即使配置了懒加载，但是懒加载的代码体积很大，用户体验并不好。因此使用`Preload、Prefetch`使浏览器暗中加载未来需要使用的资源。
+
+`Preload`：告知浏览器立即加载资源，优先级高，但是只能加载当前页面的资源。
+
+`Prefetch`：告知浏览器在空闲时才开始加载资源，优先级低，既能加载当前页面，也可以加载下一个页面。
+
+二者的共同点是：只加载不执行，且都有缓存。
+
+二者都存在的问题：都存在兼容性问题。截止目前，`Preload`对市面上浏览器支持率为`97.29%`。`Prefetch`对市面上浏览器支持率为`79.96%`。因此使用时推荐使用`Preload`。
+
+代码中借助`webpack魔法注释`实现。
+
+```typescript
+import(/* webpackPreload: true */ 'ChartingLibrary');
+import(/* webpackPrefetch: true */ './path/to/LoginModal.js');
+```
+
+<div><img style="border:2px solid #42b883" src=".\prefetch.png"></div>
+
+##### contenthash
+
+在输出文件名中，使用该占位符。这样只有当文件修改时，才会改变文件的`hash`值，因此实现了**缓存**。
+
+```typescript
+module.exports = {
+    output: {
+        filename: 'static/js/[name].[contenthash:8].js',
+        chunkFilename: 'static/js/[name].chunk.[contenthash:8].js',
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'static/css/[name].[contenthash:8].css',
+            chunkFilename: 'static/css/[name].chunk.[contenthash:8].css',
+        })
+    ]
+}
+```
+
+##### runtimeChunk
+
+基于`contenthash`实现的缓存，存在一个问题：在`A`模块中引入了`B`模块。当`B`模块发生变化，其`hash`值变化，同时`A`模块的`hash`值也变化，导致缓存失效。
+
+```typescript
+module.exports = {
+  optimization: {
+    runtimeChunk: {
+      name: (entrypoint) => `runtime~${entrypoint.name}`,
+    },
+  },
+};
+```
+
+借助于`runtimeChunk`。当`B`模块发生变化时，其`hash`值变化，同时`runtime`文件(记录文件之间`hash`值的依赖关系)的`hash`值变化，但是对`A`模块的`hash`值无影响，实现了更好的缓存效果。
+
+<div><img style="border:2px solid #42b883" src=".\runtimeChunk.jpg"></div>
+
+##### PWA
+
+借助插件`workbox-webpack-plugin`实现`渐进式网络应用程序(progressive web application - PWA)`。
+
+`PWA`可以用来做很多事。其中最重要的是，在**离线**时应用程序能够继续运行功能。
+
+```typescript
+const WorkboxPlugin = require('workbox-webpack-plugin');
+module.exports = {
+    plugins: [
+        new WorkboxPlugin.GenerateSW({
+            clientsClaim: true,
+            skipWaiting: true,
+        })
+    ]
+}
+```
+
+#### 项目

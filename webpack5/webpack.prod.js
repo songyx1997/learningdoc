@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const os = require('os');
 const TerserPlugin = require('terser-webpack-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 /**
  * 获取样式加载器
@@ -22,13 +23,14 @@ function getStyleLoader(loaders) {
 
 module.exports = {
     entry: {
-        one: './src/main.ts',
-        two: './src/app.ts'
+        main: './src/main.ts',
+        app: './src/app.ts'
     },
     output: {
         path: path.resolve(__dirname, './dist'),
-        // [name]指entry中的key值（上面的one、two）
-        filename: 'static/js/[name].js',
+        // [name]指entry中的key值
+        filename: 'static/js/[name].[contenthash:8].js',
+        chunkFilename: 'static/js/[name].chunk.[contenthash:8].js',
         // 在打包前，将path整个目录清空，再进行打包
         clean: true,
         environment: {
@@ -117,7 +119,12 @@ module.exports = {
         }),
         new MiniCssExtractPlugin({
             // 指定文件名和路径
-            filename: 'static/css/all.css'
+            filename: 'static/css/[name].[contenthash:8].css',
+            chunkFilename: 'static/css/[name].chunk.[contenthash:8].css',
+        }),
+        new WorkboxPlugin.GenerateSW({
+            clientsClaim: true,
+            skipWaiting: true,
         })
     ],
     // 官方文档，将压缩操作配置在optimization中
@@ -134,7 +141,21 @@ module.exports = {
         splitChunks: {
             // 所有模块（即main.ts、app.ts）都进行分割
             chunks: 'all',
+            // 该插件有很多默认配置，以下代码进行默认配置的覆盖
+            cacheGroups: {
+                default: {
+                    // 默认打包的文件大小为20kb，这里修改为0
+                    minSize: 0,
+                    // 让自定义组获得更高的优先级
+                    priority: -20,
+                    // 被拆分出的模块将被重用
+                    reuseExistingChunk: true,
+                }
+            },
         },
+        runtimeChunk: {
+            name: (entrypoint) => `runtime~${entrypoint.name}`,
+        }
     },
     resolve: {
         // 配置别名

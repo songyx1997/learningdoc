@@ -22,7 +22,9 @@ module.exports = {
     },
     plugins: [
         // 引入ts插件
-        '@typescript-eslint'
+        '@typescript-eslint',
+        // 解决动态导入语法错误
+        'import'
     ],
     // 继承其他规则（这里继承了eslint、ts的官方规则）
     extends: [

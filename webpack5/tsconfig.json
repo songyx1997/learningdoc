@@ -11,9 +11,9 @@
     "compilerOptions": {
         // 指定编译出的js版本
         // ESNext表示永远指向下一个版本
-        "target": "ES6",
+        "target": "ESNext",
         // 模块化规范
-        "module": "ES6",
+        "module": "ESNext",
         // 编译后文件所在目录
         // "outDir": "./dist",
         // 所有的全局作用域中的代码会合并到一个文件中
