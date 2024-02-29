@@ -2,6 +2,7 @@ const path = require('path');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
+const { DefinePlugin } = require('webpack');
 
 /**
  * 获取样式加载器
@@ -23,7 +24,7 @@ function getStyleLoaders(loaders) {
 }
 
 module.exports = {
-    entry: './src/main.ts',
+    entry: './src/main.js',
     output: {
         // 开发模式没有输出
         path: undefined,
@@ -32,14 +33,12 @@ module.exports = {
     },
     module: {
         rules: [
-            // {
-            // oneOf: [
             {
                 test: /\.vue$/,
                 loader: 'vue-loader'
             },
             {
-                test: /\.ts$/,
+                test: /\.js$/,
                 include: path.resolve(__dirname, './src'),
                 loader: 'babel-loader',
                 options: {
@@ -57,9 +56,11 @@ module.exports = {
             },
             {
                 test: /\.(jpe?g|png|webp|gif|bmp)$/,
+                // 图片会转换为base64
                 type: 'asset',
                 parser: {
                     dataUrlCondition: {
+                        // 最大10kb，10kb以内的将被转换为base64
                         maxSize: 10 * 1024,
                     }
                 },
@@ -74,8 +75,6 @@ module.exports = {
                     filename: 'static/media/[hash][ext][query]'
                 }
             }
-            //     ]
-            // }
         ],
     },
     plugins: [
@@ -84,30 +83,46 @@ module.exports = {
             cache: true
         }),
         new HTMLWebpackPlugin({
+            // 使用public下的模板文件，保持DOM结构一致，同时自动引入js
             template: path.resolve(__dirname, './public/index.html')
         }),
-        new VueLoaderPlugin()
+        new VueLoaderPlugin(),
+        // cross-env定义的环境变量给打包工具使用
+        // 用于定义环境变量给源代码使用，用于解决Vue3页面警告
+        new DefinePlugin({
+            __VUE_OPTIONS_API__: true,
+            // 开发模式下启用开发工具
+            __VUE_PROD_DEVTOOLS__: true,
+            __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
+        })
     ],
+    // 压缩
     optimization: {
+        // 代码分割
         splitChunks: {
             chunks: 'all'
         },
+        // 用临时文件记录文件间hash值的关系，便于缓存
         runtimeChunk: {
             name: (entrypoint) => `runtime~${entrypoint.name}`,
         }
     },
     resolve: {
+        // 配置别名
         alias: {
             '@': path.resolve(__dirname, './src')
         },
-        extensions: ['.vue', '.ts', '.js', '.json']
+        // 设置引用模块（设置哪些文件可以作为模块使用）
+        extensions: ['.vue', '.js', '.json']
     },
     mode: 'development',
+    // 仅提供列映射
     devtool: 'cheap-module-source-map',
     devServer: {
         host: 'localhost',
         port: '80',
         open: true,
+        // 开启热模块替换（默认值为true）
         hot: true
     }
 }
