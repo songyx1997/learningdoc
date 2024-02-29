@@ -872,7 +872,7 @@ module.exports = {
 
 借助于`runtimeChunk`。当`B`模块发生变化时，其`hash`值变化，同时`runtime`文件(记录文件之间`hash`值的依赖关系)的`hash`值变化，但是对`A`模块的`hash`值无影响，实现了更好的缓存效果。
 
-<div><img style="border:2px solid #42b883" src=".\runtimeChunk.jpg"></div>
+<div style="width:80%"><img style="border:2px solid #42b883" src=".\runtimeChunk.jpg"></div>
 
 ##### PWA
 
@@ -893,3 +893,33 @@ module.exports = {
 ```
 
 #### 项目
+
+##### Vue
+
+处理Vue文件，使用如下包。
+
+需要注意每次升级项目中的 `vue` 包时，也应该匹配升级 `vue-template-compiler`。
+
+```shell
+npm install -D vue-loader vue-template-compiler
+```
+
+```typescript
+const { VueLoaderPlugin } = require('vue-loader')
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      }
+    ]
+  },
+  plugins: [
+    new VueLoaderPlugin()
+  ]
+}
+```
+
+处理`Vue`的样式，还需要使用`vue-style-loader`替换`style-loader`。
