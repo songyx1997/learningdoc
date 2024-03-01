@@ -892,34 +892,86 @@ module.exports = {
 }
 ```
 
-#### 项目
+### 项目-Vue
 
-##### Vue
+#### 开发模式
 
-处理Vue文件，使用如下包。
+##### 基础配置
 
-需要注意每次升级项目中的 `vue` 包时，也应该匹配升级 `vue-template-compiler`。
-
-```shell
-npm install -D vue-loader vue-template-compiler
-```
+1. 处理`vue`文件，使用`vue-loader、vue-template-compiler`。需要注意每次升级项目中的 `vue` 时，也应该匹配升级 `vue-template-compiler`。
+2. 处理`vue`的样式，还需要使用`vue-style-loader`替换`style-loader`。
+3. `vue3`会输出控制台警告，需要借助`webpack`的内置插件`DefinePlugin`。
 
 ```typescript
-const { VueLoaderPlugin } = require('vue-loader')
+const { VueLoaderPlugin } = require('vue-loader');
+const { DefinePlugin } = require('webpack');
 
 module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader'
-      }
-    ]
-  },
-  plugins: [
-    new VueLoaderPlugin()
-  ]
+    module: {
+        rules: [
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader'
+            },
+        ],
+    },
+    plugins: [
+        new VueLoaderPlugin(),
+        // cross-env定义的环境变量给打包工具使用
+        // 用于定义环境变量给源代码使用，用于解决Vue3页面警告
+        new DefinePlugin({
+            // 启用配置项式API
+            __VUE_OPTIONS_API__: true,
+            // 开发模式下启用开发工具
+            __VUE_PROD_DEVTOOLS__: true,
+            __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
+        }),
+    ],
+    resolve: {
+        // 设置引用模块（设置哪些文件可以作为模块使用）
+        extensions: ['.vue', '.ts', '.js', '.json'],
+    },
 }
 ```
 
-处理`Vue`的样式，还需要使用`vue-style-loader`替换`style-loader`。
+##### 使用ts
+
+首先导入`tsconfig.json`，配置别名和`moduleResolution`，使`import`语法不再报错。
+
+```json
+{
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "src/**/*.vue"
+    ],
+    "compilerOptions": {
+        "moduleResolution": "node",
+        // 设置路径别名
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        },
+    }
+}
+```
+
+之后修改`babel`的配置。
+
+```typescript
+module.exports = {
+    // 预设
+    presets: [
+        [
+            // 将ts编译为js
+            "@babel/preset-typescript", {
+                // 支持所有文件扩展名（非常重要！！！）
+                allExtensions: true
+            },
+        ],
+    ]
+}
+```
+
+最后修改`eslint`配置。

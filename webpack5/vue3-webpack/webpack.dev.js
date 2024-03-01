@@ -1,5 +1,5 @@
 const path = require('path');
-const ESLintPlugin = require('eslint-webpack-plugin');
+// const ESLintPlugin = require('eslint-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 const { DefinePlugin } = require('webpack');
@@ -24,7 +24,7 @@ function getStyleLoaders(loaders) {
 }
 
 module.exports = {
-    entry: './src/main.js',
+    entry: './src/main.ts',
     output: {
         // 开发模式没有输出
         path: undefined,
@@ -38,7 +38,7 @@ module.exports = {
                 loader: 'vue-loader'
             },
             {
-                test: /\.js$/,
+                test: /\.ts$/,
                 include: path.resolve(__dirname, './src'),
                 loader: 'babel-loader',
                 options: {
@@ -78,10 +78,10 @@ module.exports = {
         ],
     },
     plugins: [
-        new ESLintPlugin({
-            context: path.resolve(__dirname, './src'),
-            cache: true
-        }),
+        // new ESLintPlugin({
+        //     context: path.resolve(__dirname, './src'),
+        //     cache: true
+        // }),
         new HTMLWebpackPlugin({
             // 使用public下的模板文件，保持DOM结构一致，同时自动引入js
             template: path.resolve(__dirname, './public/index.html')
@@ -90,6 +90,7 @@ module.exports = {
         // cross-env定义的环境变量给打包工具使用
         // 用于定义环境变量给源代码使用，用于解决Vue3页面警告
         new DefinePlugin({
+            // 启用配置项式API
             __VUE_OPTIONS_API__: true,
             // 开发模式下启用开发工具
             __VUE_PROD_DEVTOOLS__: true,
@@ -113,7 +114,7 @@ module.exports = {
             '@': path.resolve(__dirname, './src')
         },
         // 设置引用模块（设置哪些文件可以作为模块使用）
-        extensions: ['.vue', '.js', '.json']
+        extensions: ['.vue', '.ts', '.js', '.json']
     },
     mode: 'development',
     // 仅提供列映射
@@ -121,7 +122,6 @@ module.exports = {
     devServer: {
         host: 'localhost',
         port: '80',
-        open: true,
         // 开启热模块替换（默认值为true）
         hot: true
     }

@@ -1,0 +1,45 @@
+{
+    // 指定哪些文件需要被编译
+    // **表示任意目录
+    // *表示任意文件
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "src/**/*.vue"
+    ],
+    // 默认值包括node_modules
+    "exclude": [],
+    // 编译器选项
+    "compilerOptions": {
+        "moduleResolution": "node",
+        // 设置路径别名
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        },
+        // 指定编译出的js版本
+        // ESNext表示永远指向下一个版本
+        "target": "ESNext",
+        // 模块化规范
+        "module": "ESNext",
+        // 是否编译目录下的js文件
+        "allowJs": true,
+        // 是否检查js代码是否符合语法规范
+        "checkJs": false,
+        // 是否移除注释
+        "removeComments": true,
+        // 当存在错误时不生成编译后的文件
+        "noEmitOnError": true,
+        // 所有严格检查的总开关，包括以下四项
+        "strict": true,
+        // 是否将编译后的文件指定为严格模式
+        // "alwaysStrict": true,
+        // 不允许隐式的any类型
+        // "noImplicitAny": true,
+        // 不允许不明确类型的this
+        // "noImplicitThis": true,
+        // 严格检查空值
+        // "strictNullChecks": true,
+    }
+}
