@@ -1,5 +1,5 @@
 const path = require('path');
-// const ESLintPlugin = require('eslint-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 const { DefinePlugin } = require('webpack');
@@ -78,10 +78,15 @@ module.exports = {
         ],
     },
     plugins: [
-        // new ESLintPlugin({
-        //     context: path.resolve(__dirname, './src'),
-        //     cache: true
-        // }),
+        new ESLintPlugin({
+            context: path.resolve(__dirname, './src'),
+            // 若检查ts以及vue文件内的ts代码，需指定文件类型
+            extensions: ['.ts', '.js', '.vue'],
+            // 出现错误时终止构建
+            emitError: true,
+            emitWarning: false,
+            cache: true
+        }),
         new HTMLWebpackPlugin({
             // 使用public下的模板文件，保持DOM结构一致，同时自动引入js
             template: path.resolve(__dirname, './public/index.html')

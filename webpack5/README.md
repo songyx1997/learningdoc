@@ -916,6 +916,15 @@ module.exports = {
         ],
     },
     plugins: [
+        new ESLintPlugin({
+            context: path.resolve(__dirname, './src'),
+            // 若检查ts以及vue文件内的ts代码，需指定文件类型
+            extensions: ['.ts', '.js', '.vue'],
+            // 出现错误时终止构建
+            emitError: true,
+            emitWarning: false,
+            cache: true
+        }),
         new VueLoaderPlugin(),
         // cross-env定义的环境变量给打包工具使用
         // 用于定义环境变量给源代码使用，用于解决Vue3页面警告
@@ -975,3 +984,27 @@ module.exports = {
 ```
 
 最后修改`eslint`配置。
+
+```typescript
+module.exports = {
+    root: true,
+    parser: 'vue-eslint-parser',
+    parserOptions: {
+        parser: '@typescript-eslint/parser',
+        // 引入ts配置文件
+        project: path.resolve(__dirname, './tsconfig.json'),
+        // 扩展文件
+        extraFileExtensions: ['.vue']
+    },
+    plugins: [
+        // 引入ts插件
+        '@typescript-eslint',
+        'vue'
+    ],
+    extends: [
+        'plugin:vue/vue3-recommended',
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended'
+    ]
+}
+```

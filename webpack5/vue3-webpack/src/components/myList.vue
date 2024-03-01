@@ -10,7 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div v-for="(item, index) in dataSource" :key="index">
+    <div v-for="(item, index) in props.dataSource" :key="index">
         id:{{ item.id }}、name:{{ item.name }}
         <!-- 将每一行的数据传输给父组件 -->
         <slot name="option" :record="item"></slot>

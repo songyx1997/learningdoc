@@ -7,7 +7,7 @@ import Header from '@/components/header.vue';
     <Header />
     <div class="main">
       <!-- 页面占位 -->
-      <RouterView></RouterView>
+      <RouterView />
     </div>
   </div>
 </template>

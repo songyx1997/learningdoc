@@ -15,7 +15,7 @@ function onInput(event: Event) {
 </script>
 
 <template>
-    <input :value="modelValue" @input="onInput" />
+    <input :value="props.modelValue" @input="onInput" />
 </template>
 
 <style lang="less" scoped></style>

@@ -24,10 +24,10 @@ function onInputPassword(event: Event) {
 
 <template>
     <div>
-        <input :value="name" @input="onInputName" />
+        <input :value="props.name" @input="onInputName" />
     </div>
     <div>
-        <input :value="password" @input="onInputPassword" />
+        <input :value="props.password" @input="onInputPassword" />
     </div>
 </template>
 
