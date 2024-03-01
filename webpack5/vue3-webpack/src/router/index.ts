@@ -1,10 +1,11 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
-import Home from '@/views/home.vue';
-import Person from '@/views/person.vue';
-import Help from '@/views/help.vue';
+import { createRouter, createWebHistory } from 'vue-router';
+// 借助webpack实现懒加载
+const Home = () => import(/* webpackChunkName: 'home' */ '@/views/home.vue');
+const Person = () => import(/* webpackChunkName: 'person' */ '@/views/person.vue');
+const Help = () => import(/* webpackChunkName: 'help' */ '@/views/help.vue');
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes: [
         {
             path: '/',

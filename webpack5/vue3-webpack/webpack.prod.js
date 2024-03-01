@@ -3,13 +3,18 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 const { DefinePlugin } = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require('terser-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 /**
  * 获取样式加载器
  */
 function getStyleLoaders(loaders) {
     let defaultLoaders = [
-        'vue-style-loader',
+        // 用插件中的loader替换vue-style-loader
+        MiniCssExtractPlugin.loader,
         'css-loader',
         {
             loader: 'postcss-loader',
@@ -26,10 +31,15 @@ function getStyleLoaders(loaders) {
 module.exports = {
     entry: './src/main.ts',
     output: {
-        // 开发模式没有输出
-        path: undefined,
-        filename: 'static/js/[name].js',
-        chunkFilename: 'static/js/[name].chunk.js'
+        path: path.resolve(__dirname, './dist'),
+        filename: 'static/js/[name].[contenthash:8].js',
+        chunkFilename: 'static/js/[name].chunk.[contenthash:8].js',
+        // 在打包前，将path整个目录清空，再进行打包
+        clean: true,
+        environment: {
+            // 编译结果不使用箭头函数
+            arrowFunction: false
+        }
     },
     module: {
         rules: [
@@ -91,6 +101,11 @@ module.exports = {
             // 使用public下的模板文件，保持DOM结构一致，同时自动引入js
             template: path.resolve(__dirname, './public/index.html')
         }),
+        new MiniCssExtractPlugin({
+            // 指定文件名和路径
+            filename: 'static/css/[name].[contenthash:8].css',
+            chunkFilename: 'static/css/[name].chunk.[contenthash:8].css',
+        }),
         new VueLoaderPlugin(),
         // cross-env定义的环境变量给打包工具使用
         // 用于定义环境变量给源代码使用，用于解决Vue3页面警告
@@ -100,10 +115,29 @@ module.exports = {
             // 开发模式下启用开发工具
             __VUE_PROD_DEVTOOLS__: true,
             __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
-        })
+        }),
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, './public'),
+                    to: path.resolve(__dirname, './dist'),
+                    globOptions: {
+                        // 忽略index.html文件
+                        ignore: ['**/index.html'],
+                    },
+                },
+            ],
+        }),
     ],
     // 压缩
     optimization: {
+        minimize: true,
+        minimizer: [
+            // css压缩插件
+            new CssMinimizerPlugin(),
+            // webpack5内置js压缩操作
+            new TerserPlugin()
+        ],
         // 代码分割
         splitChunks: {
             chunks: 'all',
@@ -131,13 +165,6 @@ module.exports = {
         // 设置引用模块（设置哪些文件可以作为模块使用）
         extensions: ['.vue', '.ts', '.js', '.json']
     },
-    mode: 'development',
-    // 仅提供列映射
-    devtool: 'cheap-module-source-map',
-    devServer: {
-        host: 'localhost',
-        port: '80',
-        // 开启热模块替换（默认值为true）
-        hot: true
-    }
+    mode: 'production',
+    devtool: 'source-map'
 }

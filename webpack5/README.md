@@ -1008,3 +1008,173 @@ module.exports = {
     ]
 }
 ```
+
+#### 生产模式
+
+##### CopyPlugin
+
+打包时，对于`public`目录下的内容，除了`index.html`外，其他的内容直接借助插件`copy-webpack-plugin`复制即可。
+
+```typescript
+const CopyPlugin = require('copy-webpack-plugin');
+
+module.exports = {
+    plugins: [
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, './public'),
+                    to: path.resolve(__dirname, './dist'),
+                    globOptions: {
+                        // 忽略index.html文件
+                        ignore: ['**/index.html'],
+                    },
+                },
+            ],
+        }),
+    ]
+}
+```
+
+##### 路由懒加载
+
+在路由文件中，非常适合实现懒加载。
+
+```typescript
+import { createRouter, createWebHistory } from 'vue-router';
+// 借助webpack实现懒加载
+const Home = () => import(/* webpackChunkName: 'home' */ '@/views/home.vue');
+const Person = () => import(/* webpackChunkName: 'person' */ '@/views/person.vue');
+const Help = () => import(/* webpackChunkName: 'help' */ '@/views/help.vue');
+
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        {
+            path: '/',
+            name: 'home',
+            component: Home
+        },
+        {
+            path: '/person',
+            name: 'person',
+            component: Person
+        },
+        {
+            path: '/help',
+            name: 'help',
+            component: Help
+        }
+    ]
+});
+export default router;
+```
+
+并在`webpack`中进行配置
+
+```typescript
+module.exports = {
+    // 压缩
+    optimization: {
+        // 代码分割
+        splitChunks: {
+            chunks: 'all',
+            cacheGroups: {
+                default: {
+                    // 默认打包的文件大小为20kb，这里修改为0
+                    minSize: 0,
+                    // 让自定义组获得更高的优先级
+                    priority: -20,
+                    // 被拆分出的模块将被重用
+                    reuseExistingChunk: true,
+                }
+            },
+        },
+        // 用临时文件记录文件间hash值的关系，便于缓存
+        runtimeChunk: {
+            name: (entrypoint) => `runtime~${entrypoint.name}`,
+        }
+    },
+}
+```
+
+#### 合并配置
+
+借助于`process.env.NODE_ENV`进行生产模式(`production`)与开发模式(`development`)的配置的合并。
+
+```json
+{
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development webpack serve --config webpack.dev.js",
+    "prod": "cross-env NODE_ENV=production webpack --config webpack.prod.js"
+  }
+}
+```
+
+```typescript
+const isProduction = process.env.NODE_ENV === 'production';
+
+/**
+ * 获取样式加载器
+ */
+function getStyleLoaders(loaders) {
+    let defaultLoaders = [
+        isProduction ? MiniCssExtractPlugin.loader : 'vue-style-loader',
+        'css-loader',
+        {
+            loader: 'postcss-loader',
+            options: {
+                postcssOptions: {
+                    plugins: ['postcss-preset-env']
+                }
+            }
+        }
+    ];
+    return loaders ? [...defaultLoaders, ...loaders] : defaultLoaders;
+}
+
+module.exports = {
+    output: {
+        path: isProduction ? path.resolve(__dirname, './dist') : undefined,
+        filename: `static/js/[name]${isProduction ? '.[contenthash:8]' : ''}.js`,
+        chunkFilename: `static/js/[name].chunk${isProduction ? '.[contenthash:8]' : ''}.js`,
+        // 在打包前，将path整个目录清空，再进行打包
+        clean: true,
+        environment: {
+            // 编译结果不使用箭头函数
+            arrowFunction: false
+        }
+    },
+    plugins: [
+        isProduction && new MiniCssExtractPlugin({
+            // 指定文件名和路径
+            filename: 'static/css/[name].[contenthash:8].css',
+            chunkFilename: 'static/css/[name].chunk.[contenthash:8].css',
+        }),
+        isProduction && new CopyPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, './public'),
+                    to: path.resolve(__dirname, './dist'),
+                    globOptions: {
+                        // 忽略index.html文件
+                        ignore: ['**/index.html'],
+                    },
+                },
+            ],
+        }),
+    ].filter(Boolean),
+    // 压缩
+    optimization: {
+        minimize: isProduction,
+    },
+    mode: process.env.NODE_ENV,
+    devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
+    devServer: {
+        host: 'localhost',
+        port: '80',
+        // 开启热模块替换（默认值为true）
+        hot: true
+    }
+}
+```
