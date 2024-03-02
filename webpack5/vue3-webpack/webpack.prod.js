@@ -45,7 +45,11 @@ module.exports = {
         rules: [
             {
                 test: /\.vue$/,
-                loader: 'vue-loader'
+                loader: 'vue-loader',
+                options: {
+                    // 开启loader缓存
+                    cacheDirectory: path.resolve(__dirname, './node_modules/.cache/vue-loader')
+                }
             },
             {
                 test: /\.ts$/,
@@ -142,14 +146,21 @@ module.exports = {
         splitChunks: {
             chunks: 'all',
             cacheGroups: {
-                default: {
-                    // 默认打包的文件大小为20kb，这里修改为0
-                    minSize: 0,
-                    // 让自定义组获得更高的优先级
-                    priority: -20,
-                    // 被拆分出的模块将被重用
-                    reuseExistingChunk: true,
-                }
+                vue: {
+                    test: /[\\/]node_modules[\\/]vue(.*)?[\\/]/,
+                    name: 'chunk-vue',
+                    priority: 30,
+                },
+                'ant-design-vue': {
+                    test: /[\\/]node_modules[\\/]ant-design-vue[\\/]/,
+                    name: 'chunk-ant-design-vue',
+                    priority: 20,
+                },
+                libs: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'chunk-libs',
+                    priority: 10,
+                },
             },
         },
         // 用临时文件记录文件间hash值的关系，便于缓存

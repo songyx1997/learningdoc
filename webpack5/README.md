@@ -1178,3 +1178,64 @@ module.exports = {
     }
 }
 ```
+
+#### 优化配置
+
+##### 缓存
+
+```typescript
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader',
+                options: {
+                    // 开启loader缓存
+                    cacheDirectory: path.resolve(__dirname, './node_modules/.cache/vue-loader')
+                }
+            },
+        ],
+    },
+}
+```
+
+需要注意的是，`vue-loader`并没有特定的缓存配置项，而是通过启用`webpack`的`loader`缓存。在`webpack5`中还可以全局开启缓存。
+
+##### 拆分node_modules
+
+`node_modules`会被打包成一个`js`文件，因此需要进行拆分，单独打包，大致分为三组。
+
+1. `vue`相关的文件。
+2. 引入的`ant-design-vue`。
+3. 其余的`node_modules`。
+
+```typescript
+module.exports = {
+    optimization: {
+        // 代码分割
+        splitChunks: {
+            chunks: 'all',
+            cacheGroups: {
+                vue: {
+                    test: /[\\/]node_modules[\\/]vue(.*)?[\\/]/,
+                    name: 'chunk-vue',
+                    priority: 30,
+                },
+                'ant-design-vue': {
+                    test: /[\\/]node_modules[\\/]ant-design-vue[\\/]/,
+                    name: 'chunk-ant-design-vue',
+                    priority: 20,
+                },
+                libs: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'chunk-libs',
+                    priority: 10,
+                },
+            },
+        },
+    },
+}
+```
+
+### 原理

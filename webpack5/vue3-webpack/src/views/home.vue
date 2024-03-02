@@ -47,7 +47,7 @@ function onClickRow(record: any) {
     <div>
         <MyList :dataSource="list">
             <template #option="{ record }">
-                <button @click="onClickRow(record)">查看</button>
+                <a-button type="primary" @click="onClickRow(record)">查看</a-button>
             </template>
         </MyList>
     </div>
