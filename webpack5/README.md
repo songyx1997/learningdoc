@@ -1292,7 +1292,7 @@ module.exports.pitch = function (remainingRequest) {
       const styleEl = document.createElement('style');
       styleEl.innerHTML = style;
       document.head.appendChild(styleEl);
-    `
+    `;
     // 3.中止后续loader执行
     return script;
 }
@@ -1390,3 +1390,46 @@ module.exports = function (content) {
     return `module.exports = ${filename}`
 }
 ```
+
+### 原理-plugin
+
+#### Tapable
+
+`webpack`编译过程是一条流水线，会触发一系列的`Tapable`钩子事件。
+
+插件的实现，就是寻找相应的钩子，在上面挂上自己的任务，即注册事件。
+
+`Tapable`暴露了三个方法用于注册事件。
+
+1. `tap`：注册同步或异步钩子。
+2. `tapAsync`：回调函数方式的异步钩子。
+3. `tapPromise`： `Promise`方式的异步钩子。
+
+#### compiler、compilation
+
+##### compiler
+
+`compiler`对象保存着完整的`webpack`环境配置。每次启动`webpack`构建时它都是独一无二的，仅仅创建一次。它暴露了一系列生命周期钩子，允许插件在其各个阶段进行干预。
+
+##### compilation
+
+`compilation`对象则代表着一次完整的模块编译过程。每个`compilation`都是针对一组模块及其依赖关系而创建的。`compilation`对象包含了当前所有模块的信息，并且管理着从加载模块、解析模块依赖到最终输出资源的所有步骤，这些步骤包括但不限于：模块的加载、优化、分块、哈希计算和资源生成。`compilation`也提供了众多的生命周期钩子，供插件在编译的不同阶段插入自定义逻辑。
+
+<div style="width:80%"><img style="border:2px solid #42b883" src=".\compiler和compilation.png"></div>
+
+上图也展示出`webpack`就是一条流水线。
+
+每一个插件必然包含构造函数`constructor(){}`与`apply(compiler){}`方法。
+
+1. `webpack`加载`webpack.config.js`中所有的配置。调用`constructor`实例化插件。
+2. `webpack`创建`compiler`对象。
+3. 遍历所有`plugins`中插件，调用插件的`apply`方法。
+4. 开始编译流程，触发`hooks`。
+
+#### 钩子类型
+
+钩子的类型有：
+
+1. 同步，如`environment`。
+2. 异步串行（按照注册顺序执行），如`emit`。
+3. 异步并行（同时执行，结果根据执行快慢依次输出），如`make`。

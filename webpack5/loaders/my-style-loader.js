@@ -13,7 +13,7 @@ module.exports.pitch = function (remainingRequest) {
       const styleEl = document.createElement('style');
       styleEl.innerHTML = style;
       document.head.appendChild(styleEl);
-    `
+    `;
     // 3.中止后续loader执行
     return script;
 }
