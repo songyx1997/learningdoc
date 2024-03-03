@@ -71,7 +71,7 @@ module.exports = {
 
 `style-loader` ：把`CSS`插入到`DOM`中。
 
-`css-loader`： 会对 `@import` 和 `url()` 进行处理，就像`js` 解析 `import/require()` 一样。
+`css-loader`： 会对 `@import` 和 `url()` 进行处理，解决依赖问题。就像`js` 解析 `import/require()` 一样。
 
 `less-loader`：`webpack`将`less`编译为`CSS`的`loader`。
 
@@ -1238,4 +1238,155 @@ module.exports = {
 }
 ```
 
-### 原理
+### 原理-loader
+
+#### 执行顺序
+
+`pre > normal > inline > post`。前置、普通、内联、后置。
+
+借助`enforce`配置`loader`的类型(`pre、post`)。若不指定则为普通`loader`，普通`loader`的执行顺序为从右往左、从下往上。
+
+使用`inline loader`的方式如下：
+
+```typescript
+// 在js文件中导入css文件时直接指定加载器
+import Styles from 'style-loader!css-loader?modules!./styles.css';
+// 上述代码表示：对于./styles.css文件
+// 首先使用css-loader(带modules参数)进行处理
+// 然后再使用style-loader处理结果，最后将css样式注入到DOM中
+```
+
+#### 本质
+
+`loader`是导出为一个函数的`node`模块。该函数在`loader`转换资源的时候调用。该函数中的`this`就是上下文(`context`)。
+
+该函数包括三个入参：
+
+1. `content`：`loader`需要处理的原始模块内容。
+2. `sourceMap`：可选参数，用于传递`sourceMap`。
+3. `meta`：可选参数，`loader`执行时的额外元数据，可以在`loader`链中传递信息。
+
+#### 类型
+
+`loader`类型包括四种：`同步、异步、raw、pitch`。
+
+使用`pitch`可以实现熔断。
+
+<div style="width:80%"><img style="border:2px solid #42b883" src=".\pitch.png"></div>
+
+借助于`pitch`方法，可以实现`style-loader`。
+
+```typescript
+// remainingRequest表示剩下还需要处理的loader
+module.exports.pitch = function (remainingRequest) {
+    // 1.将remainingRequest中绝对路径修改为相对路径
+    const path = remainingRequest.split('!').map((absolutePath) => {
+        return this.utils.contextify(this.context, absolutePath);
+    }).join('!');
+    // path输出为../../../node_modules/css-loader/dist/cjs.js!./reset.css
+    // 2.引入css-loader处理过的资源
+    // 创建style，将内容插入页面中生效
+    // 使用!!中止后续loader执行
+    const script = `
+      import style from '!!${path}';
+      const styleEl = document.createElement('style');
+      styleEl.innerHTML = style;
+      document.head.appendChild(styleEl);
+    `
+    // 3.中止后续loader执行
+    return script;
+}
+```
+
+#### 常用API
+
+##### callback
+
+将结果返回给`webpack`，常用于`同步loader`。
+
+实现将js代码中的`console.log`全部移除的`nolog-loader.js`。
+
+```javascript
+// 同步loader
+// 1.直接返回
+// return content;
+// 2.借助上下文中的API-callback
+module.exports = function (content, sourceMap, meta) {
+    let result = '';
+    try {
+        result = content.replace(/console\.log\(['"](.*)['"]\);?/g, '');
+        this.callback(null, result, sourceMap, meta)
+    } catch (e) {
+        this.callback(e)
+    }
+}
+```
+
+##### async
+
+该函数的调用将创建一个回调(`callback`，注意和上下文中的`callback`进行区分)，该回调可以放在异步方法内，因此常用于`异步loader`。
+
+实现`my-babel-loader`，将`es6`代码转换为低版本`js`。
+
+```javascript
+const schema = require('./schemas/my-babel-schema.json');
+const babel = require('@babel/core');
+// 异步loader
+module.exports = function (content) {
+    // 获取配置的预设
+    let options = this.getOptions(schema);
+    // transform为异步方法，创建回调函数
+    let callback = this.async();
+    babel.transform(content, options, function (err, result) {
+        if (err) {
+            callback(err);
+        } else {
+            callback(null, result.code);
+        }
+    });
+    return content;
+}
+```
+
+上述代码中还使用了`getOptions`。
+
+##### getOptions
+
+获取`loader`的`options`，该`API`的入参为`schema`。
+
+`JSON Schema`是一种用于描述`JSON`数据格式和结构的标准规范。上面自定义`babel-loader`使用的就是`my-babel-schema.json`。
+
+```json
+{
+    "type": "object",
+    "properties": {
+        "presets": {
+            "type": "array"
+        }
+    },
+    "additionalProperties": true
+}
+```
+
+`additionalProperties`为`true`，即允许添加额外参数。
+
+##### emitFile
+
+实现`resource-loader`，用于处理`type: 'asset/resource'`的资源。借助于`raw-loader`，使输入的`content`为`buffer`。
+
+```typescript
+const loaderUtils = require('loader-utils');
+
+// 这样输入的content就是buffer，用于处理其他资源
+module.exports.raw = true;
+module.exports = function (content) {
+    // 1.生成带有hash值的文件名
+    let filename = loaderUtils.interpolateName(this, 'static/media/[hash].[ext][query]', {
+        content,
+    });
+    // 2.输出文件
+    this.emitFile(filename, content);
+    // 3.返回module.exports = '文件名'
+    return `module.exports = ${filename}`
+}
+```
