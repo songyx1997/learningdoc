@@ -1426,10 +1426,59 @@ module.exports = function (content) {
 3. 遍历所有`plugins`中插件，调用插件的`apply`方法。
 4. 开始编译流程，触发`hooks`。
 
+#### debug
+
+运行`webpack`时加上`--inspect-brk`参数以开启`Node.js`调试器支持。
+
+```shell
+node --inspect-brk ./node_modules/webpack/bin/webpack.js --config webpack.config.js
+```
+
 #### 钩子类型
 
 钩子的类型有：
 
 1. 同步，如`environment`。
-2. 异步串行（按照注册顺序执行），如`emit`。
-3. 异步并行（同时执行，结果根据执行快慢依次输出），如`make`。
+2. 异步串行（`AsyncSeriesHook`，按照注册顺序执行），如`emit`。
+3. 异步并行（`AsyncParallelHook`，同时执行，结果根据执行快慢依次输出），如`make`。
+
+#### 开发举例
+
+##### cleanWebpackPlugin
+
+钩子`emit`：输出`asset`到`output`目录之前执行。
+
+```javascript
+const path = require('path');
+class CleanWebpackPlugin {
+    constructor() { };
+    apply(compiler) {
+        compiler.hooks.emit.tap('CleanWebpackPlugin', () => {
+            // 1.获取输出的目录
+            const fs = compiler.outputFileSystem;
+            // webpack执行到此时，才得到输出路径
+            const path = compiler.outputPath;
+            // 2.文件处理使用内置的outputFileSystem
+            removeDirectoryRecursive(fs, path);
+        });
+    }
+}
+function removeDirectoryRecursive(fs, dirPath) {
+    // 首先读取目录内容
+    const files = fs.readdirSync(dirPath);
+    for (const file of files) {
+        const filePath = path.join(dirPath, file);
+        const stats = fs.statSync(filePath);
+        if (stats.isFile()) {
+            // 如果是文件，则直接删除
+            fs.unlinkSync(filePath);
+        } else {
+            // 如果是子目录，则递归删除
+            removeDirectoryRecursive(fs, filePath);
+        }
+    }
+    // 当子目录及文件都删除后，删除空的父目录
+    fs.rmdirSync(dirPath);
+}
+module.exports = CleanWebpackPlugin;
+```

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
+    "webpack-dev-debug": "node --inspect-brk ./node_modules/webpack/bin/webpack.js --config webpack.dev.js",
     "webpack-dev": "npx webpack serve --config webpack.dev.js",
     "webpack-prod": "npx webpack --config webpack.prod.js"
   },
