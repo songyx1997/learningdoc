@@ -45,6 +45,14 @@
 ]
 ```
 
-之后将`基础tokens`转换为`嵌套tokens`。
+之后将`基础tokens`转换为`嵌套tokens`，借助于`nestedTokens.js`。
 
-这里使用的栈结构，而不是递归。
+这里巧妙的使用栈和引用，而不是递归。
+
+核心操作包括：
+
+1. 初始化收集器(`collector`)，`collector`初始化为结果数组，栈(`sections`)。
+2. 遇见`#`入栈，并清空`collector`，将其放入当前`token`。
+3. 遇见`/`出栈，并将`collector`置于栈顶。
+
+获取到嵌套数组后，借助`renderTemplate.js`将其渲染为`dom`字符串。

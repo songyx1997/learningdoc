@@ -18,7 +18,7 @@ module.exports = function (template) {
             } else if (name[0] == '/') {
                 tokens.push(['/', name.substring(1)]);
             } else {
-                tokens.push(['text', name]);
+                tokens.push(['name', name]);
             }
         }
         scanner.scan('}}');
