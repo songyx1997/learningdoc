@@ -1,6 +1,6 @@
-const Scanner = require('./scanner');
+import Scanner from '@/js/scanner';
 // 解析模板字符串
-module.exports = function (template) {
+const parseTemplate = function (template) {
     let tokens = [];
     let scanner = new Scanner(template);
     while (scanner.end()) {
@@ -25,3 +25,5 @@ module.exports = function (template) {
     }
     return tokens;
 }
+
+export default parseTemplate;

@@ -1,4 +1,5 @@
-const lookup = require('./lookup');
+import lookup from '@/js/lookup';
+import parseArray from '@/js/parseArray';
 
 // 将tokens数组变成dom字符串
 const renderTemplate = function (tokens, data) {
@@ -14,8 +15,8 @@ const renderTemplate = function (tokens, data) {
                 str += lookup(data, tokens[i][1]);
                 break;
             case '#':
-                // 递归调用
-                str += renderTemplate(tokens[i][2], data);
+                // 对于数组，进行特殊解析
+                str += parseArray(tokens[i], data);
                 break;
             default:
                 break;
@@ -24,4 +25,4 @@ const renderTemplate = function (tokens, data) {
     return str;
 }
 
-module.exports = renderTemplate;
+export default renderTemplate;

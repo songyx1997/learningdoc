@@ -1,5 +1,5 @@
 // 使用栈、引用的思想
-module.exports = function (tokens) {
+const nestedTokens = function (tokens) {
     const nestedTokens = [];
     // 收集器
     let collector = nestedTokens;
@@ -27,3 +27,5 @@ module.exports = function (tokens) {
     }
     return nestedTokens;
 }
+
+export default nestedTokens;

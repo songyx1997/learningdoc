@@ -1,13 +1,15 @@
-const parseTemplate = require('./parseTemplate');
-const nestedTokens = require('./nestedTokens');
-const renderTemplate = require('./renderTemplate');
+import parseTemplate from '@/js/parseTemplate';
+import nestedTokens from '@/js/nestedTokens';
+import renderTemplate from '@/js/renderTemplate';
 
 function render(template, data) {
+    // 将模板解析为tokens
     let tokens = parseTemplate(template);
+    // 利用栈和引用将tokens转换为嵌套的tokens
     let finalTokens = nestedTokens(tokens);
+    // 将嵌套的tokens转换为dom字符串
     let domStr = renderTemplate(finalTokens, data);
-    console.log(finalTokens);
-    console.log(domStr);
+    document.getElementById('app').innerHTML = domStr;
 }
 
 let template =
@@ -19,7 +21,7 @@ let template =
                 学生{{name}}的爱好是
                 <ol>
                     {{#hobbies}}
-                    <li>{{type}}是{{evaluate}}</li>
+                    <li>{{.}}</li>
                     {{/hobbies}}
                 </ol>
             </li>
@@ -34,18 +36,11 @@ let data = {
     students: [
         {
             name: '张三',
-            hobbies: [
-                { type: '吃', evaluate: 'good' },
-                { type: '喝', evaluate: 'good' },
-                { type: '打游戏', evaluate: 'bad' }
-            ]
+            hobbies: ['吃', '喝', '打游戏']
         },
         {
             name: '李四',
-            hobbies: [
-                { type: '打高尔夫', evaluate: 'bad' },
-                { type: '骑车', evaluate: 'good' }
-            ]
+            hobbies: ['打高尔夫', '骑车']
         }
     ]
 }

@@ -24,4 +24,5 @@ class Scanner {
         return this.pos < this.all.length;
     }
 }
-module.exports = Scanner;
+
+export default Scanner;

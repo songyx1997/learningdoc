@@ -55,4 +55,10 @@
 2. 遇见`#`入栈，并清空`collector`，将其放入当前`token`。
 3. 遇见`/`出栈，并将`collector`置于栈顶。
 
-获取到嵌套数组后，借助`renderTemplate.js`将其渲染为`dom`字符串。
+获取到嵌套数组后，借助`renderTemplate.js`将其渲染为`dom`字符串，其入参为`tokens`数组和数据。
+
+生成字符串时，根据`#、/、数组`分类讨论。
+
+针对数组，调用`parseArray.js`，其入参为单个`token`和数据。其生成的字符串内容取决于提供的数据，遍历数据时调用`renderTemplate.js`，将单个`token`中的数组再次往后传递。
+
+`renderTemplate.js`与`parseArray.js`的互相调用实现了递归！！
