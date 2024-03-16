@@ -8,8 +8,13 @@ class LinkedList {
     }
 
     get(index) {
+        let node = this.getNode(index);
+        return node ? node.val : -1;
+    }
+
+    getNode(index) {
         if (index < 0 || index >= this.length) {
-            return -1;
+            return null;
         }
         let virtualNode = new ListNode();
         virtualNode.next = this.head;
@@ -18,7 +23,7 @@ class LinkedList {
             current = current.next;
             index--;
         }
-        return current.next.val;
+        return current.next;
     }
 
     addAtHead(val) {
