@@ -1,9 +1,9 @@
 class TreeNode {
-    constructor(val, left, right) {
+    constructor(val, left = null, right = null) {
         this.val = val;
-        this.left = null;
-        this.right = null;
+        this.left = left;
+        this.right = right;
     }
 }
 
-exports = TreeNode;
+module.exports = TreeNode;
