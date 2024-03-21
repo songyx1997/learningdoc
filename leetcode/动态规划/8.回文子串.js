@@ -42,4 +42,36 @@ const countSubstrings = function (str) {
     return num;
 };
 
-console.log(countSubstrings('aaa'));
+// 另外一个变种:最长回文子串
+const longestPalindrome = function (str) {
+    let dp = new Array(str.length).fill(0).map(() => new Array(str.length).fill(0));
+    let start = 0;
+    let end = 0;
+    let maxLength = 0;
+    for (let i = str.length - 1; i >= 0; i--) {
+        for (let j = i; j < str.length; j++) {
+            if (str[j] === str[i]) {
+                if (i === j || j === i + 1) {
+                    dp[i][j] = 1;
+                    if (j - i + 1 > maxLength) {
+                        maxLength = j - i + 1;
+                        start = i;
+                        end = j;
+                    }
+                } else if (j > i + 1) {
+                    if (dp[i + 1][j - 1] === 1) {
+                        dp[i][j] = 1;
+                        if (j - i + 1 > maxLength) {
+                            maxLength = j - i + 1;
+                            start = i;
+                            end = j;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return str.substring(start, end + 1);
+};
+
+console.log(longestPalindrome('babad'));
