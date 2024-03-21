@@ -21,7 +21,7 @@ class MyQueue {
     // 出队列操作很不同，需要满足先进先出
     // 将pushStack除了栈底的数据全部弹出，并压入popStack
     pop() {
-        while (this.pushStack.length > 0) {
+        while (this.pushStack.length() > 0) {
             let el = this.pushStack.pop();
             this.popStack.push(el);
         }
@@ -29,7 +29,7 @@ class MyQueue {
         if (!this.popStack.isEmpty()) {
             result = this.popStack.pop();
         }
-        while (this.popStack.length > 0) {
+        while (this.popStack.length() > 0) {
             let el = this.popStack.pop();
             this.pushStack.push(el);
         }
@@ -37,7 +37,7 @@ class MyQueue {
     }
 
     peek() {
-        while (this.pushStack.length > 0) {
+        while (this.pushStack.length() > 0) {
             let el = this.pushStack.pop();
             this.popStack.push(el);
         }
@@ -45,7 +45,7 @@ class MyQueue {
         if (!this.popStack.isEmpty()) {
             result = this.popStack.peek();
         }
-        while (this.popStack.length > 0) {
+        while (this.popStack.length() > 0) {
             let el = this.popStack.pop();
             this.pushStack.push(el);
         }
@@ -53,6 +53,8 @@ class MyQueue {
     }
 
     empty() {
-        return this.pushStack.length === 0;
+        return this.pushStack.length() === 0;
     }
 }
+
+module.exports = MyQueue;
