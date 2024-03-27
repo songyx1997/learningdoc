@@ -17,53 +17,43 @@ class MyQueue {
         this.arr = [];
     }
     push(el) {
-        let max = this.peek();
         // 1.往队尾加入元素，若队尾的元素小于当前待加入元素，则弹出（保持队列的单调性）
-        if (max) {
-            if (max < el) {
-                this.arr = [el];
-            } else {
-                while (this.arr[this.arr.length - 1] < el) {
-                    this.arr.pop();
-                }
-                this.arr.push(el);
-            }
-        } else {
-            this.arr.push(el);
+        while (!this.empty() && el > this.back()) {
+            this.arr.pop();
         }
+        this.arr.push(el);
     }
     pop(el) {
         // 2.只有当窗口弹出的元素与队头元素相等时，才弹出
-        let max = this.peek();
-        if (max) {
-            if (max === el) {
-                return this.arr.shift();
-            }
+        if (!this.empty() && el === this.peek()) {
+            this.arr.shift();
         }
     }
     peek() {
         return this.arr[0];
     }
+    back() {
+        return this.arr[this.arr.length - 1];
+    }
+    empty() {
+        return this.arr.length === 0;
+    }
 }
 
 const maxSlidingWindow = function (nums, k) {
     // 初始化单调队列
-    let queue = new MyQueue();
+    const queue = new MyQueue();
     for (let i = 0; i < k; i++) {
         queue.push(nums[i]);
     }
-    let result = [];
-    if (queue.peek()) {
-        result.push(queue.peek());
-    }
+    const result = [];
+    result.push(queue.peek());
     for (let i = k; i < nums.length; i++) {
         // nums[i - k]为待出窗口的数据
         queue.pop(nums[i - k]);
         // nums[i]为待入队的元素
         queue.push(nums[i]);
-        if (queue.peek()) {
-            result.push(queue.peek());
-        }
+        result.push(queue.peek());
     }
     return result;
 };
