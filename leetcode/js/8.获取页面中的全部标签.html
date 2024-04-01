@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8.获取页面中的全部标签</title>
+</head>
+
+<body>
+    <div>文本一</div>
+    <div>文本二</div>
+    <div>文本三</div>
+    <a>测试链接一</a>
+    <a />
+    <div>
+        <iframe src="../../html+css+js/practice/mail/index.html" width="100%" height="600" frameborder="0"
+            scrolling="auto" />
+    </div>
+    <button onclick="getTags">获取页面中的标签个数</button>
+</body>
+
+<script>
+
+    // 获取页面中的标签数目
+    let elements = document.querySelectorAll('*');
+    console.log(elements);
+    let set = new Set();
+    console.log(elements);
+    for (const el of elements) {
+        if (!set.has(el.tagName)) {
+            set.add(el.tagName)
+        }
+    }
+    console.log(set);
+</script>
+
+</html>
