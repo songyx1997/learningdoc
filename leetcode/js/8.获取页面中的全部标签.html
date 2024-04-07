@@ -21,18 +21,51 @@
                     }
                 }
             }
-
             let elements = document.querySelectorAll('body *');
             let set = new Set();
             addEl(elements);
             console.log(set);
+        }
+
+        function addListenDOM() {
+            // 选择要观察的DOM节点
+            const targetNode = document.querySelector('body');
+            // 观察器配置选项，定义需要监听的类型
+            const config = { attributes: true, childList: true, subtree: true };
+            // 回调函数，当目标节点发生变化时执行
+            const callback = function (mutationsList, observer) {
+                for (let mutation of mutationsList) {
+                    if (mutation.type === 'childList') {
+                        console.log('子节点已添加或删除：', mutation.addedNodes, mutation.removedNodes);
+                    }
+                    else if (mutation.type === 'attributes') {
+                        console.log('属性已更改：', mutation.attributeName);
+                    }
+                }
+            };
+            // 创建一个新的MutationObserver实例并传入回调函数
+            const observer = new MutationObserver(callback);
+            // 开始观察目标节点
+            observer.observe(targetNode, config);
+            // 停止观察
+            // observer.disconnect();
+        }
+
+        function addDom() {
+            const body = document.querySelector('body');
+            let newParagraph = document.createElement('p');
+            newParagraph.textContent = '测试行';
+            body.appendChild(newParagraph);
         }
     </script>
 </head>
 
 <body>
     <button onclick="getTags()">获取页面中的标签个数</button>
+    <button onclick="addListenDOM()">添加dom监听</button>
+    <button onclick="addDom()">添加dom</button>
     <div>文本一</div>
+    <input />
     <div>文本二</div>
     <div>文本三</div>
     <a>测试链接一</a>
