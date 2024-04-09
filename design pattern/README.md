@@ -424,4 +424,51 @@ function getFileHandler(fileType) {
 
 显然，上述代码，添加策略也是很简单的。
 
-##### 状态模式
+##### 观察者模式
+
+目标者`(subject)`和观察者`(observer)`。
+
+当目标者发生变化时，目标者中的所有观察者都会接收到通知，并执行观察者的方法。
+
+```javascript
+class Subject {
+    constructor() {
+        this.observers = [];
+    }
+    add(observer) {
+        this.observers.push(observer);
+    }
+    remove(observer) {
+        this.observers = this.observers.filter((item) => {
+            return item !== observer;
+        })
+    }
+    notify() {
+        this.observers.forEach((item) => {
+            item.show();
+        })
+    }
+}
+
+class Observer {
+    constructor(name) {
+        this.name = name;
+    }
+    show() {
+        console.log(this.name);
+    }
+}
+
+const sub = new Subject();
+// 添加观察者
+const zhang = new Observer('zhang');
+const li = new Observer('li');
+sub.add(zhang);
+sub.add(li);
+// 触发通知
+sub.notify();
+```
+
+`Vue`中对于观察者模式的应用：
+
+1. 事件总线
