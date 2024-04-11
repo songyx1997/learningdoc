@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11.交通灯问题</title>
+    <style>
+        .overall {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lamp {
+            background-color: #e5e5e5;
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+            border-radius: 50%;
+        }
+
+        .time {
+            font-size: 48px;
+            font-weight: 500;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .red {
+            background-color: red !important;
+        }
+
+        .yellow {
+            background-color: yellow !important;
+        }
+
+        .green {
+            background-color: green !important;
+        }
+    </style>
+    <script type="module">
+        class Lamp {
+            constructor(options) {
+                this.options = options;
+                // 初始化时切换至指定颜色
+                this._switch(options.color, null);
+            }
+            // 切换交通灯至指定颜色
+            _switch(color, oldColor) {
+                this.current = color;
+                this.pre = oldColor;
+                // 持续时间
+                this.duration = this.options[color];
+                // 记录切换的时间
+                this.time = new Date().getTime();
+            }
+            // 获取下一个交通灯
+            next() {
+                if (this.current === 'red') {
+                    this._switch('yellow', 'red');
+                } else if (this.current === 'green') {
+                    this._switch('yellow', 'green');
+                } else {
+                    // 当前灯为黄色
+                    if (this.pre === 'red') {
+                        this._switch('green', 'yellow');
+                    } else if (this.pre === 'green') {
+                        this._switch('red', 'yellow');
+                    } else {
+                        throw Error('黄灯之前肯定为红灯或绿灯');
+                    }
+                }
+            }
+            // 问询时调用该方法，获取当前灯的颜色和灯的剩余时间
+            getCurrent() {
+                let currentTime = new Date().getTime();
+                let remain = Math.ceil(this.duration - (currentTime - this.time) / 1000);
+                if (remain <= 0) {
+                    // 当前灯已走完，需要切换
+                    this.next();
+                    // remain需要重新计算，直至其为正数，递归！！！
+                    return this.getCurrent();
+                } else {
+                    // 当前灯还没有走完
+                    return {
+                        // 当前的颜色
+                        current: this.current,
+                        // 还剩多少秒切换
+                        remain: remain
+                    }
+                }
+            }
+        }
+
+        // 初始化为红灯，20s后切换为黄灯，3s后切换为绿灯，10s后切换为黄灯，3s后切换为红灯，循环往复。
+        const lamp = new Lamp({
+            red: 20,
+            green: 10,
+            yellow: 3,
+            color: 'red'
+        });
+
+        // requestAnimationFrame是JavaScript中的一个重要API，它主要用于创建高性能、流畅的动画效果。
+        // 每一帧调用一次
+        function raf() {
+            requestAnimationFrame(() => {
+                // 递归，调用60次，即60Hz
+                raf();
+                let obj = lamp.getCurrent();
+                // 将全部灯置灰
+                document.querySelectorAll('.lamp').forEach((item) => {
+                    item.setAttribute('class', 'lamp');
+                })
+                // 改变指定灯的颜色
+                document.getElementById(obj.current).classList.add(obj.current);
+                document.getElementById('time').innerHTML = obj.remain;
+                document.getElementById('time').style.color = obj.current;
+            })
+        }
+
+        raf();
+    </script>
+</head>
+
+<body>
+    <div class="overall">
+        <div id="red" class="lamp"></div>
+        <div id="yellow" class="lamp"></div>
+        <div id="green" class="lamp"></div>
+    </div>
+    <div id="time" class="time">00</div>
+</body>
+
+</html>
