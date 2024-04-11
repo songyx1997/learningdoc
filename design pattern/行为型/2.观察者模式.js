@@ -12,7 +12,7 @@ class Subject {
     }
     notify() {
         this.observers.forEach((item) => {
-            item.show();
+            item.show('the observer name is ');
         })
     }
 }
@@ -21,8 +21,8 @@ class Observer {
     constructor(name) {
         this.name = name;
     }
-    show() {
-        console.log(this.name);
+    show(prefix) {
+        console.log(prefix + this.name);
     }
 }
 
