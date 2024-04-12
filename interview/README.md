@@ -129,5 +129,28 @@ TCP连接是双向的，即全双工通信，因此关闭连接时需要独立�
 <div style="margin:0 auto;border:2px solid #42b883">
     <img src=".\数字证书的原理_2.png">
 </div>
+#### 浏览器渲染页面的过程？
+
+首先生成`DOM`树，通过`HTTP`请求获取到页面的内容**(字节格式)**，浏览器将其翻译为`HTML`文本。之后解析，将其转换为`token`，再转换为`DOM`节点，最后用节点生成`DOM`树。
+
+tips：`mustache`模板引擎也是类似的方式，技术都是互通的！
+
+<div style="margin:0 auto;border:2px solid #42b883">
+    <img src=".\生成DOM树.png">
+</div>
+
+当解析`HTML`时，遇到`<link href="./style.css" rel="stylesheet">`，就会去生成`CSSOM`树，该过程与`DOM`树的生成基本一致。
+
+当`DOM`树与`CSSOM`树生成完毕后，二者结合生成`渲染树`。因此`CSS`阻塞`HTML`解析是指`CSSOM`阻塞渲染树的生成。
+
+渲染树生成完毕后，页面仍然为空。浏览器需要根据每个元素的盒子模型，进行`布局`。
+
+浏览器把渲染树，进行像素`绘制`。
+
+需要注意的是，`HTML`解析时，当遇到引入外部`js`文件时，若未设置`async(异步)`或`defer(推迟)`，则`js`会直接阻塞`HTML`解析，只有当`js`完全解析完，`HTML`才会继续解析，才能生成`DOM`树。
+
+<div style="margin:0 auto;border:2px solid #42b883">
+    <img src=".\浏览器渲染_未设置异步js.png">
+</div>
 
 #### 使用defer优化白屏时间？
