@@ -7,7 +7,6 @@
     <title>11.交通灯问题</title>
     <style>
         .overall {
-            margin-top: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,14 +16,13 @@
             background-color: #e5e5e5;
             width: 80px;
             height: 80px;
-            margin-right: 20px;
+            margin: 30px 10px;
             border-radius: 50%;
         }
 
         .time {
             font-size: 48px;
             font-weight: 500;
-            margin-top: 20px;
             text-align: center;
         }
 
@@ -85,6 +83,7 @@
                 } else {
                     // 当前灯还没有走完
                     return {
+                        pre: this.pre,
                         // 当前的颜色
                         current: this.current,
                         // 还剩多少秒切换
@@ -109,10 +108,10 @@
                 // 递归，调用60次，即60Hz
                 raf();
                 let obj = lamp.getCurrent();
-                // 将全部灯置灰
-                document.querySelectorAll('.lamp').forEach((item) => {
-                    item.setAttribute('class', 'lamp');
-                })
+                // 将先前的灯置灰
+                if (obj.pre) {
+                    document.getElementById(obj.pre).setAttribute('class', 'lamp');
+                }
                 // 改变指定灯的颜色
                 document.getElementById(obj.current).classList.add(obj.current);
                 document.getElementById('time').innerHTML = obj.remain;

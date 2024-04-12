@@ -1,17 +1,14 @@
 /* 给定一个字符串s，请你找出其中不含有重复字符的最长子串的长度。
 核心思想：利用滑动窗口。 */
-const lengthOfLongestSubstring = function (str) {
+let lengthOfLongestSubstring = function (str) {
     let window = [];
     let max = 0;
     for (const s of str) {
         let index = window.indexOf(s);
-        if (index == -1) {
-            window.push(s);
-        } else {
+        if (index != -1) {
             window = window.slice(index + 1);
-            window.push(s);
         }
-        console.log(window);
+        window.push(s);
         if (max < window.length) {
             max = window.length
         }
