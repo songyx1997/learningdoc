@@ -102,6 +102,27 @@ myReadFile('./README.m').then(onResolved).catch(onRejected);
 <div style="margin:0 auto">
     <img src=".\promiseAll.png">
 </div>
+使用该方法，在某些场景下可以进行代码优化
+
+```js
+// execute的执行依赖于异步方法funA、funB、funC的值
+// 该方法执行时，funA、funB、funC依次执行，变成了同步
+async function execute() {
+    let a = await funA();
+    let b = await funB();
+    let c = await funC();
+    return a + b + c;
+}
+execute();
+
+// 使用promiseAll进行上述代码的优化
+async function newExecute() {
+    // funA、funB、funC同时执行
+    let result = await Promise.all([funA(), funB(), funC()])
+    return result[0] + result[1] + result[2];
+}
+newExecute();
+```
 
 ##### Promise.race
 
