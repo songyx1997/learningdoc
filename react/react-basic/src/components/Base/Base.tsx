@@ -32,7 +32,7 @@ function Base() {
 
     ]
     let flag = 1;
-    const change = function (flag) {
+    const change = function (flag: number) {
         switch (flag) {
             case 0:
                 return <span>为0</span>;
@@ -43,13 +43,13 @@ function Base() {
         }
     }
     // 三种定义方式均可
-    function baseEvent(e) {
+    function baseEvent(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         console.log('基础绑定，输出事件对象（可选）', e);
     }
-    const printParam = function (param) {
+    const printParam = function (param: string) {
         console.log('输出参数', param);
     }
-    const printParamAndEvent = (param, e) => {
+    const printParamAndEvent = (param: string, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         console.log('输出参数和事件', param, e);
     }
 

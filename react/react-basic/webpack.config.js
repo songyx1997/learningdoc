@@ -2,7 +2,7 @@ const path = require('path');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/index.tsx',
   output: {
     // 开发模式没有输出
     path: undefined,
@@ -12,7 +12,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(ts|js)x?$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
         options: {
@@ -74,7 +74,7 @@ module.exports = {
       '@': path.resolve(__dirname, './src')
     },
     // 设置引用模块（设置哪些文件可以作为模块使用）
-    extensions: ['.js', '.jsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
   mode: 'development',
   // 仅提供列映射
