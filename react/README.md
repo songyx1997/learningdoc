@@ -101,3 +101,94 @@ function App() {
     );
 }
 ```
+
+#### 事件绑定
+
+```jsx
+function Base() {
+    // 三种定义方式均可
+    function baseEvent(e) {
+        console.log('基础绑定，输出事件对象（可选）', e);
+    }
+    const printParam = function (param) {
+        console.log('输出参数', param);
+    }
+    const printParamAndEvent = (param, e) => {
+        console.log('输出参数和事件', param, e);
+    }
+
+    return (
+        <div>
+            <p>事件绑定，基本遵循驼峰式命名</p>
+            <div>
+                <button onClick={baseEvent}>基础绑定，输出事件对象（可选）</button>
+                <button onClick={() => printParam('param')}>输出参数</button>
+                <button onClick={(e) => printParamAndEvent('param', e)}>输出参数和事件</button>
+            </div>
+        </div>
+    );
+}
+
+export default Base;
+```
+
+#### 组件
+
+`React`中的组件，就是首字母大写的函数。
+
+仅在单个组件内部使用的辅助函数或计算逻辑，可以在组件内部定义，以保持组件的**封装性**和**独立性**。
+
+#### useState
+
+`useState` 是一个`React`内置`hook`，可让你将**状态变量**添加到组件中。
+
+当修改局部变量时，存在两个问题：
+
+1. 局部变量不会在渲染之间持续存在。当`React`第二次渲染此组件时，它会从头开始渲染。
+2. 对局部变量的更改不会触发渲染，`React`没有意识到需要用新数据再次渲染组件。
+
+```jsx
+// state解决第一个问题、setState解决第二个问题。
+const [state, setState] = useState(initialState)
+```
+
+```jsx
+import React, { useState } from 'react';
+
+function Base() {
+    // 根据React的Hook规则，Hooks只能在函数组件的顶层或者自定义Hook中调用
+    // 数组的解构赋值
+    const [hobby, setHobby] = useState([
+        { id: 1000, text: '骑车' },
+        { id: 1001, text: '健身' }
+    ]);
+    function addDirect() {
+        // 局部变量变化，但是页面渲染不变
+        hobby.push({ id: 1002, text: '徒步' });
+        console.log(hobby);
+    }
+    function addBySet() {
+        let tmp = [...hobby, { id: 1002, text: '徒步' }];
+        // 状态的行为类似于快照。更新状态，则执行渲染。
+        // hobby仍然为旧值（注意：并不是不变，而且为旧值！）
+        setHobby(tmp);
+        console.log(hobby);
+    }
+
+    return (
+        <div>
+            <ul>
+                {hobby.map(function (item) {
+                    return <li key={item.id}>{item.text}</li>
+                })}
+            </ul>
+            <div>
+                <button onClick={addDirect}>直接添加</button>
+                <button onClick={addBySet}>借助set添加</button>
+            </div>
+        </div>
+    );
+}
+
+export default Base;
+```
