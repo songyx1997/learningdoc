@@ -3,7 +3,7 @@
     // **表示任意目录
     // *表示任意文件
     "include": [
-        "src"
+        "src/**/*"
     ],
     // 默认值包括node_modules
     "exclude": [],

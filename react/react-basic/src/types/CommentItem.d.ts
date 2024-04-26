@@ -1,4 +1,4 @@
-export interface CommentItem {
+interface CommentItemEntity {
   /**
    * 主键
    */
@@ -24,3 +24,5 @@ export interface CommentItem {
    */
   praiseNum: number;
 }
+
+export { CommentItemEntity };

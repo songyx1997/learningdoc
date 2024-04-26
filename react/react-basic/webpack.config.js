@@ -1,13 +1,24 @@
 const path = require('path');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
   entry: './src/index.tsx',
   output: {
-    // 开发模式没有输出
-    path: undefined,
-    filename: 'static/js/[name].js',
-    chunkFilename: 'static/js/[name].chunk.js'
+    path: isProduction ? path.resolve(__dirname, './dist') : undefined,
+    filename: `static/js/[name]${isProduction ? '.[contenthash:8]' : ''}.js`,
+    chunkFilename: `static/js/[name].chunk${isProduction ? '.[contenthash:8]' : ''}.js`,
+    // 在打包前，将path整个目录清空，再进行打包
+    clean: true,
+    environment: {
+      // 编译结果不使用箭头函数
+      arrowFunction: false
+    }
   },
   module: {
     rules: [
@@ -55,10 +66,34 @@ module.exports = {
     new HTMLWebpackPlugin({
       // 使用public下的模板文件，保持DOM结构一致，同时自动引入js
       template: path.resolve(__dirname, './public/index.html')
-    })
-  ],
+    }),
+    isProduction && new MiniCssExtractPlugin({
+      // 指定文件名和路径
+      filename: 'static/css/[name].[contenthash:8].css',
+      chunkFilename: 'static/css/[name].chunk.[contenthash:8].css',
+    }),
+    isProduction && new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, './public'),
+          to: path.resolve(__dirname, './dist'),
+          globOptions: {
+            // 忽略index.html文件
+            ignore: ['**/index.html'],
+          },
+        },
+      ],
+    }),
+  ].filter(Boolean),
   // 压缩
   optimization: {
+    minimize: isProduction,
+    minimizer: [
+      // css压缩插件
+      new CssMinimizerPlugin(),
+      // webpack5内置js压缩操作
+      new TerserPlugin()
+    ],
     // 代码分割
     splitChunks: {
       chunks: 'all'
@@ -74,11 +109,10 @@ module.exports = {
       '@': path.resolve(__dirname, './src')
     },
     // 设置引用模块（设置哪些文件可以作为模块使用）
-    extensions: ['.ts', '.tsx', '.js', '.jsx']
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.less']
   },
-  mode: 'development',
-  // 仅提供列映射
-  devtool: 'cheap-module-source-map',
+  mode: process.env.NODE_ENV,
+  devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
   devServer: {
     host: 'localhost',
     port: '80',
@@ -92,8 +126,16 @@ module.exports = {
  */
 function getStyleLoaders(loaders) {
   let defaultLoaders = [
-    'style-loader',
-    'css-loader',
+    isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
+    {
+      loader: 'css-loader',
+      options: {
+        modules: {
+          // 自定义类名生成规则
+          localIdentName: '[path][name]__[local]--[hash:base64:5]',
+        }
+      },
+    },
     {
       // 配合package.json中的browserslist，指定兼容性
       loader: 'postcss-loader',
