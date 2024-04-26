@@ -1,12 +1,12 @@
 import React from 'react';
-import Base from '@/components/Base/Base';
+import Comment from '@/pages/Comment/Comment';
 
 function App() {
-    return (
-        <div>
-            <Base />
-        </div>
-    );
+  return (
+    <div>
+      <Comment />
+    </div>
+  );
 }
 
 export default App;

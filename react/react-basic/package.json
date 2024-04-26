@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx webpack serve --open"
+    "start": "npx webpack serve --open",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,less}\""
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -22,8 +23,10 @@
     "core-js": "^3.36.0",
     "css-loader": "^7.1.1",
     "html-webpack-plugin": "^5.6.0",
+    "less-loader": "^12.2.0",
     "postcss-loader": "^8.1.1",
     "postcss-preset-env": "^9.5.9",
+    "prettier": "^3.2.5",
     "style-loader": "^4.0.0",
     "typescript": "^5.4.5",
     "webpack": "^5.90.3",
