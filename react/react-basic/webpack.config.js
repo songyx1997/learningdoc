@@ -132,7 +132,7 @@ function getStyleLoaders(loaders) {
       options: {
         modules: {
           // 自定义类名生成规则
-          localIdentName: '[path][name]__[local]--[hash:base64:5]',
+          localIdentName: '[local]-[hash:base64:8]',
         }
       },
     },
