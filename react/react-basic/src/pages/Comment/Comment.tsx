@@ -1,28 +1,86 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CommentItem from '@/components/CommentItem/CommentItem';
 import { CommentItemEntity } from '@/types/CommentItem';
+import * as styles from './Comment.module.less';
+import dayjs from 'dayjs';
+
+/**
+ * 排序方式：true-按照点赞数排序、false-按照发布时间排序
+ * 必须声明在组件方法外
+ */
+let sortType = true;
 
 function Comment() {
-  const comments: Array<CommentItemEntity> = [
-    {
-      id: '1000',
-      name: '拜森',
-      level: 6,
-      context: '这是一条评论',
-      time: '2024-01-01 00:00:00',
-      praiseNum: 100,
-    },
-  ];
+  const [comments, setComments] = useState(new Array<CommentItemEntity>());
+
+  function publicComment() {
+    let input = document.getElementById('newComment') as HTMLInputElement;
+    if (input.value && input.value.trim()) {
+      let context = input.value.trim();
+      let time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+      let comment = {
+        id: Math.floor(Math.random() * 10000001), name: '拜森', level: Math.floor(Math.random() * 6) + 1, context, time, praiseNum: Math.floor(Math.random() * 1001)
+      }
+      if (sortType) {
+        sortByPraiseNum([...comments, comment]);
+      } else {
+        sortByTime([...comments, comment]);
+      }
+      input.value = '';
+    } else {
+      alert('请输入评论！');
+    }
+  }
+
+  /**
+   * 根据点赞数降序 
+   */
+  function sortByPraiseNum(array?: Array<CommentItemEntity>) {
+    if (array) {
+      setComments(array.sort((a, b) => b.praiseNum - a.praiseNum));
+    } else {
+      setComments([...comments].sort((a, b) => b.praiseNum - a.praiseNum));
+    }
+    sortType = true;
+  }
+
+
+  /**
+   * 根据发布时间降序 
+   */
+  function sortByTime(array?: Array<CommentItemEntity>) {
+    if (array) {
+      setComments(array.sort((a, b) => dayjs(b.time).valueOf() - dayjs(a.time).valueOf()));
+    } else {
+      setComments([...comments].sort((a, b) => dayjs(b.time).valueOf() - dayjs(a.time).valueOf()));
+    }
+    sortType = false;
+  }
+
   return (
-    <ul>
-      {comments.map(function (item: CommentItemEntity) {
-        return (
-          <li key={item.id}>
-            <CommentItem item={item} />
-          </li>
-        );
-      })}
-    </ul>
+    <div className={styles.commentOverall}>
+      <div className={styles.commentTitle}>
+        <div>评论</div>
+        <div>{comments.length}</div>
+        <a onClick={() => sortByPraiseNum()}>最热</a>
+        <div>|</div>
+        <a onClick={() => sortByTime()}>最新</a>
+      </div>
+      <div className={styles.commentInput}>
+        <img src='/images/portrait.jpg' alt='头像' />
+        <input id='newComment' autoComplete='off' placeholder='这里需要一条查重率0%的评论' />
+        <button onClick={publicComment}>发布</button>
+      </div>
+      <ul>
+        {comments.map(function (item: CommentItemEntity) {
+          return (
+            <li key={item.id}>
+              <CommentItem item={item} />
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 

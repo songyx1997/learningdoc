@@ -1,12 +1,12 @@
 @import '@/styles/less/method.less';
 @import '@/styles/less/theme-colors.less';
 
-.commentOverall {
+.commentItemOverall {
   display: flex;
   margin: 22px 16px;
 }
 
-.commentPortrait {
+.commentItemPortrait {
   img {
     width: 48px;
     border-radius: 50%;
@@ -14,7 +14,7 @@
   }
 }
 
-.commentBody {
+.commentItemBody {
   flex: 1;
 
   &::after {
@@ -25,7 +25,7 @@
     display: inline-block;
   }
 
-  .commentUser {
+  .commentItemUser {
     display: flex;
     align-items: center;
 
@@ -40,12 +40,12 @@
     }
   }
 
-  .commentContext {
+  .commentItemContext {
     .font(16px, 400, @base-dark);
     margin-top: 14px;
   }
 
-  .commentAction {
+  .commentItemAction {
     .font(14px, 400, @base-grey);
     display: flex;
     align-items: center;
@@ -55,8 +55,16 @@
       margin-right: 20px;
     }
 
+    &>div:nth-of-type(2) {
+      flex: 1;
+    }
+
     &>div:nth-of-type(3) {
       cursor: pointer;
+
+      &:hover {
+        color: @base-red;
+      }
     }
   }
 }

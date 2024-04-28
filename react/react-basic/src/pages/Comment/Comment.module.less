@@ -1,0 +1,70 @@
+@import '@/styles/less/method.less';
+@import '@/styles/less/theme-colors.less';
+
+.commentOverall {
+    margin: 20px 20px 0;
+
+    .commentTitle {
+        display: flex;
+        align-items: center;
+
+        &>div:nth-of-type(1) {
+            .font(24px, 500, @base-dark);
+        }
+
+        &>div:nth-of-type(2) {
+            margin: 0 36px 0 6px;
+            .font(14px, 500, @base-grey);
+        }
+
+        &>div:nth-of-type(3) {
+            color: @base-grey
+        }
+
+        a {
+            .font(16px, 400, @base-grey);
+            cursor: pointer;
+
+            &:hover {
+                color: @base-blue;
+            }
+        }
+
+        &>a:nth-of-type(1) {
+            margin-right: 10px;
+        }
+
+        &>a:nth-of-type(2) {
+            margin-left: 10px;
+        }
+    }
+
+    .commentInput {
+        margin: 22px 16px 40px;
+        display: flex;
+
+        img {
+            width: 48px;
+            border-radius: 50%;
+            margin-right: 16px;
+        }
+
+        input {
+            flex: 1;
+            border-radius: 5px;
+            border: 1px solid @base-grey;
+            background-color: @base-lightgrey;
+            padding: 0 8px;
+        }
+
+        button {
+            width: 80px;
+            border: none;
+            border-radius: 5px;
+            background-color: @base-blue;
+            margin-left: 10px;
+            .font(16px, 900, @base-white);
+            cursor: pointer;
+        }
+    }
+}
