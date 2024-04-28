@@ -2,7 +2,7 @@ import React from 'react';
 import { CommentItemEntity } from '@/types/CommentItem';
 import * as styles from './CommentItem.module.less';
 
-function Component(props: { item: CommentItemEntity }) {
+function Component(props: { item: CommentItemEntity; onDelete: Function }) {
   const item = props.item;
 
   return (
@@ -24,7 +24,7 @@ function Component(props: { item: CommentItemEntity }) {
         <div className={styles.commentItemAction}>
           <div>{item.time}</div>
           <div>点赞数：{item.praiseNum}</div>
-          <div>删除</div>
+          <div onClick={() => props.onDelete()}>删除</div>
         </div>
       </div>
     </div>

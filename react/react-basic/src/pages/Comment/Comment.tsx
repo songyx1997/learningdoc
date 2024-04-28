@@ -71,14 +71,31 @@ function Comment() {
     sortType = false;
   }
 
+  /**
+   * 删除评论
+   */
+  function deleteById(id: number) {
+    setComments([...comments].filter((item) => item.id !== id));
+  }
+
   return (
     <div className={styles.commentOverall}>
       <div className={styles.commentTitle}>
         <div>评论</div>
         <div>{comments.length}</div>
-        <a onClick={() => sortByPraiseNum()}>最热</a>
+        <a
+          className={sortType ? styles.commentLinkActive : undefined}
+          onClick={() => sortByPraiseNum()}
+        >
+          最热
+        </a>
         <div>|</div>
-        <a onClick={() => sortByTime()}>最新</a>
+        <a
+          className={sortType ? undefined : styles.commentLinkActive}
+          onClick={() => sortByTime()}
+        >
+          最新
+        </a>
       </div>
       <div className={styles.commentInput}>
         <img src='/images/portrait.jpg' alt='头像' />
@@ -93,7 +110,7 @@ function Comment() {
         {comments.map(function (item: CommentItemEntity) {
           return (
             <li key={item.id}>
-              <CommentItem item={item} />
+              <CommentItem item={item} onDelete={() => deleteById(item.id)} />
             </li>
           );
         })}
