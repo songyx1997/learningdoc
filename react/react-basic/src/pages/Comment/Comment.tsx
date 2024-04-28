@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
  * 必须声明在组件方法外
  */
 let sortType = true;
+let id = 1000;
 
 function Comment() {
   const [comments, setComments] = useState(new Array<CommentItemEntity>());
@@ -18,9 +19,17 @@ function Comment() {
     if (input.value && input.value.trim()) {
       let context = input.value.trim();
       let time = dayjs().format('YYYY-MM-DD HH:mm:ss');
-      let comment = {
-        id: Math.floor(Math.random() * 10000001), name: '拜森', level: Math.floor(Math.random() * 6) + 1, context, time, praiseNum: Math.floor(Math.random() * 1001)
+      if (comments.length !== 0) {
+        id++;
       }
+      let comment = {
+        id,
+        name: '拜森',
+        level: Math.floor(Math.random() * 6) + 1,
+        context,
+        time,
+        praiseNum: Math.floor(Math.random() * 1001),
+      };
       if (sortType) {
         sortByPraiseNum([...comments, comment]);
       } else {
@@ -33,7 +42,7 @@ function Comment() {
   }
 
   /**
-   * 根据点赞数降序 
+   * 根据点赞数降序
    */
   function sortByPraiseNum(array?: Array<CommentItemEntity>) {
     if (array) {
@@ -44,15 +53,20 @@ function Comment() {
     sortType = true;
   }
 
-
   /**
-   * 根据发布时间降序 
+   * 根据发布时间降序
    */
   function sortByTime(array?: Array<CommentItemEntity>) {
     if (array) {
-      setComments(array.sort((a, b) => dayjs(b.time).valueOf() - dayjs(a.time).valueOf()));
+      setComments(
+        array.sort((a, b) => dayjs(b.time).valueOf() - dayjs(a.time).valueOf()),
+      );
     } else {
-      setComments([...comments].sort((a, b) => dayjs(b.time).valueOf() - dayjs(a.time).valueOf()));
+      setComments(
+        [...comments].sort(
+          (a, b) => dayjs(b.time).valueOf() - dayjs(a.time).valueOf(),
+        ),
+      );
     }
     sortType = false;
   }
@@ -68,7 +82,11 @@ function Comment() {
       </div>
       <div className={styles.commentInput}>
         <img src='/images/portrait.jpg' alt='头像' />
-        <input id='newComment' autoComplete='off' placeholder='这里需要一条查重率0%的评论' />
+        <input
+          id='newComment'
+          autoComplete='off'
+          placeholder='这里需要一条查重率0%的评论'
+        />
         <button onClick={publicComment}>发布</button>
       </div>
       <ul>
