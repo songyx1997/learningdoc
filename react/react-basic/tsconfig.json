@@ -3,13 +3,13 @@
     // **表示任意目录
     // *表示任意文件
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "global.d.ts"
     ],
     // 默认值包括node_modules
     "exclude": [],
     // 编译器选项
     "compilerOptions": {
-        // 重要！！
         "jsx": "react",
         "moduleResolution": "node",
         // 允许进行默认导入

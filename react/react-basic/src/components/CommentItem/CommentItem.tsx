@@ -1,12 +1,12 @@
 import React from 'react';
 import { CommentItemEntity } from '@/types/CommentItem';
-// import styles from './CommentItem.module.less';
+import * as styles from './CommentItem.module.less';
 
 function Component(props: { item: CommentItemEntity }) {
   const item = props.item;
 
   return (
-    <div>
+    <div className={styles.commentOverall}>
       {/* 头像 */}
       <div>
         <img src='/images/portrait.jpg' alt='头像' />
