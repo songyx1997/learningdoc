@@ -8,3 +8,10 @@ declare module '*.less' {
     const classes: ClassNames;
     export = classes;
 }
+
+/**
+ * 解决TypeScript编译器无法找到对应模块的类型定义
+ */
+declare module 'uuid' {
+    export function v4(): string;
+}

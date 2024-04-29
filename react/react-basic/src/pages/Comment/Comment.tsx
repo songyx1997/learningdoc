@@ -1,29 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import CommentItem from '@/components/CommentItem/CommentItem';
 import { CommentItemEntity } from '@/types/CommentItem';
 import * as styles from './Comment.module.less';
 import dayjs from 'dayjs';
+import classNames from 'classnames';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * 排序方式：true-按照点赞数排序、false-按照发布时间排序
  * 必须声明在组件方法外
  */
 let sortType = true;
-let id = 1000;
 
 function Comment() {
   const [comments, setComments] = useState(new Array<CommentItemEntity>());
+  // 创建ref对象，以绑定至DOM，初始值为null
+  // 指定类型为HTMLInputElement，避免ts报错
+  const commentRef = useRef<HTMLInputElement>(null);
 
   function publicComment() {
-    let input = document.getElementById('newComment') as HTMLInputElement;
-    if (input.value && input.value.trim()) {
+    let input = commentRef.current;
+    if (input && input.value && input.value.trim()) {
       let context = input.value.trim();
       let time = dayjs().format('YYYY-MM-DD HH:mm:ss');
-      if (comments.length !== 0) {
-        id++;
-      }
       let comment = {
-        id,
+        id: uuidv4(),
         name: '拜森',
         level: Math.floor(Math.random() * 6) + 1,
         context,
@@ -74,7 +75,7 @@ function Comment() {
   /**
    * 删除评论
    */
-  function deleteById(id: number) {
+  function deleteById(id: string) {
     setComments([...comments].filter((item) => item.id !== id));
   }
 
@@ -84,14 +85,14 @@ function Comment() {
         <div>评论</div>
         <div>{comments.length}</div>
         <a
-          className={sortType ? styles.commentLinkActive : undefined}
+          className={classNames({ [styles.commentLinkActive]: sortType })}
           onClick={() => sortByPraiseNum()}
         >
           最热
         </a>
         <div>|</div>
         <a
-          className={sortType ? undefined : styles.commentLinkActive}
+          className={classNames({ [styles.commentLinkActive]: !sortType })}
           onClick={() => sortByTime()}
         >
           最新
@@ -100,7 +101,7 @@ function Comment() {
       <div className={styles.commentInput}>
         <img src='/images/portrait.jpg' alt='头像' />
         <input
-          id='newComment'
+          ref={commentRef}
           autoComplete='off'
           placeholder='这里需要一条查重率0%的评论'
         />

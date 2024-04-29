@@ -192,3 +192,142 @@ function Base() {
 
 export default Base;
 ```
+
+#### classnames
+
+一个`JS`库，通过条件动态控制`class`类名。
+
+```shell
+npm install classnames
+```
+
+```tsx
+import classNames from 'classnames';
+
+const buttonClass = classNames(
+  // 基础类名
+  'button',
+  // 如果isActive为true，则添加'button--active'类
+  { 'button--active': isActive }
+);
+```
+
+`classnames`也可以和`css module`结合，写法上有所变化。
+
+```tsx
+<a
+  className={classNames({ [styles.commentLinkActive]: sortType })}
+  onClick={() => sortByPraiseNum()}
+/>
+```
+
+#### 受控表单绑定
+
+类似于`Vue`中的双向绑定，但实现方式略有不同。
+
+```tsx
+import React, { useState } from 'react';
+
+function Base() {
+  const [address, setAddress] = useState('成都');
+
+  return (
+    <div>
+      <div>当前所在地：{address}</div>
+      <div><input value={address} onChange={(e) => setAddress(e.target.value)} /></div>
+    </div>
+  );
+}
+
+export default Base;
+```
+
+#### 获取DOM
+
+借助于钩子函数`useRef`，给`DOM`节点添加标记，建立起隔离，和`Vue3`中的`ref`是非常相似的。
+
+```tsx
+import React, { useRef } from 'react';
+
+function Comment() {
+  // 创建ref对象，以绑定至DOM，初始值为null
+  // 指定类型为HTMLInputElement，避免ts报错
+  const commentRef = useRef<HTMLInputElement>(null);
+
+  function publicComment() {
+    let input = commentRef.current;
+    if (input && input.value && input.value.trim()) {
+      // ...
+    }
+  }
+
+  return (
+    <div>
+      <input ref={commentRef} />
+    </div>
+  );
+}
+
+export default Comment;
+```
+
+#### 组件通信
+
+##### 父传子
+
+`props`可以传递任意类型的数据：数字、字符串、布尔值、数组、对象、函数、`JSX`。
+
+```tsx
+{/* 父组件 */}
+<CommentItem item={item} tips={<span>测试</span>} />
+```
+
+```tsx
+// 子组件
+function Component(props: { item: CommentItemEntity; tips: ReactElement }) {
+  return <div>{props.tips}</div>;
+}
+```
+
+上述实现，也可以借助`props.children`属性，与`Vue`的默认插槽很像。
+
+```tsx
+{/* 父组件 */}
+<CommentItem item={item}>
+  <span>测试</span>
+</CommentItem>
+```
+
+```tsx
+// 子组件
+function Component(props: { item: CommentItemEntity; children: ReactElement }) {
+  return <div>{props.children}</div>;
+}
+```
+
+和`Vue`中一样，`props`是只读的，通信是单向的。
+
+##### 子传父
+
+核心思路：在子组件中调用父组件中的函数，并将子组件中的数据作为入参。
+
+```tsx
+// 父组件
+function getComments(comments: Array<string>) {
+  console.log('子组件包括以下评论', comments);
+}
+
+function Comment() {
+  // 传递方法
+  return <CommentItem onGetComments={getComments} />;
+}
+```
+
+```tsx
+// 子组件
+const comments = ['text'];
+function Component(props: { onGetComments: Function }) {
+  // 调用，入参
+  return <div onClick={() => props.onGetComments({ comments })}>获取</div>;
+}
+```

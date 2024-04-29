@@ -54,6 +54,7 @@ function Base() {
   ) => {
     console.log('输出参数和事件', param, e);
   };
+  const [address, setAddress] = useState('成都');
 
   return (
     <div>
@@ -100,6 +101,11 @@ function Base() {
       <div>
         <button onClick={addDirect}>直接添加</button>
         <button onClick={addBySet}>借助set添加</button>
+      </div>
+      <p>受控表单绑定</p>
+      <div>当前所在地：{address}</div>
+      <div>
+        <input value={address} onChange={(e) => setAddress(e.target.value)} />
       </div>
     </div>
   );

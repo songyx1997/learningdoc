@@ -2,7 +2,7 @@ interface CommentItemEntity {
   /**
    * 主键
    */
-  id: number;
+  id: string;
   /**
    * 昵称
    */
