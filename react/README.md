@@ -401,7 +401,7 @@ function Component(props: { dataFromA: string }) {
     <img src=".\状态提升.png">
 </div>
 
-##### context-跨层传递
+##### 跨层传递
 
 实现思路包括三步。
 
@@ -447,3 +447,26 @@ function B() {
 
 export default B;
 ```
+
+#### useEffect
+
+基于渲染本身引起的操作，而不是事件触发。
+
+```typescript
+useEffect(setup, dependencies?)
+```
+
+`setup`的执行，由`dependencies`决定。
+
+| 序号 | `dependencies`    | `setup`                                   | 类比`Vue2`               |
+| ---- | ----------------- | ----------------------------------------- | ------------------------ |
+| 1    | 未输入            | 初始化、组件刷新时                        | `mounted`和`updated`结合 |
+| 2    | `[]`              | 仅初始化时                                | `mounted`                |
+| 3    | `[id, productId]` | 初始化、仅`id`或`productId`导致组件刷新时 | `mounted`和`watch`结合   |
+
+场景举例：
+
+- 监听浏览器全局事件，如实现图片懒加载，使用`2`。
+- 获取外部数据，且当某个条件变化时，再次请求最新数据，使用`3`。
+
+`useEffect`可以指定返回值，其返回值为一个回调，该回调在组件**销毁**时调用，类似于`Vue2`中的`beforeDestroy`。

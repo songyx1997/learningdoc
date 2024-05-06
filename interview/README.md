@@ -168,5 +168,85 @@ tips：`mustache`模板引擎也是类似的方式，技术都是互通的！
 <div style="margin:0 auto;border:2px solid #42b883">
     <img src=".\async和defer.png">
 </div>
-
 #### 图片懒加载？
+
+##### 计算高度差
+
+比较元素相对于视口顶部的距离`el.getBoundingClientRect().top`、视口高度`window.innerHeight`的大小。若前者小于后者，说明图片进入视口，将`data-src`修改为`src`。
+
+```less
+// Base.module.less
+.baseBackground {
+  // 将高度填满，便于计算元素位置
+  height: 400px;
+  border-radius: 5px;
+}
+
+.baseImg {
+  height: 300px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+```
+
+```tsx
+import React, { useEffect } from 'react';
+import * as styles from './Base.module.less';
+import throttle from '@/utils/throttle';
+
+function Base() {
+  // 组件初始化时，添加浏览器监听，因此依赖为空数组
+  useEffect(() => {
+    const images: HTMLImageElement[] = Array.from(
+      document.querySelectorAll('img[data-src]'),
+    );
+    function lazyLoad() {
+      images.forEach((img: HTMLImageElement) => {
+        // 元素相对于视口顶部的距离
+        let imgTop = img.getBoundingClientRect().top;
+        if (imgTop <= window.innerHeight) {
+          // 说明图片进入视口
+          let src = img.getAttribute('data-src');
+          if (src) {
+            img.setAttribute('src', src);
+            img.removeAttribute('data-src');
+          }
+        }
+      });
+    }
+    // 先调用一次。即初始化时，图片已位于视口中
+    lazyLoad();
+    // 使用节流
+    const throttledLazyLoad = throttle(lazyLoad, 150);
+    window.addEventListener('scroll', throttledLazyLoad);
+    return () => {
+      // 组件销毁时，移除事件监听
+      window.removeEventListener('scroll', throttledLazyLoad);
+    };
+  }, []);
+
+  return (
+    <div>
+      <div>
+        <img
+          className={styles.baseBackground}
+          data-src='/images/background.png'
+        />
+      </div>
+      <div>
+        <img className={styles.baseImg} data-src='/images/portrait.jpg' />
+      </div>
+    </div>
+  );
+}
+
+export default Base;
+```
+
+缺点：即使使用了节流，浏览器滚动时，仍然会触发事件，造成资源浪费。
+
+##### IntersectionObserver
+
+`intersection`意为交叉点。
+
+在`Can I use`中，`96.92%`的浏览器支持该`API`，注意`IE`完全不支持。

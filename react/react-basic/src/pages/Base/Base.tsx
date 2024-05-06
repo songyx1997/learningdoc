@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as styles from './Base.module.less';
+import throttle from '@/utils/throttle';
 
 function Base() {
   // 根据React的Hook规则，Hooks只能在函数组件的顶层或者自定义Hook中调用
@@ -56,6 +57,36 @@ function Base() {
     console.log('输出参数和事件', param, e);
   };
   const [address, setAddress] = useState('成都');
+  // 组件初始化时，添加浏览器监听，因此依赖为空数组
+  useEffect(() => {
+    const images: HTMLImageElement[] = Array.from(
+      document.querySelectorAll('img[data-src]'),
+    );
+    function lazyLoad() {
+      images.forEach((img: HTMLImageElement) => {
+        // 元素相对于视口顶部的距离
+        let imgTop = img.getBoundingClientRect().top;
+        if (imgTop <= window.innerHeight) {
+          // 说明图片进入视口
+          let src = img.getAttribute('data-src');
+          if (src) {
+            img.setAttribute('src', src);
+            img.removeAttribute('data-src');
+          }
+        }
+      });
+      console.log('被调用了');
+    }
+    // 先调用一次。即初始化时，图片已位于视口中
+    lazyLoad();
+    // 使用节流
+    const throttledLazyLoad = throttle(lazyLoad, 150);
+    window.addEventListener('scroll', throttledLazyLoad);
+    return () => {
+      // 组件销毁时，移除事件监听
+      window.removeEventListener('scroll', throttledLazyLoad);
+    };
+  }, []);
 
   return (
     <div>
@@ -110,10 +141,13 @@ function Base() {
       </div>
       <p>图片懒加载</p>
       <div>
-        <img className={styles.baseImg} data-src='/images/portrait.jpg' />
+        <img
+          className={styles.baseBackground}
+          data-src='/images/background.png'
+        />
       </div>
       <div>
-        <img className={styles.baseBackground} data-src='/images/background.png' />
+        <img className={styles.baseImg} data-src='/images/portrait.jpg' />
       </div>
     </div>
   );
