@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import * as styles from './Base.module.less';
 
 function Base() {
   // 根据React的Hook规则，Hooks只能在函数组件的顶层或者自定义Hook中调用
@@ -106,6 +107,13 @@ function Base() {
       <div>当前所在地：{address}</div>
       <div>
         <input value={address} onChange={(e) => setAddress(e.target.value)} />
+      </div>
+      <p>图片懒加载</p>
+      <div>
+        <img className={styles.baseImg} data-src='/images/portrait.jpg' />
+      </div>
+      <div>
+        <img className={styles.baseBackground} data-src='/images/background.png' />
       </div>
     </div>
   );

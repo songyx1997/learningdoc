@@ -168,3 +168,5 @@ tips：`mustache`模板引擎也是类似的方式，技术都是互通的！
 <div style="margin:0 auto;border:2px solid #42b883">
     <img src=".\async和defer.png">
 </div>
+
+#### 图片懒加载？
