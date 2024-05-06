@@ -331,3 +331,119 @@ function Component(props: { onGetComments: Function }) {
   return <div onClick={() => props.onGetComments({ comments })}>获取</div>;
 }
 ```
+
+##### 状态提升
+
+核心思路：借助共同的父组件，实现兄弟之间的通信。
+
+兄弟组件`A`。
+
+```tsx
+// onGetText为父组件的方法
+// 将A组件内部的数据作为入参，实现子传父
+function Component(props: { onGetText: Function }) {
+  const [text, setText] = useState('初始数据');
+  function editText() {
+    setText(Math.random().toString());
+  }
+  return (
+    <div className={styles.aOverall}>
+      <p>A组件</p>
+      <div>
+        <button onClick={editText}>修改A组件内的数据</button>
+      </div>
+      <div>
+        <button onClick={() => props.onGetText(text)}>将A组件内的数据传输至B组件</button>
+      </div>
+    </div>
+  );
+}
+```
+
+父组件
+
+```tsx
+import A from '@/components/A/A';
+import B from '@/components/B/B';
+
+function Comment() {
+  const [dataFromA, setDataFromA] = useState('');
+  const getText = function (text: string) {
+    // 对A组件的数据进行管理
+    setDataFromA(text);
+  }
+  return (
+    <div className={styles.commentOverall}>
+      <A onGetText={getText} />
+      {/* 即使有多个B组件，并不影响 */}
+      <B dataFromA={dataFromA} />
+      <B dataFromA={dataFromA} />
+    </div>
+  );
+}
+```
+
+兄弟组件`B`。
+
+```tsx
+function Component(props: { dataFromA: string }) {
+  return (
+    <div className={styles.bOverall}>
+      <p>B组件</p>
+      {/* 展示A组件内的数据 */}
+      <p>来自A组件的数据为{props.dataFromA}</p>
+    </div>
+  );
+}
+```
+实现效果如下：
+<div style="border:2px solid #42b883">
+    <img src=".\状态提升.png">
+</div>
+
+##### context-跨层传递
+
+实现思路包括三步。
+
+顶层组件`APP`中，实现前两步。中间组件为`A`。底层组件为`B`，实现最后一步。
+
+```tsx
+import React, { createContext } from 'react';
+import A from './A';
+
+// 1.借助createContext创建上下文对象，并将其暴露出去，便于底层组件使用
+const msgContext = createContext('');
+export { msgContext };
+
+function App() {
+  let msg = '这是一条顶层信息';
+  return (
+    <div>
+      {/* 2.提供数据，并包裹中间组件A */}
+      <msgContext.Provider value={msg}>
+        <A />
+      </msgContext.Provider>
+    </div>
+  );
+}
+
+export default App;
+```
+
+```tsx
+import React, { useContext } from 'react';
+import { msgContext } from './App';
+
+function B() {
+    // 3.获取并使用上下文中的数据
+    let msgFromTop = useContext(msgContext);
+    return (
+        <div>
+            <p>B组件</p>
+            <div>顶层组件中的信息为：{msgFromTop}</div>
+        </div>
+    )
+}
+
+export default B;
+```
