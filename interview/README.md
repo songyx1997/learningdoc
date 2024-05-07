@@ -250,3 +250,35 @@ export default Base;
 `intersection`意为交叉点。
 
 在`Can I use`中，`96.92%`的浏览器支持该`API`，注意`IE`完全不支持。
+
+```tsx
+useEffect(() => {
+  const images: HTMLImageElement[] = Array.from(
+    document.querySelectorAll('img[data-src]'),
+  );
+  // 1.创建实例
+  const observer = new IntersectionObserver(callback);
+  images.forEach((img) => {
+    // 2.开始观察
+    observer.observe(img);
+  });
+  function callback(entries: IntersectionObserverEntry[]) {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        let img = entry.target;
+        let src = img.getAttribute('data-src');
+        if (src) {
+          img.setAttribute('src', src);
+          img.removeAttribute('data-src');
+          // 3.停止观察
+          observer.unobserve(img);
+        }
+      }
+    });
+  }
+  return () => {
+    // 4.释放资源
+    observer.disconnect();
+  };
+}, []);
+```

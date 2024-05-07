@@ -62,29 +62,29 @@ function Base() {
     const images: HTMLImageElement[] = Array.from(
       document.querySelectorAll('img[data-src]'),
     );
-    function lazyLoad() {
-      images.forEach((img: HTMLImageElement) => {
-        // 元素相对于视口顶部的距离
-        let imgTop = img.getBoundingClientRect().top;
-        if (imgTop <= window.innerHeight) {
-          // 说明图片进入视口
+    // 1.创建实例
+    const observer = new IntersectionObserver(callback);
+    images.forEach((img) => {
+      // 2.开始观察
+      observer.observe(img);
+    });
+    function callback(entries: IntersectionObserverEntry[]) {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          let img = entry.target;
           let src = img.getAttribute('data-src');
           if (src) {
             img.setAttribute('src', src);
             img.removeAttribute('data-src');
+            // 3.停止观察
+            observer.unobserve(img);
           }
         }
       });
-      console.log('被调用了');
     }
-    // 先调用一次。即初始化时，图片已位于视口中
-    lazyLoad();
-    // 使用节流
-    const throttledLazyLoad = throttle(lazyLoad, 150);
-    window.addEventListener('scroll', throttledLazyLoad);
     return () => {
-      // 组件销毁时，移除事件监听
-      window.removeEventListener('scroll', throttledLazyLoad);
+      // 4.释放资源
+      observer.disconnect();
     };
   }, []);
 
