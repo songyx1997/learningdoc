@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as styles from './Base.module.less';
-import throttle from '@/utils/throttle';
+import { throttle } from '@/utils/throttle';
 
 function Base() {
   // 根据React的Hook规则，Hooks只能在函数组件的顶层或者自定义Hook中调用

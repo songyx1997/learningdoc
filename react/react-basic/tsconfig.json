@@ -34,14 +34,14 @@
         // 当存在错误时不生成编译后的文件
         "noEmitOnError": true,
         // 所有严格检查的总开关，包括以下四项
-        "strict": true,
+        // "strict": true,
         // 是否将编译后的文件指定为严格模式
-        // "alwaysStrict": true,
+        "alwaysStrict": true,
         // 不允许隐式的any类型
-        // "noImplicitAny": true,
+        "noImplicitAny": true,
         // 不允许不明确类型的this
         // "noImplicitThis": true,
         // 严格检查空值
-        // "strictNullChecks": true,
+        "strictNullChecks": true,
     }
 }

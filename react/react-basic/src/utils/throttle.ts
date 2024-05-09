@@ -1,7 +1,7 @@
-function throttle(func, delay) {
+function throttle(func: Function, delay: number) {
   let lastExecutionTime = 0;
-  let timer = null;
-  return function (...args) {
+  let timer: NodeJS.Timeout | null;
+  return function (...args: any[]) {
     const now = Date.now();
     const remainingTime = delay - (now - lastExecutionTime);
     if (remainingTime <= 0) {
@@ -20,4 +20,5 @@ function throttle(func, delay) {
     }
   };
 }
-export default throttle;
+
+export { throttle };
