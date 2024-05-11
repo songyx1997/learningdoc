@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as styles from './Base.module.less';
-import { throttle } from '@/utils/throttle';
 
 function Base() {
   // 根据React的Hook规则，Hooks只能在函数组件的顶层或者自定义Hook中调用
@@ -57,6 +56,10 @@ function Base() {
     console.log('输出参数和事件', param, e);
   };
   const [address, setAddress] = useState('成都');
+  // 拖拽对象-图片
+  const dragAnimesRef = useRef<HTMLDivElement>(null);
+  // 待接纳拖拽对象-衣服
+  const dragClothesRef = useRef<HTMLInputElement>(null);
   // 组件初始化时，添加浏览器监听，因此依赖为空数组
   useEffect(() => {
     const images: HTMLImageElement[] = Array.from(
@@ -98,6 +101,7 @@ function Base() {
       <div>{new Date().getFullYear()}</div>
       {/* JS对象，常用于内联样式 */}
       <div style={{ color: red }}>深红色</div>
+      <hr />
       <p>列表渲染</p>
       {/* ES5 */}
       <ul>
@@ -109,6 +113,7 @@ function Base() {
           );
         })}
       </ul>
+      <hr />
       <p>条件渲染</p>
       {/* 逻辑与 */}
       <div>{flag === 1 && <span>flag为{flag}，显示文本</span>}</div>
@@ -116,6 +121,7 @@ function Base() {
       <div>{flag === 0 ? <span>为0</span> : <span>非0</span>}</div>
       {/* 函数封装 */}
       <div>{change(2)}</div>
+      <hr />
       <p>事件绑定，基本遵循驼峰式命名</p>
       <div>
         <button onClick={baseEvent}>基础绑定，输出事件对象（可选）</button>
@@ -124,6 +130,7 @@ function Base() {
           输出参数和事件
         </button>
       </div>
+      <hr />
       <p>useState：展示兴趣爱好</p>
       <ul>
         {hobby.map(function (item) {
@@ -134,11 +141,13 @@ function Base() {
         <button onClick={addDirect}>直接添加</button>
         <button onClick={addBySet}>借助set添加</button>
       </div>
+      <hr />
       <p>受控表单绑定</p>
       <div>当前所在地：{address}</div>
       <div>
         <input value={address} onChange={(e) => setAddress(e.target.value)} />
       </div>
+      <hr />
       <p>图片懒加载</p>
       <div>
         <img
@@ -148,6 +157,20 @@ function Base() {
       </div>
       <div>
         <img className={styles.baseImg} data-src='/images/portrait.jpg' />
+      </div>
+      <hr />
+      <p>拖拽实现：drag</p>
+      <p>拖动你喜欢的图案到衣服上</p>
+      <div className={styles.dragOverall}>
+        <div ref={dragAnimesRef} className={styles.dragAnimes}>
+          <img data-src='/images/portrait_anime_1.jpeg' />
+          <img data-src='/images/portrait_anime_2.jpeg' />
+          <img data-src='/images/portrait_anime_3.jpeg' />
+        </div>
+        <div ref={dragClothesRef} className={styles.dragClothes}>
+          <div></div>
+          <img data-src='/images/t-shirt.jpg' />
+        </div>
       </div>
     </div>
   );

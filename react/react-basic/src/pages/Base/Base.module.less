@@ -1,13 +1,59 @@
+@import '@/styles/less/method.less';
+@import '@/styles/less/theme-colors.less';
+
+hr {
+  border: none;
+  height: 2px;
+  background-color: @base-lightgrey;
+}
+
 .baseBackground {
   // 将高度填满，便于计算元素位置
   height: 400px;
   border-radius: 5px;
-  border: 2px solid #42b883;
+  border: 2px solid @base-green;
 }
 
 .baseImg {
   height: 300px;
   border-radius: 5px;
   margin-top: 5px;
-  border: 2px solid #42b883;
+  border: 2px solid @base-green;
+}
+
+.dragOverall {
+  display: flex;
+  align-items: center;
+
+  .dragAnimes {
+    border: 2px solid @base-green;
+
+    img {
+      height: 150px;
+      display: block;
+      margin: 10px;
+      border: 2px solid @base-green;
+    }
+  }
+
+  .dragClothes {
+    margin-left: 20px;
+    border: 2px solid @base-green;
+    text-align: center;
+    font-size: 20px;
+    position: relative;
+
+    div {
+      position: absolute;
+      left: 50%;
+      top: 45%;
+      transform: translate(-50%, -50%);
+      width: 150px;
+      height: 150px;
+    }
+
+    img {
+      height: 500px;
+    }
+  }
 }
