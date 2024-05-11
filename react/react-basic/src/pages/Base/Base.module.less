@@ -26,19 +26,19 @@ hr {
   align-items: center;
 
   .dragAnimes {
-    border: 2px solid @base-green;
+    .dragBorderGreen;
 
     img {
-      height: 150px;
-      display: block;
+      .dragImg;
+      .dragBorderGreen;
       margin: 10px;
-      border: 2px solid @base-green;
+      box-sizing: border-box;
     }
   }
 
   .dragClothes {
+    .dragBorderGreen;
     margin-left: 20px;
-    border: 2px solid @base-green;
     text-align: center;
     font-size: 20px;
     position: relative;
@@ -48,12 +48,26 @@ hr {
       left: 50%;
       top: 45%;
       transform: translate(-50%, -50%);
-      width: 150px;
-      height: 150px;
+      min-width: 150px;
+      min-height: 150px;
+      box-sizing: border-box;
     }
 
-    img {
+    & > img {
       height: 500px;
     }
   }
+}
+
+.dragBorderRed {
+  border: 2px dashed @base-red !important;
+}
+
+.dragBorderGreen {
+  border: 2px solid @base-green;
+}
+
+.dragImg {
+  height: 150px;
+  display: block;
 }

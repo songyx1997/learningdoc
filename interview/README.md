@@ -286,3 +286,75 @@ useEffect(() => {
 #### 拖拽？
 
 ##### drag
+
+将元素`A`拖动至目标元素`B`中。
+
+针对`A`，拖动时的事件如下：
+
+`dragstart(开始)`，当元素`A`存在多个时，可在该事件中进行拷贝记录。
+
+```typescript
+let current: HTMLImageElement;
+function onDragStart(e: DragEvent) {
+  let el = e.target as HTMLElement;
+  // 事件冒泡
+  if (el.tagName === 'IMG') {
+    // 浅拷贝元素，存储当前拖动的元素
+    current = el.cloneNode() as HTMLImageElement;
+  }
+}
+```
+
+`drag(进行中)`，拖动元素`A`时，进行区域标记。
+
+```typescript
+function onDrag(e: DragEvent) {
+  let el = e.target as HTMLElement;
+  // 事件冒泡
+  if (el.tagName === 'IMG') {
+    el.className = styles.dragBorderRed;
+    clothesDiv.className = styles.dragBorderRed;
+  }
+}
+```
+
+`drag(结束)`，拖动元素`A`结束时，取消区域标记。
+
+针对`B`，当元素`A`进入区域`B`时。
+
+`dragenter(进入时)`，当元素`A`存在多个时，对于已经放入区域`B`的元素`A`进行清除。
+
+```typescript
+function onDragEnter(e: DragEvent) {
+  let el = e.target as HTMLDivElement;
+  if (el.firstChild) {
+    // 避免一直展示第一次拖拽的结果
+    el.removeChild(el.firstChild);
+  }
+}
+```
+
+`dragover(进入后)`，需清除浏览器默认事件。
+
+```typescript
+function onDragOver(e: DragEvent) {
+  // 阻止浏览器默认行为
+  e.preventDefault();
+}
+```
+
+`dragleave(离开)`
+
+`drop(放置)`，将元素`A`放入区域`B`。
+
+```typescript
+function onDrop(e: DragEvent) {
+  // 阻止浏览器默认行为
+  e.preventDefault();
+  let el = e.target as HTMLDivElement;
+  current.className = styles.dragImg;
+  el.appendChild(current);
+}
+```
+
+##### mouse

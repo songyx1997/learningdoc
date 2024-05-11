@@ -62,6 +62,65 @@ function Base() {
   const dragClothesRef = useRef<HTMLInputElement>(null);
   // 组件初始化时，添加浏览器监听，因此依赖为空数组
   useEffect(() => {
+    // ----- 拖拽
+    const animesDiv = dragAnimesRef.current as HTMLDivElement;
+    const clothesDiv = dragClothesRef.current as HTMLDivElement;
+    animesDiv.addEventListener('dragstart', onDragStart);
+    animesDiv.addEventListener('drag', onDrag);
+    animesDiv.addEventListener('dragend', onDragEnd);
+    clothesDiv.addEventListener('dragenter', onDragEnter);
+    clothesDiv.addEventListener('dragover', onDragOver);
+    clothesDiv.addEventListener('drop', onDrop);
+    let current: HTMLImageElement;
+    // 元素拖拽前
+    function onDragStart(e: DragEvent) {
+      let el = e.target as HTMLElement;
+      // 事件冒泡
+      if (el.tagName === 'IMG') {
+        // 浅拷贝元素，存储当前拖动的元素
+        current = el.cloneNode() as HTMLImageElement;
+      }
+    }
+    // 元素拖拽时
+    function onDrag(e: DragEvent) {
+      let el = e.target as HTMLElement;
+      // 事件冒泡
+      if (el.tagName === 'IMG') {
+        el.className = styles.dragBorderRed;
+        clothesDiv.className = styles.dragBorderRed;
+      }
+    }
+    // 元素拖拽后
+    function onDragEnd(e: DragEvent) {
+      let el = e.target as HTMLElement;
+      // 事件冒泡
+      if (el.tagName === 'IMG') {
+        el.className = styles.dragBorderGreen;
+        clothesDiv.className = '';
+      }
+    }
+    // 元素进入区域，且进入时
+    function onDragEnter(e: DragEvent) {
+      let el = e.target as HTMLDivElement;
+      if (el.firstChild) {
+        // 避免一直展示第一次拖拽的结果
+        el.removeChild(el.firstChild);
+      }
+    }
+    // 元素进入区域，且进入后
+    function onDragOver(e: DragEvent) {
+      // 阻止浏览器默认行为
+      e.preventDefault();
+    }
+    // 元素进入区域，并触发放置
+    function onDrop(e: DragEvent) {
+      // 阻止浏览器默认行为
+      e.preventDefault();
+      let el = e.target as HTMLDivElement;
+      current.className = styles.dragImg;
+      el.appendChild(current);
+    }
+    // ----- 图片懒加载
     const images: HTMLImageElement[] = Array.from(
       document.querySelectorAll('img[data-src]'),
     );
@@ -167,11 +226,13 @@ function Base() {
           <img data-src='/images/portrait_anime_2.jpeg' />
           <img data-src='/images/portrait_anime_3.jpeg' />
         </div>
-        <div ref={dragClothesRef} className={styles.dragClothes}>
-          <div></div>
+        <div className={styles.dragClothes}>
+          <div ref={dragClothesRef}></div>
           <img data-src='/images/t-shirt.jpg' />
         </div>
       </div>
+      <hr />
+      <p>拖拽实现：mouse</p>
     </div>
   );
 }
