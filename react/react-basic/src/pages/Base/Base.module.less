@@ -7,13 +7,6 @@ hr {
   background-color: @base-lightgrey;
 }
 
-.baseBackground {
-  // 将高度填满，便于计算元素位置
-  height: 400px;
-  border-radius: 5px;
-  border: 2px solid @base-green;
-}
-
 .baseImg {
   height: 300px;
   border-radius: 5px;
@@ -70,4 +63,24 @@ hr {
 .dragImg {
   height: 150px;
   display: block;
+}
+
+.mouseOverall {
+  position: relative;
+
+  img {
+    box-sizing: border-box;
+  }
+
+  .mouseBackground {
+    .dragBorderGreen;
+    height: 400px;
+    border-radius: 5px;
+  }
+  .mouseBackgroundPatch {
+    .dragBorderGreen;
+    height: 125px;
+    position: absolute;
+    left: 0;
+  }
 }

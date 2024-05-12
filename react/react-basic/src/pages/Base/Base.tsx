@@ -60,9 +60,57 @@ function Base() {
   const dragAnimesRef = useRef<HTMLDivElement>(null);
   // 待接纳拖拽对象-衣服
   const dragClothesRef = useRef<HTMLInputElement>(null);
+  // 拖拽对象-背景补丁
+  const backgroundRef = useRef<HTMLImageElement>(null);
+  // 待接纳拖拽对象-背景
+  const backgroundPatchRef = useRef<HTMLImageElement>(null);
   // 组件初始化时，添加浏览器监听，因此依赖为空数组
   useEffect(() => {
-    // ----- 拖拽
+    // ----- 拖拽：mouse
+    const backgroundImg = backgroundRef.current as HTMLImageElement;
+    const patchImg = backgroundPatchRef.current as HTMLImageElement;
+    // 背景图片左边缘到页面最左侧、上边缘到浏览器最顶部的距离是固定的
+    const backgroundLeft = backgroundImg.getBoundingClientRect().left;
+    const backgroundTop = backgroundImg.getBoundingClientRect().top;
+    // 点击补丁时
+    patchImg.addEventListener('mousedown', (e: MouseEvent) => {
+      // 鼠标点击位置距离补丁左边缘和上边缘的距离也是固定的
+      const patchLeft = e.pageX - backgroundLeft - patchImg.offsetLeft;
+      const patchTop = e.pageY - backgroundTop - patchImg.offsetTop;
+      function onMove(e: MouseEvent) {
+        // 根据两个固定值，计算出图片的位置
+        let left = e.pageX - patchLeft - backgroundLeft;
+        let top = e.pageY - patchTop - backgroundTop;
+        // 限制补丁的移动区域
+        if (
+          left >= 0 &&
+          top >= 0 &&
+          top <= backgroundImg.height - patchImg.height &&
+          left <= backgroundImg.width - patchImg.width
+        ) {
+          patchImg.style.left = left + 'px';
+          patchImg.style.top = top + 'px';
+        }
+      }
+      // 页面添加事件，模拟拖动补丁
+      document.addEventListener('mousemove', onMove);
+      // 页面添加事件，拖动补丁释放
+      document.addEventListener('mouseup', (e: MouseEvent) => {
+        // 移除事件，释放补丁
+        document.removeEventListener('mousemove', onMove);
+        if (
+          patchImg.offsetLeft > 282 &&
+          patchImg.offsetLeft < 392 &&
+          patchImg.offsetTop > 40 &&
+          patchImg.offsetTop < 50
+        ) {
+          console.log('验证成功！');
+        } else {
+          console.log('验证失败！');
+        }
+      });
+    });
+    // ----- 拖拽：drag
     const animesDiv = dragAnimesRef.current as HTMLDivElement;
     const clothesDiv = dragClothesRef.current as HTMLDivElement;
     animesDiv.addEventListener('dragstart', onDragStart);
@@ -209,12 +257,6 @@ function Base() {
       <hr />
       <p>图片懒加载</p>
       <div>
-        <img
-          className={styles.baseBackground}
-          data-src='/images/background.png'
-        />
-      </div>
-      <div>
         <img className={styles.baseImg} data-src='/images/portrait.jpg' />
       </div>
       <hr />
@@ -233,6 +275,21 @@ function Base() {
       </div>
       <hr />
       <p>拖拽实现：mouse</p>
+      <p>拖拽图片完成验证</p>
+      <div className={styles.mouseOverall}>
+        <img
+          draggable='false'
+          ref={backgroundRef}
+          className={styles.mouseBackground}
+          data-src='/images/background.png'
+        />
+        <img
+          draggable='false'
+          ref={backgroundPatchRef}
+          className={styles.mouseBackgroundPatch}
+          data-src='/images/background_patch.png'
+        />
+      </div>
     </div>
   );
 }
