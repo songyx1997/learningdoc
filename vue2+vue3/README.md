@@ -15,11 +15,11 @@
 
 `webpack`构建与`vite`构建对比如下：
 
-<div style="margin:0 auto;width:85%;">
+<div style="border:2px solid #42b883">
     <img src=".\webpack构建.png">
 </div>
 
-<div style="margin:0 auto;width:70%">
+<div style="border:2px solid #42b883">
     <img src=".\vite构建.png">
 </div>
 
@@ -29,10 +29,11 @@
 
 `Vue3`采用的是`CompositionAPI`（组合式）。采用函数的方式，更加优雅的组织代码，将相关功能的代码更加有有序的组织在一起。
 
-<div style="display:flex;justify-content: center;">
+<div style="border:2px solid #42b883">
     <img src=".\OptionsAPI与CompositionAPI_1.gif" style="width:48%">
     <img src=".\OptionsAPI与CompositionAPI_2.gif" style="width:48%">
 </div>
+
 ##### Fragment
 
 在`Vue3`中不需要写`<div>`根标签，内部的标签将会被包含在`Fragment`虚拟元素内。
@@ -1223,7 +1224,7 @@ const posts = await res.json()
 2. `V`：视图（`View`）：模板。
 3. `VM`：视图模型（`ViewModel`）：`Vue`实例对象。
 
-<div style="margin:0 auto;border:2px solid #42b883">
+<div style="border:2px solid #42b883">
     <img src=".\MVVM.png">
 </div>
 
@@ -1271,7 +1272,7 @@ function Vue(options) {
 export default Vue;
 ```
 
-<div style="margin:0 auto;border:2px solid #42b883">
+<div style="border:2px solid #42b883">
     <img src=".\数据代理.png">
 </div>
 
@@ -1342,12 +1343,12 @@ let domainName = computed(() => {
 
 当对数据进行了**破坏顺序(逆序添加、逆序删除)**的操作，且使用`index`作为`key`，将可能会出现`BUG`。
 
-<div style="margin:0 auto">
+<div style="border:2px solid #42b883">
     <img src=".\key原理示例.png">
 </div>
 
 虚拟`DOM`对比算法，比较时遍历新的虚拟`DOM`列表，以`key`为基准。
-<div style="margin:0 auto">
+<div style="border:2px solid #42b883">
     <img src=".\key原理.png">
 </div>
 ##### 数据监测
@@ -1382,7 +1383,7 @@ methods: {
 }
 ```
 
-<div style="margin:0 auto;border:2px solid #42b883">
+<div style="border:2px solid #42b883">
     <img src=".\监测数据.png">
 </div>
 
@@ -1483,7 +1484,7 @@ export default {
 | 更新-钩子函数的调用次数取决于数据变化的次数 | beforeUpdate(){}  | updated(){}   |
 | 销毁-组件销毁时触发                         | beforeDestory(){} | destoryed(){} |
 
-<div style="margin:0 auto">
+<div style="border:2px solid #42b883">
     <img src=".\生命周期.png">
 </div>
 ##### 自定义指令
@@ -1615,7 +1616,7 @@ Vue.extend = function (extendOptions) {
 ```
 3. `VueComponent.prototype.__proto__ === Vue.prototype`。通过该关系式，借助于原型链，**使得组件的实例可以使用Vue原型对象上的数据与方法**。
 
-<div style="margin:0 auto">
+<div style="border:2px solid #42b883">
     <img src=".\组件原型链.jpg">
 </div>
 ##### 全局事件总线
@@ -1756,7 +1757,7 @@ onClick() {
 
 ##### Vuex
 
-<div style="margin:0 auto;">
+<div style="border:2px solid #42b883">
     <img src=".\Vuex构成.jpg">
 </div>
 
@@ -1807,3 +1808,16 @@ onClick() {
 5. 移除事件修饰符`.native`（为了避免组件上的方法被视为自定义事件，如`@click.native`）。
 6. 移除过滤器，因为其具有实现成本，打破了`{{}}`内只有`js`的假设，推荐使用计算属性。
 7. ...
+
+#### 单元测试
+
+##### E2E
+
+`End-To-End`，端到端的测试。系统处于黑盒的状态，只有`UI`暴露给测试工程师。
+
+##### 单元测试
+
+`Vue`项目中单元测试的工具，包括`Karma`、`Mocha`。
+
+1. `Karma`用于不同浏览器环境`(chrome、firefox、ie等)`下的测试。
+2. `Mocha`是测试框架，需搭配断言库`Chai`使用，断言库用于判断源码的实际结果与预期结果是否一致。
